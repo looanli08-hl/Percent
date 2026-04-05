@@ -1,0 +1,184 @@
+<div align="center">
+
+<!-- Logo 占位符：有 logo 后替换为 assets/logo.svg -->
+<img src="assets/logo.svg" alt="Engram logo" width="80" height="80" />
+
+# Engram
+
+**AI 的人格引擎**
+
+[![CI](https://github.com/your-org/engram/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/engram/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+
+[文档](#工作原理) · [快速开始](#快速开始) · [PersonaBench](#personabench) · [参与贡献](#参与贡献) · [English](README.md)
+
+</div>
+
+---
+
+## 为什么需要 Engram？
+
+每个 AI 助手都从零开始。它不知道你怎么思考、在乎什么、习惯怎么表达。每次对话你都要重新介绍自己。
+
+**Engram 解决了这个问题。**
+
+把你的微信聊天记录、B 站观看历史、YouTube 记录喂给它——任何能反映你真实思维的数据。Engram 从中提取你的人格，生成结构化的 `core.md`，让任何大语言模型都能成为真正属于你的 AI，而不是千篇一律的通用助手。
+
+- **隐私优先。** 一切在本地运行，你的数据永不离开你的设备。
+- **数据源无关。** 微信、YouTube、B 站——更多来源持续接入。
+- **模型无关。** 兼容 Claude、GPT-4、DeepSeek、Ollama 等所有 LiteLLM 支持的模型。
+- **可量化。** PersonaBench 给出具体的准确率分数，不是感觉。
+
+---
+
+## PersonaBench
+
+PersonaBench 是 Engram 内置的人格一致性基准测试，衡量你的人格模型有多准确地反映了真实的你。
+
+```
+PersonaBench v0.1
+Score: 84.3%  (10 tests)
+
+  [1] 0.91  预测到直接表达风格；实际回应与模型一致
+  [2] 0.88  知识诚实模式：在错误面前直接指出
+  [3] 0.79  沟通风格：简洁，不废话
+  [4] 0.85  系统性思维体现在回应结构中
+  [5] 0.72  偏好硬证据，符合模型预测
+  [6] 0.90  低容忍度模糊表达；与人格档案一致
+  [7] 0.83  偏好深度优于表面概述
+  [8] 0.81  精准词汇使用，与档案一致
+  [9] 0.86  事实错误面前的对抗性，符合建模
+  [10] 0.88  硬科幻偏好引用，与偏好一致
+```
+
+自己跑一下：
+
+```bash
+engram persona validate --num-tests 10
+```
+
+---
+
+## 快速开始
+
+```bash
+pip install engram
+engram init
+engram import run wechat ~/exports/wechat_chat.csv
+engram chat
+```
+
+就这四步。`import run` 完成后，Engram 已经构建好你的 `core.md`，chat 就会以你的风格说话。
+
+---
+
+## 工作原理
+
+```
+你的数据                  Engram 流水线                输出
+─────────────────────    ────────────────────────     ──────────────────
+微信 CSV            ──►  解析器（Parser）         ──►  数据块（DataChunk）
+YouTube Takeout     ──►  提取器（Extractor，LLM） ──►  发现（Finding）
+B 站历史            ──►  片段库（SQLite）          ──►  向量嵌入
+                         合成器（Synthesizer，LLM）──►  core.md
+                         人格引擎（PersonaEngine） ──►  core.md（持续更新）
+                                                   ──►  Chat / SOUL.md
+```
+
+1. **解析** — 各数据源解析器将原始导出文件标准化为 `DataChunk` 对象
+2. **提取** — LLM 读取每个数据块，提取人格发现（特质、观点、偏好）
+3. **存储** — 发现被嵌入并存储到本地 SQLite + 向量索引
+4. **合成** — 所有发现被压缩为结构化的 `core.md` 人格档案
+5. **使用** — 与你的人格对话，或导出 `SOUL.md` 作为任何系统提示
+
+---
+
+## 支持的数据源
+
+| 数据源 | 格式 | 命令 |
+|--------|------|------|
+| 微信 | PyWxDump CSV 导出 | `engram import run wechat <路径>` |
+| YouTube | Google Takeout JSON | `engram import run youtube <路径>` |
+| B 站 | 观看历史 JSON | `engram import run bilibili <路径>` |
+
+欢迎提交更多数据源——参见[参与贡献](#参与贡献)。
+
+---
+
+## 命令参考
+
+```
+engram init                         配置 API key 和模型提供商
+engram import run <来源> <路径>      导入并分析数据
+engram import guide <来源>           查看某数据源的导出说明
+engram import status                查看片段库统计
+
+engram persona view                 打印当前 core.md
+engram persona stats                片段统计
+engram persona rebuild              从所有存储的片段重建 core.md
+engram persona validate             运行 PersonaBench
+
+engram export soul                  生成 SOUL.md 系统提示
+engram export core                  将 core.md 复制到指定路径
+
+engram chat                         与你的人格进行交互对话
+engram config llm                   修改 LLM 提供商 / 模型 / key
+engram config parsers               列出可用的解析器
+```
+
+---
+
+## 架构
+
+```
+engram/
+├── cli.py                  Typer CLI 入口
+├── config.py               EngramConfig（Pydantic），加载/保存 YAML
+├── models.py               DataChunk、Finding、Fragment（Pydantic）
+├── llm/
+│   └── client.py           LiteLLM 封装（提供商无关）
+├── parsers/
+│   ├── base.py             DataParser 抽象基类
+│   ├── bilibili.py         B 站观看历史
+│   ├── youtube.py          YouTube Takeout
+│   └── wechat.py           微信 PyWxDump CSV
+├── persona/
+│   ├── engine.py           PersonaEngine（编排提取→合成）
+│   ├── extractor.py        基于 LLM 的发现提取器
+│   ├── synthesizer.py      基于 LLM 的 core.md 合成器
+│   ├── fragments.py        FragmentStore（SQLite + 余弦搜索）
+│   ├── validator.py        PersonaValidator（对齐评分）
+│   └── bench.py            PersonaBench v0.1
+├── export/
+│   └── soul_md.py          SOUL.md 导出器
+└── chat/
+    └── engine.py           ChatEngine（基于片段的 RAG）
+```
+
+---
+
+## 参与贡献
+
+Engram 是开源项目，欢迎贡献。
+
+目前最有价值的贡献方向：
+
+- **新数据源解析器** — Spotify、Twitter/X、Notion、iMessage
+- **提示词优化** — 改进 `prompts/` 下的提取和合成提示词
+- **PersonaBench 数据集** — 用于校准的参考人格数据
+
+添加解析器：在 `engram/parsers/` 中继承 `DataParser`，在 `cli.py` 注册，并在 `tests/test_parsers/` 下添加测试。
+
+```bash
+git clone https://github.com/your-org/engram
+cd engram
+uv sync
+uv run pytest tests/ -v
+```
+
+---
+
+## 许可证
+
+MIT — 随意使用。你的人格模型属于你。
