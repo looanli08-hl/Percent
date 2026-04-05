@@ -147,6 +147,59 @@ def import_run(
     console.print("[green]Import complete. core.md updated.[/green]")
 
 
+# ── engram import bilibili ───────────────────────────────────────────────────
+
+
+@import_app.command("bilibili")
+def import_bilibili_auto(
+    cookie: str = typer.Option(..., "--cookie", "-c", help="Your Bilibili cookie string"),
+    max_pages: int = typer.Option(50, "--max-pages", help="Maximum pages to fetch"),
+) -> None:
+    """Import Bilibili watch history directly via API (no manual export needed)."""
+    from engram.config import load_config
+    from engram.parsers.bilibili_api import fetch_bilibili_history
+
+    config = load_config()
+    if not config.llm_api_key:
+        console.print("[red]No API key configured. Run 'engram init' first.[/red]")
+        raise typer.Exit(1)
+
+    console.print("[cyan]Fetching Bilibili watch history via API...[/cyan]")
+    try:
+        chunks = fetch_bilibili_history(cookie, max_pages=max_pages)
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+
+    if not chunks:
+        console.print("[yellow]No watch history found. Check your cookie.[/yellow]")
+        raise typer.Exit(0)
+
+    console.print(f"[cyan]Fetched {len(chunks)} videos. Running personality analysis...[/cyan]")
+
+    from engram.llm.client import LLMClient
+    from engram.persona.engine import PersonaEngine
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    engine = PersonaEngine(
+        client=client,
+        engram_dir=config.engram_dir,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=config.embedding_model,
+    )
+
+    with console.status("[bold cyan]Analyzing personality...[/bold cyan]"):
+        engine.run(chunks)
+
+    console.print("\n[green]Analysis complete![/green]")
+    console.print(f"  Videos analyzed: {len(chunks)}")
+    console.print(f"  Core profile: {config.core_path}")
+
+
 # ── engram import guide ──────────────────────────────────────────────────────
 
 
