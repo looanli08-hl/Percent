@@ -263,6 +263,67 @@ def persona_rebuild() -> None:
     console.print("[green]core.md rebuilt successfully.[/green]")
 
 
+# ── engram persona validate ──────────────────────────────────────────────────
+
+
+@persona_app.command("validate")
+def persona_validate(
+    num_tests: int = typer.Option(10, help="Number of fragments to use as test cases."),
+) -> None:
+    """Run PersonaBench — measure personality model accuracy."""
+    from engram.config import load_config
+    from engram.llm.client import LLMClient
+    from engram.persona.bench import PersonaBench
+    from engram.persona.fragments import FragmentStore
+    from engram.persona.validator import PersonaValidator
+
+    config = load_config()
+
+    if not config.core_path.exists():
+        console.print(_NO_PROFILE_MSG)
+        raise typer.Exit(0)
+
+    if not config.llm_api_key:
+        console.print("[yellow]Warning: no API key configured. Run 'engram init' first.[/yellow]")
+
+    core_md = config.core_path.read_text(encoding="utf-8")
+
+    store = FragmentStore(config.fragments_db_path)
+    fragments = store.get_all()
+    store.close()
+
+    if not fragments:
+        console.print("[yellow]No fragments found. Run 'engram import run' first.[/yellow]")
+        raise typer.Exit(0)
+
+    from datetime import datetime
+
+    from engram.models import ChunkType, DataChunk
+
+    test_chunks = [
+        DataChunk(
+            source=f.source,
+            type=ChunkType.CONVERSATION,
+            timestamp=datetime.now(),
+            content=f.content,
+        )
+        for f in fragments
+    ]
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    validator = PersonaValidator(client, prompts_dir=_PROMPTS_DIR)
+    bench = PersonaBench(validator)
+
+    with console.status("[bold]Running PersonaBench…[/bold]"):
+        result = bench.evaluate(core_md, test_chunks, num_tests=num_tests)
+
+    console.print(bench.format_report(result))
+
+
 # ── engram chat ──────────────────────────────────────────────────────────────
 
 
