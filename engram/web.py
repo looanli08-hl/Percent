@@ -142,37 +142,44 @@ async def upload_file(file: UploadFile, source: str = Form(...)) -> dict:
     return {"status": "ok", "path": str(dest), "filename": file.filename}
 
 
+class AnalyzeRequest(BaseModel):
+    source: str | None = None
+
+
 @app.post("/api/import/analyze")
-def analyze_imported() -> dict:
-    """Run personality analysis on all imported files under ~/.engram/raw/."""
+def analyze_source(req: AnalyzeRequest | None = None) -> dict:
+    """Analyze a specific source (incremental) or all sources."""
+    source = req.source if req else None
     import importlib
 
     raw_dir = _config.engram_dir / "raw"
     if not raw_dir.exists():
         return {"status": "error", "message": "No imported files found."}
 
-    all_chunks = []
+    # Determine which source directories to scan
+    if source and source in _PARSER_REGISTRY:
+        dirs_to_scan = [raw_dir / source]
+    else:
+        dirs_to_scan = [d for d in raw_dir.iterdir() if d.is_dir() and d.name in _PARSER_REGISTRY]
 
-    for source_dir in raw_dir.iterdir():
-        if not source_dir.is_dir():
+    all_chunks = []
+    for source_dir in dirs_to_scan:
+        if not source_dir.exists():
             continue
         source_name = source_dir.name
-        if source_name not in _PARSER_REGISTRY:
-            continue
 
         dotted = _PARSER_REGISTRY[source_name]
         module_path, class_name = dotted.rsplit(".", 1)
         module = importlib.import_module(module_path)
         parser = getattr(module, class_name)()
 
-        # Scan all files recursively (handles extracted zip subdirectories)
         for file_path in sorted(source_dir.rglob("*")):
             if file_path.is_file() and parser.validate(file_path):
                 try:
                     chunks = parser.parse(file_path)
                     all_chunks.extend(chunks)
                 except Exception:
-                    pass  # Skip unparseable files
+                    pass
 
     if not all_chunks:
         return {"status": "error", "message": "No parseable data found in uploaded files."}
@@ -191,24 +198,31 @@ def analyze_imported() -> dict:
         prompts_dir=_PROMPTS_DIR,
         embedding_model=_config.embedding_model,
     )
+
+    # run() is already incremental:
+    # - extracts new findings → appends to fragments.db
+    # - re-synthesizes core.md from ALL fragments (old + new)
     engine.run(all_chunks)
 
-    # Reinitialize chat engine now that core.md exists
+    # Initialize or reinitialize chat engine with updated persona
     global _chat_engine
-    if _chat_engine is None and _config.core_path.exists():
-        from engram.chat.engine import ChatEngine
+    from engram.chat.engine import ChatEngine
+    _chat_engine = ChatEngine(
+        engram_dir=_config.engram_dir,
+        provider=_config.llm_provider,
+        model=_config.llm_model,
+        api_key=_config.llm_api_key,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=_config.embedding_model,
+    )
 
-        _chat_engine = ChatEngine(
-            engram_dir=_config.engram_dir,
-            provider=_config.llm_provider,
-            model=_config.llm_model,
-            api_key=_config.llm_api_key,
-            prompts_dir=_PROMPTS_DIR,
-            embedding_model=_config.embedding_model,
-        )
-
-    core_content = _config.core_path.read_text(encoding="utf-8") if _config.core_path.exists() else ""
-    return {"status": "ok", "chunks_analyzed": len(all_chunks), "core_md": core_content}
+    stats = engine.stats()
+    return {
+        "status": "ok",
+        "chunks_analyzed": len(all_chunks),
+        "total_fragments": stats.get("total", 0),
+        "sources": list(stats.get("by_source", {}).keys()),
+    }
 
 
 @app.get("/")

@@ -1651,17 +1651,67 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      uploadedFiles.push({ filename: data.filename, source });
+      uploadedFiles.push({ filename: data.filename, source, status: 'uploaded' });
       renderUploadedFiles();
-      updateAnalyzeBtn();
 
       // Also render in source-specific list if visible
       const srcList = document.getElementById('sourceFileList');
       if (srcList && activeSource === source) {
         renderFileInSourceList(data.filename, source);
       }
+
+      // Auto-analyze this source immediately
+      await analyzeSource(source);
     } catch (e) {
       alert(`Upload failed: ${e.message}`);
+    }
+  }
+
+  async function analyzeSource(source) {
+    // Show analyzing state
+    const btn = document.getElementById('analyzeBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = `Analyzing ${source}...`;
+    }
+    document.getElementById('analyzingOverlay').classList.add('active');
+
+    try {
+      const res = await fetch('/api/import/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source }),
+      });
+      const data = await res.json();
+
+      document.getElementById('analyzingOverlay').classList.remove('active');
+
+      if (data.status === 'ok') {
+        // Mark files as analyzed
+        uploadedFiles.forEach(f => { if (f.source === source) f.status = 'analyzed'; });
+        renderUploadedFiles();
+
+        // Update button to show success
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = `✓ ${source} analyzed (${data.total_fragments} fragments) — Chat Now`;
+          btn.onclick = () => showChatView();
+          btn.style.opacity = '1';
+        }
+      } else {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Start Analysis';
+        }
+        alert('Analysis failed: ' + (data.message || 'Unknown error'));
+      }
+    } catch (e) {
+      document.getElementById('analyzingOverlay').classList.remove('active');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Start Analysis';
+      }
+      alert('Analysis failed: ' + e.message);
     }
   }
 
