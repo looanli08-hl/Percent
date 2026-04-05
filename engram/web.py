@@ -70,6 +70,16 @@ def get_stats() -> dict:
     return stats
 
 
+@app.get("/api/fingerprint")
+def get_fingerprint() -> dict:
+    """Return behavioral fingerprint data."""
+    fp_path = _config.engram_dir / "fingerprint.json"
+    if fp_path.exists():
+        import json
+        return json.loads(fp_path.read_text(encoding="utf-8"))
+    return {}
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
     """Send a message to the persona and get a response."""
