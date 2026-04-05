@@ -709,11 +709,477 @@
       color: #9A9A9E;
       flex: 1;
     }
+
+    /* ── Import Wizard ─────────────────────────────────────────────────────── */
+
+    .import-view {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .import-view.active { display: flex; }
+    .chat-view { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+    .chat-view.hidden { display: none; }
+
+    .import-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .import-hero {
+      text-align: center;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+
+    .import-hero-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #5B9A8B 0%, #7CC1AF 100%);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 8px 32px rgba(91, 154, 139, 0.25);
+      margin: 0 auto 20px;
+    }
+
+    .import-hero-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2C2C2E;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .import-hero-sub {
+      font-size: 15px;
+      color: #6B6B6E;
+      line-height: 1.6;
+    }
+
+    /* Source cards grid */
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 680px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 600px) {
+      .source-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .source-card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(139, 109, 80, 0.08);
+      padding: 18px 16px 16px;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
+      border: 1.5px solid transparent;
+      user-select: none;
+    }
+
+    .source-card:hover {
+      box-shadow: 0 6px 24px rgba(139, 109, 80, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .source-card.selected {
+      border-color: #5B9A8B;
+      box-shadow: 0 4px 20px rgba(91, 154, 139, 0.18);
+    }
+
+    .source-card.disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .source-card.disabled:hover {
+      transform: none;
+      box-shadow: 0 2px 12px rgba(139, 109, 80, 0.08);
+    }
+
+    .source-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .source-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2C2C2E;
+      margin-bottom: 4px;
+    }
+
+    .source-desc {
+      font-size: 12px;
+      color: #9A9A9E;
+      line-height: 1.4;
+    }
+
+    /* Expanded source panel */
+    .source-expand {
+      width: 100%;
+      max-width: 680px;
+      background: #FFFFFF;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(139, 109, 80, 0.10);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+      animation: expandIn 0.22s ease both;
+    }
+
+    .source-expand.active { display: block; }
+
+    @keyframes expandIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .source-expand-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2C2C2E;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .source-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px;
+      counter-reset: step;
+    }
+
+    .source-steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: #4C4C4E;
+      line-height: 1.5;
+    }
+
+    .source-steps li::before {
+      content: counter(step);
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(91, 154, 139, 0.12);
+      color: #5B9A8B;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #E8E4DE;
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      position: relative;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: #5B9A8B;
+      background: rgba(91, 154, 139, 0.04);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-zone-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .drop-zone-text {
+      font-size: 13.5px;
+      color: #6B6B6E;
+    }
+
+    .drop-zone-sub {
+      font-size: 12px;
+      color: #B4AFA9;
+      margin-top: 4px;
+    }
+
+    /* Uploaded file row */
+    .uploaded-file {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(91, 154, 139, 0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #2C2C2E;
+    }
+
+    .uploaded-check {
+      width: 20px;
+      height: 20px;
+      background: #5B9A8B;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .uploaded-name {
+      flex: 1;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .uploaded-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9A9A9E;
+      font-size: 16px;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .uploaded-remove:hover { color: #E05A5A; }
+
+    /* External link style */
+    .ext-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #5B9A8B;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1.5px solid rgba(91, 154, 139, 0.3);
+      border-radius: 8px;
+      padding: 6px 12px;
+      margin-top: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .ext-link:hover {
+      border-color: #5B9A8B;
+      background: rgba(91, 154, 139, 0.06);
+    }
+
+    /* Cookie input */
+    .cookie-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cookie-input {
+      flex: 1;
+      border: 1.5px solid #E8E4DE;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #2C2C2E;
+      font-family: inherit;
+      background: #FDFCFA;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .cookie-input:focus { border-color: #5B9A8B; }
+
+    .cookie-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: #5B9A8B;
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .cookie-btn:hover { background: #4A8577; }
+
+    /* Global drop overlay */
+    .drop-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(91, 154, 139, 0.12);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .drop-overlay.active { display: flex; }
+
+    .drop-overlay-box {
+      background: #FFFFFF;
+      border: 2.5px dashed #5B9A8B;
+      border-radius: 20px;
+      padding: 48px 64px;
+      text-align: center;
+      box-shadow: 0 16px 64px rgba(91, 154, 139, 0.2);
+    }
+
+    .drop-overlay-icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-overlay-text { font-size: 18px; font-weight: 600; color: #2C2C2E; }
+    .drop-overlay-sub { font-size: 14px; color: #6B6B6E; margin-top: 6px; }
+
+    /* Divider */
+    .import-divider {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      color: #B4AFA9;
+      font-size: 13px;
+    }
+
+    .import-divider::before,
+    .import-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #E8E4DE;
+    }
+
+    /* Analyze button */
+    .analyze-btn {
+      display: block;
+      width: 100%;
+      max-width: 680px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      background: #5B9A8B;
+      border: none;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 4px 16px rgba(91, 154, 139, 0.3);
+      letter-spacing: -0.01em;
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+      background: #4A8577;
+      box-shadow: 0 6px 24px rgba(91, 154, 139, 0.4);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Analyzing state */
+    .analyzing-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 245, 240, 0.95);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .analyzing-overlay.active { display: flex; }
+
+    .analyzing-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2C2C2E;
+      letter-spacing: -0.01em;
+    }
+
+    .analyzing-sub {
+      font-size: 14px;
+      color: #6B6B6E;
+    }
+
+    /* View fade transition */
+    .fade-in { animation: fadeIn 0.3s ease both; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Add data button (in chat header) */
+    .add-data-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 13px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(91, 154, 139, 0.35);
+      background: transparent;
+      color: #5B9A8B;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .add-data-btn:hover {
+      border-color: #5B9A8B;
+      background: rgba(91, 154, 139, 0.06);
+    }
   </style>
 </head>
 <body>
 
-<div class="app-shell">
+<!-- ── Import Wizard View ─────────────────────────────────────────────────── -->
+<div class="import-view" id="importView">
 
   <!-- Header -->
   <header class="header">
@@ -721,118 +1187,578 @@
       <div class="logo-mark">🧠</div>
       <span class="logo-text">Engram</span>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="profile-toggle" id="profileToggle" onclick="toggleProfile()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        Profile
-      </button>
-      <button class="reset-btn" onclick="resetChat()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Reset
-      </button>
-    </div>
   </header>
 
-  <!-- Mobile overlay -->
-  <div class="mobile-overlay" id="mobileOverlay" onclick="toggleProfile()"></div>
+  <!-- Body -->
+  <div class="import-body">
 
-  <!-- Main -->
-  <main class="main-content">
+    <div class="import-hero">
+      <div class="import-hero-icon">🧠</div>
+      <div class="import-hero-title">Welcome to Engram</div>
+      <div class="import-hero-sub">The Personality Engine for AI. Import your data to create your AI mirror.</div>
+    </div>
 
-    <!-- Left: Persona profile -->
-    <aside class="left-panel" id="leftPanel">
-      <div class="left-panel-scroll" id="leftPanelScroll">
+    <!-- Source cards -->
+    <div class="source-grid" id="sourceGrid">
 
-        <div class="section-label">Personality Profile</div>
+      <div class="source-card" onclick="selectSource('telegram')">
+        <div class="source-icon">📱</div>
+        <div class="source-name">Telegram</div>
+        <div class="source-desc">Export JSON from Desktop</div>
+      </div>
 
-        <!-- Persona content -->
-        <div id="personaContent">
-          <!-- Skeleton while loading -->
-          <div id="personaSkeleton">
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              <div class="skeleton" style="height:48px;border-radius:12px;"></div>
-              <div class="skeleton" style="height:48px;border-radius:12px;"></div>
-              <div class="skeleton" style="height:48px;border-radius:12px;"></div>
-              <div class="skeleton" style="height:48px;border-radius:12px;"></div>
+      <div class="source-card" onclick="selectSource('whatsapp')">
+        <div class="source-icon">💬</div>
+        <div class="source-name">WhatsApp</div>
+        <div class="source-desc">Export chat as .txt</div>
+      </div>
+
+      <div class="source-card" onclick="selectSource('youtube')">
+        <div class="source-icon">📺</div>
+        <div class="source-name">YouTube</div>
+        <div class="source-desc">Google Takeout JSON</div>
+      </div>
+
+      <div class="source-card" onclick="selectSource('wechat')">
+        <div class="source-icon">💬</div>
+        <div class="source-name">WeChat</div>
+        <div class="source-desc">Windows decrypted files</div>
+      </div>
+
+      <div class="source-card" onclick="selectSource('bilibili')">
+        <div class="source-icon">📺</div>
+        <div class="source-name">Bilibili</div>
+        <div class="source-desc">Auto-fetch via cookie</div>
+      </div>
+
+      <div class="source-card disabled">
+        <div class="source-icon">➕</div>
+        <div class="source-name">More...</div>
+        <div class="source-desc">Coming soon</div>
+      </div>
+
+    </div>
+
+    <!-- Expanded source panel -->
+    <div class="source-expand" id="sourceExpand">
+      <div class="source-expand-title" id="sourceExpandTitle"></div>
+      <ol class="source-steps" id="sourceSteps"></ol>
+      <div id="sourceDropArea"></div>
+    </div>
+
+    <!-- Uploaded files list -->
+    <div id="uploadedList" style="width:100%;max-width:680px;display:none;margin-bottom:16px;"></div>
+
+    <!-- Divider -->
+    <div class="import-divider" id="importDivider">or drag any export file here</div>
+
+    <!-- Analyze button -->
+    <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+      Start Analysis
+    </button>
+
+  </div>
+</div>
+
+<!-- ── Global drop overlay (import page) ─────────────────────────────────── -->
+<div class="drop-overlay" id="dropOverlay">
+  <div class="drop-overlay-box">
+    <div class="drop-overlay-icon">📂</div>
+    <div class="drop-overlay-text">Drop to import</div>
+    <div class="drop-overlay-sub">Auto-detects Telegram, WhatsApp, YouTube exports</div>
+  </div>
+</div>
+
+<!-- ── Analyzing overlay ──────────────────────────────────────────────────── -->
+<div class="analyzing-overlay" id="analyzingOverlay">
+  <div class="typing-indicator" style="padding:16px 20px;">
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+  </div>
+  <div class="analyzing-text">Analyzing your personality...</div>
+  <div class="analyzing-sub">This may take a minute or two</div>
+</div>
+
+<!-- ── Chat View ──────────────────────────────────────────────────────────── -->
+<div class="chat-view hidden" id="chatView">
+
+  <div class="app-shell">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-logo">
+        <div class="logo-mark">🧠</div>
+        <span class="logo-text">Engram</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="add-data-btn" onclick="showImportWizard()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Data
+        </button>
+        <button class="profile-toggle" id="profileToggle" onclick="toggleProfile()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Profile
+        </button>
+        <button class="reset-btn" onclick="resetChat()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleProfile()"></div>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- Left: Persona profile -->
+      <aside class="left-panel" id="leftPanel">
+        <div class="left-panel-scroll" id="leftPanelScroll">
+
+          <div class="section-label">Personality Profile</div>
+
+          <!-- Persona content -->
+          <div id="personaContent">
+            <!-- Skeleton while loading -->
+            <div id="personaSkeleton">
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="skeleton" style="height:48px;border-radius:12px;"></div>
+                <div class="skeleton" style="height:48px;border-radius:12px;"></div>
+                <div class="skeleton" style="height:48px;border-radius:12px;"></div>
+                <div class="skeleton" style="height:48px;border-radius:12px;"></div>
+              </div>
             </div>
           </div>
+
+          <!-- Stats -->
+          <div class="stats-section" id="statsSection" style="display:none;">
+            <div class="section-label" style="margin-top:8px;">Data Sources</div>
+            <div id="statsContent"></div>
+          </div>
+
         </div>
+      </aside>
 
-        <!-- Stats -->
-        <div class="stats-section" id="statsSection" style="display:none;">
-          <div class="section-label" style="margin-top:8px;">Data Sources</div>
-          <div id="statsContent"></div>
-        </div>
+      <!-- Right: Chat -->
+      <section class="right-panel">
 
-      </div>
-    </aside>
+        <!-- Chat messages -->
+        <div class="chat-area" id="chatArea">
 
-    <!-- Right: Chat -->
-    <section class="right-panel">
-
-      <!-- Chat messages -->
-      <div class="chat-area" id="chatArea">
-
-        <!-- Welcome state -->
-        <div class="chat-welcome" id="chatWelcome">
-          <div class="welcome-icon">🧠</div>
-          <div>
-            <div class="welcome-title">Talk to your Engram</div>
-            <div class="welcome-subtitle" style="margin-top:6px;">
-              Ask anything — your Engram will respond as you, grounded in your personality profile and memory fragments.
+          <!-- Welcome state -->
+          <div class="chat-welcome" id="chatWelcome">
+            <div class="welcome-icon">🧠</div>
+            <div>
+              <div class="welcome-title">Talk to your Engram</div>
+              <div class="welcome-subtitle" style="margin-top:6px;">
+                Ask anything — your Engram will respond as you, grounded in your personality profile and memory fragments.
+              </div>
+            </div>
+            <div class="welcome-prompts" id="welcomePrompts">
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What are my core values?</div>
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">How do I approach problems?</div>
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What topics fascinate me most?</div>
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">Describe my aesthetic preferences</div>
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What kind of content do I consume?</div>
+              <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">How do I make decisions?</div>
             </div>
           </div>
-          <div class="welcome-prompts" id="welcomePrompts">
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What are my core values?</div>
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">How do I approach problems?</div>
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What topics fascinate me most?</div>
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">Describe my aesthetic preferences</div>
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">What kind of content do I consume?</div>
-            <div class="welcome-prompt-chip" onclick="sendPrompt(this.textContent)">How do I make decisions?</div>
+
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea
+              id="chatInput"
+              class="chat-input"
+              placeholder="Ask your Engram anything…"
+              rows="1"
+              onkeydown="handleKeyDown(event)"
+              oninput="autoGrow(this)"
+            ></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+              <svg class="send-icon" viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
           </div>
         </div>
 
-      </div>
+      </section>
+    </main>
 
-      <!-- Input -->
-      <div class="chat-input-area">
-        <div class="chat-input-row">
-          <textarea
-            id="chatInput"
-            class="chat-input"
-            placeholder="Ask your Engram anything…"
-            rows="1"
-            onkeydown="handleKeyDown(event)"
-            oninput="autoGrow(this)"
-          ></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
-            <svg class="send-icon" viewBox="0 0 24 24">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Engram · The Personality Engine for AI</span>
+      <div class="footer-dot"></div>
+      <a href="https://github.com/yourusername/engram" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </footer>
 
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <span>Engram · The Personality Engine for AI</span>
-    <div class="footer-dot"></div>
-    <a href="https://github.com/yourusername/engram" target="_blank" rel="noopener">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      GitHub
-    </a>
-  </footer>
-
+  </div>
 </div>
 
 <script>
   // ── State ────────────────────────────────────────────────────────────────────
   let messages = [];
   let isLoading = false;
+
+  // Import wizard state
+  let uploadedFiles = []; // [{filename, source}]
+  let activeSource = null;
+
+  // ── View Switching ────────────────────────────────────────────────────────────
+
+  function showImportWizard() {
+    document.getElementById('importView').classList.add('active');
+    document.getElementById('chatView').classList.add('hidden');
+    setupGlobalDrop();
+  }
+
+  function showChatView() {
+    document.getElementById('importView').classList.remove('active');
+    document.getElementById('chatView').classList.remove('hidden');
+    document.getElementById('chatView').classList.add('fade-in');
+    teardownGlobalDrop();
+    loadPersona();
+    loadStats();
+  }
+
+  // ── Source Definitions ────────────────────────────────────────────────────────
+
+  const SOURCE_CONFIG = {
+    telegram: {
+      icon: '📱',
+      name: 'Telegram',
+      steps: [
+        'Open Telegram Desktop',
+        'Go to Settings → Advanced → Export Telegram Data',
+        'Select your chats and choose <strong>JSON</strong> format',
+        'Click Export — you\'ll get a folder with <code>result.json</code>',
+      ],
+      dropLabel: 'Drag result.json here or click to browse',
+      dropAccept: '.json',
+      hint: 'Accepts: result.json',
+    },
+    whatsapp: {
+      icon: '💬',
+      name: 'WhatsApp',
+      steps: [
+        'Open a chat in WhatsApp (mobile)',
+        'Tap ⋮ → More → Export chat',
+        'Choose <strong>Without media</strong>',
+        'Send the .txt file to yourself and download it',
+      ],
+      dropLabel: 'Drag the .txt file here or click to browse',
+      dropAccept: '.txt',
+      hint: 'Accepts: _chat.txt or WhatsApp Chat with *.txt',
+    },
+    youtube: {
+      icon: '📺',
+      name: 'YouTube',
+      steps: [
+        'Go to <a href="https://takeout.google.com" target="_blank" rel="noopener" class="ext-link" style="display:inline;">takeout.google.com</a>',
+        'Select <strong>only</strong> "YouTube and YouTube Music"',
+        'Choose JSON format, then click Create export',
+        'Download the archive and extract it — find <code>watch-history.json</code>',
+      ],
+      dropLabel: 'Drag watch-history.json here or click to browse',
+      dropAccept: '.json',
+      hint: 'Accepts: watch-history.json',
+      extraLink: { href: 'https://takeout.google.com', label: 'Open Google Takeout →' },
+    },
+    wechat: {
+      icon: '💬',
+      name: 'WeChat',
+      steps: [
+        'Requires <strong>Windows</strong> with WeChat installed',
+        'Install the <code>wechat-decrypt</code> tool',
+        'Run the tool while WeChat is open to decrypt your database',
+        'Copy the decrypted folder or files here',
+      ],
+      dropLabel: 'Drag decrypted files here or click to browse',
+      dropAccept: '',
+      hint: 'Accepts: decrypted WeChat database files',
+    },
+    bilibili: {
+      icon: '📺',
+      name: 'Bilibili',
+      steps: [
+        'Log in to Bilibili in your browser',
+        'Open DevTools → Application → Cookies → bilibili.com',
+        'Copy the value of the <code>SESSDATA</code> cookie (or the full cookie string)',
+        'Paste it below and click Import',
+      ],
+      dropLabel: null, // cookie-only
+      cookieMode: true,
+      hint: 'No file needed — imports directly via API',
+    },
+  };
+
+  // ── Source Selection ──────────────────────────────────────────────────────────
+
+  function selectSource(source) {
+    // Toggle off if same
+    if (activeSource === source) {
+      activeSource = null;
+      document.querySelectorAll('.source-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('sourceExpand').classList.remove('active');
+      return;
+    }
+
+    activeSource = source;
+
+    // Update card styles
+    const cards = document.querySelectorAll('#sourceGrid .source-card');
+    cards.forEach((card, i) => {
+      const sources = ['telegram','whatsapp','youtube','wechat','bilibili'];
+      card.classList.toggle('selected', sources[i] === source);
+    });
+
+    renderSourceExpand(source);
+    document.getElementById('sourceExpand').classList.add('active');
+  }
+
+  function renderSourceExpand(source) {
+    const cfg = SOURCE_CONFIG[source];
+    const titleEl = document.getElementById('sourceExpandTitle');
+    titleEl.innerHTML = `<span style="font-size:18px">${cfg.icon}</span> How to export from ${cfg.name}`;
+
+    const stepsEl = document.getElementById('sourceSteps');
+    stepsEl.innerHTML = cfg.steps.map(s => `<li>${s}</li>`).join('');
+
+    const dropArea = document.getElementById('sourceDropArea');
+
+    if (cfg.cookieMode) {
+      dropArea.innerHTML = `
+        <div style="font-size:12px;color:#9A9A9E;margin-bottom:8px;">${cfg.hint}</div>
+        <div class="cookie-input-row">
+          <input type="text" class="cookie-input" id="bilibiliCookie" placeholder="Paste your Bilibili cookie here…" />
+          <button class="cookie-btn" onclick="importBilibili()">Import</button>
+        </div>
+        <div id="bilibiliStatus" style="margin-top:10px;font-size:13px;color:#6B6B6E;"></div>`;
+    } else {
+      dropArea.innerHTML = `
+        <div class="drop-zone" id="sourceDropZone"
+             ondragover="dzDragOver(event,'sourceDropZone')"
+             ondragleave="dzDragLeave('sourceDropZone')"
+             ondrop="dzDrop(event,'sourceDropZone','${source}')">
+          <input type="file" accept="${cfg.dropAccept}" onchange="fileInputChange(this,'${source}')" />
+          <div class="drop-zone-icon">📂</div>
+          <div class="drop-zone-text">${cfg.dropLabel}</div>
+          <div class="drop-zone-sub">${cfg.hint}</div>
+        </div>
+        <div id="sourceFileList"></div>`;
+    }
+  }
+
+  // ── Drop Zone Handlers ────────────────────────────────────────────────────────
+
+  function dzDragOver(e, id) {
+    e.preventDefault();
+    document.getElementById(id).classList.add('dragover');
+  }
+
+  function dzDragLeave(id) {
+    document.getElementById(id).classList.remove('dragover');
+  }
+
+  function dzDrop(e, id, source) {
+    e.preventDefault();
+    document.getElementById(id).classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(f => uploadFile(f, source));
+  }
+
+  function fileInputChange(input, source) {
+    Array.from(input.files).forEach(f => uploadFile(f, source));
+    input.value = '';
+  }
+
+  // ── Global drag-and-drop (whole import page) ──────────────────────────────────
+
+  function setupGlobalDrop() {
+    document.addEventListener('dragenter', onGlobalDragEnter);
+    document.addEventListener('dragleave', onGlobalDragLeave);
+    document.addEventListener('dragover', onGlobalDragOver);
+    document.addEventListener('drop', onGlobalDrop);
+  }
+
+  function teardownGlobalDrop() {
+    document.removeEventListener('dragenter', onGlobalDragEnter);
+    document.removeEventListener('dragleave', onGlobalDragLeave);
+    document.removeEventListener('dragover', onGlobalDragOver);
+    document.removeEventListener('drop', onGlobalDrop);
+  }
+
+  let _dragDepth = 0;
+
+  function onGlobalDragEnter(e) {
+    if (!document.getElementById('importView').classList.contains('active')) return;
+    _dragDepth++;
+    document.getElementById('dropOverlay').classList.add('active');
+  }
+
+  function onGlobalDragLeave(e) {
+    if (!document.getElementById('importView').classList.contains('active')) return;
+    _dragDepth--;
+    if (_dragDepth <= 0) {
+      _dragDepth = 0;
+      document.getElementById('dropOverlay').classList.remove('active');
+    }
+  }
+
+  function onGlobalDragOver(e) { e.preventDefault(); }
+
+  function onGlobalDrop(e) {
+    e.preventDefault();
+    _dragDepth = 0;
+    document.getElementById('dropOverlay').classList.remove('active');
+    if (!document.getElementById('importView').classList.contains('active')) return;
+
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(f => {
+      const source = autoDetectSource(f);
+      uploadFile(f, source);
+    });
+  }
+
+  function autoDetectSource(file) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.json')) {
+      if (name.includes('watch') || name.includes('youtube')) return 'youtube';
+      return 'telegram'; // result.json and others
+    }
+    if (name.endsWith('.txt')) return 'whatsapp';
+    return activeSource || 'telegram';
+  }
+
+  // ── File Upload ───────────────────────────────────────────────────────────────
+
+  async function uploadFile(file, source) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('source', source);
+
+    try {
+      const res = await fetch('/api/import/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      uploadedFiles.push({ filename: data.filename, source });
+      renderUploadedFiles();
+      updateAnalyzeBtn();
+
+      // Also render in source-specific list if visible
+      const srcList = document.getElementById('sourceFileList');
+      if (srcList && activeSource === source) {
+        renderFileInSourceList(data.filename, source);
+      }
+    } catch (e) {
+      alert(`Upload failed: ${e.message}`);
+    }
+  }
+
+  function renderUploadedFiles() {
+    const container = document.getElementById('uploadedList');
+    if (uploadedFiles.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#9A9A9E;margin-bottom:8px;padding:0 2px;">
+        Uploaded Files
+      </div>` +
+      uploadedFiles.map((f, i) => `
+        <div class="uploaded-file">
+          <div class="uploaded-check">✓</div>
+          <div class="uploaded-name">${escHtml(f.filename)}</div>
+          <div style="font-size:11px;color:#9A9A9E;flex-shrink:0;">${escHtml(f.source)}</div>
+          <button class="uploaded-remove" onclick="removeUpload(${i})" title="Remove">×</button>
+        </div>`).join('');
+  }
+
+  function renderFileInSourceList(filename, source) {
+    const srcList = document.getElementById('sourceFileList');
+    if (!srcList) return;
+    srcList.innerHTML += `
+      <div class="uploaded-file" style="margin-top:10px;">
+        <div class="uploaded-check">✓</div>
+        <div class="uploaded-name">${escHtml(filename)}</div>
+      </div>`;
+  }
+
+  function removeUpload(idx) {
+    uploadedFiles.splice(idx, 1);
+    renderUploadedFiles();
+    updateAnalyzeBtn();
+  }
+
+  function updateAnalyzeBtn() {
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = uploadedFiles.length === 0;
+  }
+
+  // ── Bilibili cookie import ────────────────────────────────────────────────────
+
+  async function importBilibili() {
+    const cookie = document.getElementById('bilibiliCookie').value.trim();
+    if (!cookie) { alert('Please paste your Bilibili cookie.'); return; }
+
+    const statusEl = document.getElementById('bilibiliStatus');
+    statusEl.textContent = 'Fetching Bilibili watch history...';
+
+    try {
+      // We can't call Bilibili API from here without a server-side proxy.
+      // Mark a placeholder cookie file so the analyze endpoint can handle it.
+      const blob = new Blob([cookie], { type: 'text/plain' });
+      const file = new File([blob], 'bilibili_cookie.txt', { type: 'text/plain' });
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('source', 'bilibili');
+
+      const res = await fetch('/api/import/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      uploadedFiles.push({ filename: data.filename, source: 'bilibili' });
+      renderUploadedFiles();
+      updateAnalyzeBtn();
+      statusEl.innerHTML = '<span style="color:#5B9A8B;">Cookie saved — will fetch during analysis.</span>';
+    } catch (e) {
+      statusEl.innerHTML = `<span style="color:#E05A5A;">Error: ${escHtml(e.message)}</span>`;
+    }
+  }
+
+  // ── Start Analysis ────────────────────────────────────────────────────────────
+
+  async function startAnalysis() {
+    document.getElementById('analyzingOverlay').classList.add('active');
+
+    try {
+      const res = await fetch('/api/import/analyze', { method: 'POST' });
+      const data = await res.json();
+
+      document.getElementById('analyzingOverlay').classList.remove('active');
+
+      if (data.status === 'ok') {
+        uploadedFiles = [];
+        showChatView();
+      } else {
+        alert('Analysis failed: ' + (data.message || 'Unknown error'));
+      }
+    } catch (e) {
+      document.getElementById('analyzingOverlay').classList.remove('active');
+      alert('Analysis failed: ' + e.message);
+    }
+  }
 
   // ── Persona & Stats Loading ──────────────────────────────────────────────────
 
@@ -1230,8 +2156,19 @@
   // ── Init ──────────────────────────────────────────────────────────────────────
 
   document.addEventListener('DOMContentLoaded', () => {
-    loadPersona();
-    loadStats();
+    fetch('/api/has-data')
+      .then(r => r.json())
+      .then(data => {
+        if (data.has_data) {
+          showChatView();
+        } else {
+          showImportWizard();
+        }
+      })
+      .catch(() => {
+        // Fallback: show import wizard if we can't reach the server
+        showImportWizard();
+      });
   });
 </script>
 
