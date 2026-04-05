@@ -1,0 +1,30 @@
+[project]
+name = "engram"
+version = "0.1.0"
+description = "Open-source personality modeling engine"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "litellm>=1.40",
+    "sentence-transformers>=3.0",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+engram = "engram.cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[dependency-groups]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
