@@ -118,14 +118,27 @@ _PARSER_REGISTRY = {
 
 @app.post("/api/import/upload")
 async def upload_file(file: UploadFile, source: str = Form(...)) -> dict:
-    """Upload a data file for import."""
+    """Upload a data file for import. Automatically extracts zip files."""
     import shutil
+    import zipfile
 
     raw_dir = _config.engram_dir / "raw" / source
     raw_dir.mkdir(parents=True, exist_ok=True)
     dest = raw_dir / file.filename
+
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    # Auto-extract zip files
+    if dest.suffix == ".zip":
+        try:
+            with zipfile.ZipFile(dest, "r") as zf:
+                zf.extractall(raw_dir)
+            dest.unlink()  # Remove the zip after extraction
+            return {"status": "ok", "path": str(raw_dir), "filename": file.filename, "extracted": True}
+        except zipfile.BadZipFile:
+            pass  # Not a valid zip, keep as-is
+
     return {"status": "ok", "path": str(dest), "filename": file.filename}
 
 
@@ -152,7 +165,8 @@ def analyze_imported() -> dict:
         module = importlib.import_module(module_path)
         parser = getattr(module, class_name)()
 
-        for file_path in sorted(source_dir.iterdir()):
+        # Scan all files recursively (handles extracted zip subdirectories)
+        for file_path in sorted(source_dir.rglob("*")):
             if file_path.is_file() and parser.validate(file_path):
                 try:
                     chunks = parser.parse(file_path)
