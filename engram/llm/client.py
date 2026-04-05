@@ -31,7 +31,7 @@ class LLMClient:
             messages=messages,
             api_key=self.api_key if self.api_key else None,
         )
-        return response.choices[0].message.content
+        return str(response.choices[0].message.content)
 
     def complete_chat(self, messages: list[dict], system: str = "") -> str:
         full_messages = []
@@ -44,4 +44,4 @@ class LLMClient:
             messages=full_messages,
             api_key=self.api_key if self.api_key else None,
         )
-        return response.choices[0].message.content
+        return str(response.choices[0].message.content)

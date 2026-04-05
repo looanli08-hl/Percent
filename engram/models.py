@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class ChunkType(str, Enum):
+class ChunkType(StrEnum):
     CONVERSATION = "conversation"
     WATCH_HISTORY = "watch_history"
     LISTEN_HISTORY = "listen_history"
@@ -21,7 +21,7 @@ class DataChunk(BaseModel):
     metadata: dict = Field(default_factory=dict)
 
 
-class FindingCategory(str, Enum):
+class FindingCategory(StrEnum):
     TRAIT = "trait"
     OPINION = "opinion"
     PREFERENCE = "preference"

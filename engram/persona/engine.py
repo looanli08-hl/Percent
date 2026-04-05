@@ -97,6 +97,7 @@ class PersonaEngine:
     @staticmethod
     def _fragments_to_findings(fragments: list[Fragment]) -> list[Finding]:
         from engram.models import Finding
+
         return [
             Finding(
                 category=f.category,

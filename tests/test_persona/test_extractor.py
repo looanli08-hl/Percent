@@ -18,25 +18,28 @@ def make_chunk(content: str, source: str = "wechat") -> DataChunk:
     )
 
 
-VALID_FINDINGS_JSON = json.dumps([
-    {
-        "category": "trait",
-        "content": "Values intellectual honesty over social harmony",
-        "confidence": 0.85,
-        "evidence": "consistently challenges incorrect claims even in group settings",
-    },
-    {
-        "category": "preference",
-        "content": "Prefers hard sci-fi with physics-based worldbuilding",
-        "confidence": 0.9,
-        "evidence": "recommends The Three-Body Problem and mentions liking realistic science",
-    },
-])
+VALID_FINDINGS_JSON = json.dumps(
+    [
+        {
+            "category": "trait",
+            "content": "Values intellectual honesty over social harmony",
+            "confidence": 0.85,
+            "evidence": "consistently challenges incorrect claims even in group settings",
+        },
+        {
+            "category": "preference",
+            "content": "Prefers hard sci-fi with physics-based worldbuilding",
+            "confidence": 0.9,
+            "evidence": "recommends The Three-Body Problem and mentions liking realistic science",
+        },
+    ]
+)
 
 
 def test_extract_returns_findings(mock_llm_response, tmp_path):
     mock_llm_response(VALID_FINDINGS_JSON)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
 
@@ -54,6 +57,7 @@ def test_extract_returns_findings(mock_llm_response, tmp_path):
 def test_extract_attaches_source_from_chunk(mock_llm_response, tmp_path):
     mock_llm_response(VALID_FINDINGS_JSON)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
 
@@ -66,13 +70,10 @@ def test_extract_attaches_source_from_chunk(mock_llm_response, tmp_path):
 
 def test_extract_handles_json_embedded_in_text(mock_llm_response):
     """LLM sometimes wraps JSON in prose — extractor should still parse it."""
-    response_with_text = (
-        "Here are my findings:\n\n"
-        + VALID_FINDINGS_JSON
-        + "\n\nThat's all."
-    )
+    response_with_text = "Here are my findings:\n\n" + VALID_FINDINGS_JSON + "\n\nThat's all."
     mock_llm_response(response_with_text)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
 
@@ -84,6 +85,7 @@ def test_extract_handles_invalid_json_gracefully(mock_llm_response):
     """Invalid JSON should return empty list without raising."""
     mock_llm_response("This is not JSON at all!")
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
 
@@ -93,13 +95,16 @@ def test_extract_handles_invalid_json_gracefully(mock_llm_response):
 
 def test_extract_batches_chunks(mock_llm_response):
     """More than batch_size chunks should trigger multiple LLM calls."""
-    call_count = 0
-    original_findings = json.dumps([
-        {"category": "trait", "content": "Curious", "confidence": 0.7, "evidence": "reads widely"},
-    ])
-
-    # Track how many times the mock is called
-    import litellm
+    original_findings = json.dumps(
+        [
+            {
+                "category": "trait",
+                "content": "Curious",
+                "confidence": 0.7,
+                "evidence": "reads widely",
+            },
+        ]
+    )
 
     call_log = []
 
@@ -109,6 +114,7 @@ def test_extract_batches_chunks(mock_llm_response):
         class FakeChoice:
             class FakeMessage:
                 content = original_findings
+
             message = FakeMessage()
 
         class FakeResponse:
@@ -117,8 +123,10 @@ def test_extract_batches_chunks(mock_llm_response):
         return FakeResponse()
 
     import unittest.mock
+
     with unittest.mock.patch("litellm.completion", fake_completion):
         from engram.llm.client import LLMClient
+
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         extractor = PersonaExtractor(client, prompts_dir=None, batch_size=3)
         chunks = [make_chunk(f"message {i}") for i in range(7)]
@@ -131,6 +139,7 @@ def test_extract_batches_chunks(mock_llm_response):
 
 def test_extract_empty_chunks_returns_empty():
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
     assert extractor.extract([]) == []

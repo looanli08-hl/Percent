@@ -96,18 +96,14 @@ def test_parse_strips_watched_prefix(parser: YouTubeParser, valid_history: Path)
     assert "How Neural Networks Work" in first.content
 
 
-def test_parse_extracts_channel_from_subtitles(
-    parser: YouTubeParser, valid_history: Path
-) -> None:
+def test_parse_extracts_channel_from_subtitles(parser: YouTubeParser, valid_history: Path) -> None:
     chunks = parser.parse(valid_history)
     first = chunks[0]
     assert first.metadata.get("channel") == "3Blue1Brown"
     assert "3Blue1Brown" in first.content
 
 
-def test_parse_handles_missing_subtitles(
-    parser: YouTubeParser, valid_history: Path
-) -> None:
+def test_parse_handles_missing_subtitles(parser: YouTubeParser, valid_history: Path) -> None:
     chunks = parser.parse(valid_history)
     # Second entry has empty subtitles list
     second = chunks[1]

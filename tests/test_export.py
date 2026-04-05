@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
-
 
 CORE_MD = """\
 ## Personality Traits
@@ -20,7 +17,7 @@ SOUL_RESPONSE = """\
 A deeply personalised assistant for Alice — an intellectually honest systems thinker.
 
 ## Understanding
-Alice values deep understanding over surface-level knowledge and challenges incorrect claims directly.
+Alice values deep understanding over surface-level knowledge. Challenges incorrect claims directly.
 
 ## Communication Style
 Direct, concise, no filler. Dense and precise prose. Responds better to structured information.
@@ -34,9 +31,7 @@ Avoid: small talk, hedging, oversimplification, social platitudes.
 
 
 class TestSoulMdExporter:
-    def test_export_produces_soul_md_with_expected_sections(
-        self, tmp_path, mock_llm_response
-    ):
+    def test_export_produces_soul_md_with_expected_sections(self, tmp_path, mock_llm_response):
         """export() writes SOUL.md and returns content with required sections."""
         mock_llm_response(SOUL_RESPONSE)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from engram.models import ChunkType, DataChunk
@@ -35,7 +35,7 @@ class BilibiliParser(DataParser):
                 continue
 
             view_at = entry.get("view_at")
-            timestamp = datetime.fromtimestamp(view_at, tz=timezone.utc) if view_at else datetime.now(tz=timezone.utc)
+            timestamp = datetime.fromtimestamp(view_at, tz=UTC) if view_at else datetime.now(tz=UTC)
 
             author = entry.get("author_name", "")
             tag = entry.get("tag_name", "")

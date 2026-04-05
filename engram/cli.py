@@ -1,4 +1,5 @@
 """Engram CLI — main entry point."""
+
 from __future__ import annotations
 
 import shutil
@@ -27,6 +28,7 @@ app.add_typer(config_app, name="config")
 console = Console()
 
 _PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+_NO_PROFILE_MSG = "[yellow]No personality profile found. Run 'engram import run' first.[/yellow]"
 
 # ── Supported parsers registry ───────────────────────────────────────────────
 
@@ -40,15 +42,18 @@ _PARSER_REGISTRY = {
 def _get_parser(source: str):
     """Lazily import and return a parser instance for the given source name."""
     if source not in _PARSER_REGISTRY:
-        console.print(f"[red]Unknown source '{source}'. Available: {', '.join(_PARSER_REGISTRY)}[/red]")
+        available = ", ".join(_PARSER_REGISTRY)
+        console.print(f"[red]Unknown source '{source}'. Available: {available}[/red]")
         raise typer.Exit(1)
     module_path, class_name = _PARSER_REGISTRY[source].rsplit(".", 1)
     import importlib
+
     module = importlib.import_module(module_path)
     return getattr(module, class_name)()
 
 
 # ── engram init ──────────────────────────────────────────────────────────────
+
 
 @app.command()
 def init() -> None:
@@ -87,6 +92,7 @@ def init() -> None:
 
 
 # ── engram import run ────────────────────────────────────────────────────────
+
 
 @import_app.command("run")
 def import_run(
@@ -143,6 +149,7 @@ def import_run(
 
 # ── engram import guide ──────────────────────────────────────────────────────
 
+
 @import_app.command("guide")
 def import_guide(
     source: str = typer.Argument(..., help="Data source: bilibili, youtube, wechat"),
@@ -153,6 +160,7 @@ def import_guide(
 
 
 # ── engram import status ─────────────────────────────────────────────────────
+
 
 @import_app.command("status")
 def import_status() -> None:
@@ -171,7 +179,7 @@ def import_status() -> None:
     stats = store.stats()
     store.close()
 
-    console.print(f"\n[bold]Fragment Store Stats[/bold]")
+    console.print("\n[bold]Fragment Store Stats[/bold]")
     console.print(f"  Total fragments: [cyan]{stats['total']}[/cyan]")
 
     if stats["by_source"]:
@@ -193,6 +201,7 @@ def import_status() -> None:
 
 # ── engram persona view ──────────────────────────────────────────────────────
 
+
 @persona_app.command("view")
 def persona_view() -> None:
     """Print core.md personality profile."""
@@ -210,6 +219,7 @@ def persona_view() -> None:
 
 # ── engram persona stats ─────────────────────────────────────────────────────
 
+
 @persona_app.command("stats")
 def persona_stats() -> None:
     """Show fragment statistics for the persona."""
@@ -217,6 +227,7 @@ def persona_stats() -> None:
 
 
 # ── engram persona rebuild ───────────────────────────────────────────────────
+
 
 @persona_app.command("rebuild")
 def persona_rebuild() -> None:
@@ -254,9 +265,10 @@ def persona_rebuild() -> None:
 
 # ── engram chat ──────────────────────────────────────────────────────────────
 
+
 @app.command()
 def chat(
-    username: str = typer.Option("User", "--username", "-u", help="Your name used in the conversation."),
+    username: str = typer.Option("User", "--username", "-u", help="Your name in the conversation."),
 ) -> None:
     """Start an interactive conversation with your Engram persona."""
     from engram.chat.engine import ChatEngine
@@ -265,7 +277,7 @@ def chat(
     config = load_config()
 
     if not config.core_path.exists():
-        console.print("[yellow]No personality profile found. Run 'engram import run' first.[/yellow]")
+        console.print(_NO_PROFILE_MSG)
         raise typer.Exit(0)
 
     if not config.llm_api_key:
@@ -281,7 +293,10 @@ def chat(
         username=username,
     )
 
-    console.print("[bold]Engram Chat[/bold] — type [italic]quit[/italic], [italic]exit[/italic], or [italic]q[/italic] to end.\n")
+    console.print(
+        "[bold]Engram Chat[/bold] — type [italic]quit[/italic], "
+        "[italic]exit[/italic], or [italic]q[/italic] to end.\n"
+    )
 
     while True:
         try:
@@ -302,6 +317,7 @@ def chat(
 
 # ── engram export soul ───────────────────────────────────────────────────────
 
+
 @export_app.command("soul")
 def export_soul(
     output: Path = typer.Option(Path("SOUL.md"), "--output", "-o", help="Output path for SOUL.md"),
@@ -313,7 +329,7 @@ def export_soul(
     config = load_config()
 
     if not config.core_path.exists():
-        console.print("[yellow]No personality profile found. Run 'engram import run' first.[/yellow]")
+        console.print(_NO_PROFILE_MSG)
         raise typer.Exit(0)
 
     if not config.llm_api_key:
@@ -334,9 +350,10 @@ def export_soul(
 
 # ── engram export core ───────────────────────────────────────────────────────
 
+
 @export_app.command("core")
 def export_core(
-    output: Path = typer.Option(Path("core.md"), "--output", "-o", help="Destination path for core.md"),
+    output: Path = typer.Option(Path("core.md"), "--output", "-o", help="Destination path."),
 ) -> None:
     """Copy core.md to the specified path."""
     from engram.config import load_config
@@ -344,7 +361,7 @@ def export_core(
     config = load_config()
 
     if not config.core_path.exists():
-        console.print("[yellow]No personality profile found. Run 'engram import run' first.[/yellow]")
+        console.print(_NO_PROFILE_MSG)
         raise typer.Exit(0)
 
     shutil.copy2(config.core_path, output)
@@ -352,6 +369,7 @@ def export_core(
 
 
 # ── engram config llm ────────────────────────────────────────────────────────
+
 
 @config_app.command("llm")
 def config_llm() -> None:
@@ -385,6 +403,7 @@ def config_llm() -> None:
 
 
 # ── engram config parsers ────────────────────────────────────────────────────
+
 
 @config_app.command("parsers")
 def config_parsers() -> None:

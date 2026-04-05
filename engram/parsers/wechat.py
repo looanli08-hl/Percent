@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from engram.models import ChunkType, DataChunk
@@ -24,11 +24,7 @@ class WeChatParser(DataParser):
     def validate(self, path: Path) -> bool:
         """Return True if path is a supported CSV/JSON file or a directory containing them."""
         if path.is_dir():
-            return any(
-                self._validate_single_file(f)
-                for f in path.iterdir()
-                if f.is_file()
-            )
+            return any(self._validate_single_file(f) for f in path.iterdir() if f.is_file())
         return self._validate_single_file(path)
 
     def _validate_single_file(self, path: Path) -> bool:
@@ -121,7 +117,7 @@ class WeChatParser(DataParser):
         raw = raw.strip()
         # Try as Unix timestamp (int or float)
         try:
-            return datetime.fromtimestamp(float(raw), tz=timezone.utc)
+            return datetime.fromtimestamp(float(raw), tz=UTC)
         except (ValueError, OSError):
             pass
         # Try ISO 8601
@@ -129,11 +125,9 @@ class WeChatParser(DataParser):
             return datetime.fromisoformat(raw.replace("Z", "+00:00"))
         except (ValueError, AttributeError):
             pass
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
-    def _group_into_chunks(
-        self, messages: list[tuple[str, datetime, str]]
-    ) -> list[DataChunk]:
+    def _group_into_chunks(self, messages: list[tuple[str, datetime, str]]) -> list[DataChunk]:
         """Group messages by talker and 30-minute conversation windows."""
         # Bucket messages by talker
         by_talker: dict[str, list[tuple[datetime, str]]] = {}
@@ -152,9 +146,7 @@ class WeChatParser(DataParser):
             for ts, content in msgs:
                 if ts - prev_ts > gap and window_msgs:
                     # Flush current window
-                    chunks.append(
-                        self._make_chunk(talker, window_start, window_msgs)
-                    )
+                    chunks.append(self._make_chunk(talker, window_start, window_msgs))
                     window_start = ts
                     window_msgs = []
                 window_msgs.append(content)
@@ -167,9 +159,7 @@ class WeChatParser(DataParser):
         chunks.sort(key=lambda c: c.timestamp)
         return chunks
 
-    def _make_chunk(
-        self, talker: str, timestamp: datetime, messages: list[str]
-    ) -> DataChunk:
+    def _make_chunk(self, talker: str, timestamp: datetime, messages: list[str]) -> DataChunk:
         content = "\n".join(messages)
         return DataChunk(
             source="wechat",

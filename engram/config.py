@@ -27,7 +27,13 @@ class EngramConfig(BaseModel):
         return self.engram_dir / "raw"
 
 
-_SAVED_FIELDS = {"llm_provider", "llm_model", "llm_api_key", "embedding_model", "core_rebuild_threshold"}
+_SAVED_FIELDS = {
+    "llm_provider",
+    "llm_model",
+    "llm_api_key",
+    "embedding_model",
+    "core_rebuild_threshold",
+}
 
 
 def save_config(config: EngramConfig) -> None:

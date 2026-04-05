@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
-
 from engram.models import Finding, FindingCategory
 from engram.persona.synthesizer import PersonaSynthesizer
 
@@ -42,10 +38,14 @@ MOCK_PROFILE_MD = """\
 def test_synthesize_returns_markdown(mock_llm_response):
     mock_llm_response(MOCK_PROFILE_MD)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
 
-    findings = [make_finding("Values intellectual honesty"), make_finding("Hard sci-fi fan", "preference")]
+    findings = [
+        make_finding("Values intellectual honesty"),
+        make_finding("Hard sci-fi fan", "preference"),
+    ]
     result = synthesizer.synthesize(findings)
 
     assert isinstance(result, str)
@@ -56,6 +56,7 @@ def test_synthesize_returns_markdown(mock_llm_response):
 def test_synthesize_includes_all_sections(mock_llm_response):
     mock_llm_response(MOCK_PROFILE_MD)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
 
@@ -77,6 +78,7 @@ def test_synthesize_includes_all_sections(mock_llm_response):
 def test_synthesize_and_save_writes_file(mock_llm_response, tmp_path):
     mock_llm_response(MOCK_PROFILE_MD)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
 
@@ -93,12 +95,13 @@ def test_synthesize_and_save_writes_file(mock_llm_response, tmp_path):
 def test_synthesize_and_save_creates_parent_dirs(mock_llm_response, tmp_path):
     mock_llm_response(MOCK_PROFILE_MD)
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
 
     findings = [make_finding("Introverted")]
     nested_path = tmp_path / "deep" / "nested" / "core.md"
-    result = synthesizer.synthesize_and_save(findings, nested_path)
+    synthesizer.synthesize_and_save(findings, nested_path)
 
     assert nested_path.exists()
 
@@ -116,6 +119,7 @@ def test_synthesize_formats_findings_count(mock_llm_response):
         class FakeChoice:
             class FakeMessage:
                 content = MOCK_PROFILE_MD
+
             message = FakeMessage()
 
         class FakeResponse:
@@ -124,8 +128,10 @@ def test_synthesize_formats_findings_count(mock_llm_response):
         return FakeResponse()
 
     import unittest.mock
+
     with unittest.mock.patch("litellm.completion", fake_completion):
         from engram.llm.client import LLMClient
+
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         synthesizer = PersonaSynthesizer(client, prompts_dir=None)
         findings = [make_finding(f"finding {i}") for i in range(5)]
@@ -139,6 +145,7 @@ def test_synthesize_empty_findings(mock_llm_response):
     """Empty findings list should still call LLM and return result."""
     mock_llm_response("## Personality Traits\n- Unknown")
     from engram.llm.client import LLMClient
+
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
 

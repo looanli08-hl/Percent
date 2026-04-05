@@ -19,6 +19,7 @@ def parser() -> WeChatParser:
 # Helpers to create test files
 # ---------------------------------------------------------------------------
 
+
 def _write_csv(path: Path, rows: list[dict]) -> Path:
     """Write a PyWxDump-style CSV file."""
     fieldnames = ["StrTalker", "StrContent", "CreateTime", "Type"]
@@ -132,13 +133,16 @@ def test_parse_csv_metadata_talker(parser: WeChatParser, tmp_path: Path) -> None
 # ---------------------------------------------------------------------------
 
 
-def test_parse_groups_close_messages_into_one_chunk(
-    parser: WeChatParser, tmp_path: Path
-) -> None:
+def test_parse_groups_close_messages_into_one_chunk(parser: WeChatParser, tmp_path: Path) -> None:
     rows = [
         {"StrTalker": "Alice", "StrContent": "Hello", "CreateTime": "1700000000", "Type": "1"},
-        {"StrTalker": "Alice", "StrContent": "How are you?", "CreateTime": "1700000600", "Type": "1"},
         # 10 minutes apart — same window
+        {
+            "StrTalker": "Alice",
+            "StrContent": "How are you?",
+            "CreateTime": "1700000600",
+            "Type": "1",
+        },
     ]
     f = _write_csv(tmp_path / "chat.csv", rows)
     chunks = parser.parse(f)
@@ -164,7 +168,12 @@ def test_parse_separate_talkers_produce_separate_chunks(
     base = 1700000000
     rows = [
         {"StrTalker": "Alice", "StrContent": "Hi from Alice", "CreateTime": str(base), "Type": "1"},
-        {"StrTalker": "Bob", "StrContent": "Hi from Bob", "CreateTime": str(base + 60), "Type": "1"},
+        {
+            "StrTalker": "Bob",
+            "StrContent": "Hi from Bob",
+            "CreateTime": str(base + 60),
+            "Type": "1",
+        },
     ]
     f = _write_csv(tmp_path / "chat.csv", rows)
     chunks = parser.parse(f)
@@ -207,12 +216,17 @@ def test_parse_json_skips_non_text_messages(parser: WeChatParser, tmp_path: Path
 # ---------------------------------------------------------------------------
 
 
-def test_parse_directory_merges_multiple_files(
-    parser: WeChatParser, tmp_path: Path
-) -> None:
+def test_parse_directory_merges_multiple_files(parser: WeChatParser, tmp_path: Path) -> None:
     _write_csv(
         tmp_path / "chat_alice.csv",
-        [{"StrTalker": "Alice", "StrContent": "From Alice", "CreateTime": "1700000000", "Type": "1"}],
+        [
+            {
+                "StrTalker": "Alice",
+                "StrContent": "From Alice",
+                "CreateTime": "1700000000",
+                "Type": "1",
+            }
+        ],  # noqa: E501
     )
     _write_csv(
         tmp_path / "chat_bob.csv",

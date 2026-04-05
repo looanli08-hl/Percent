@@ -2,16 +2,15 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
 
-from engram.models import ChunkType, DataChunk, FindingCategory
-
+from engram.models import ChunkType, DataChunk
 
 # ─── helpers ────────────────────────────────────────────────────────────────
+
 
 def make_chunk(content: str, source: str = "wechat") -> DataChunk:
     return DataChunk(
@@ -22,14 +21,16 @@ def make_chunk(content: str, source: str = "wechat") -> DataChunk:
     )
 
 
-EXTRACT_RESPONSE = json.dumps([
-    {
-        "category": "trait",
-        "content": "Values intellectual honesty",
-        "confidence": 0.85,
-        "evidence": "challenges incorrect claims",
-    },
-])
+EXTRACT_RESPONSE = json.dumps(
+    [
+        {
+            "category": "trait",
+            "content": "Values intellectual honesty",
+            "confidence": 0.85,
+            "evidence": "challenges incorrect claims",
+        },
+    ]
+)
 
 SYNTHESIZE_RESPONSE = """\
 ## Personality Traits
@@ -51,12 +52,14 @@ SYNTHESIZE_RESPONSE = """\
 - Dense, precise prose
 """
 
-VALIDATE_RESPONSE = json.dumps({
-    "predicted_response": "Would challenge the incorrect claim",
-    "actual_response": "That's not right, here's why...",
-    "alignment_score": 0.82,
-    "reasoning": "Profile predicted confrontation; actual response matches",
-})
+VALIDATE_RESPONSE = json.dumps(
+    {
+        "predicted_response": "Would challenge the incorrect claim",
+        "actual_response": "That's not right, here's why...",
+        "alignment_score": 0.82,
+        "reasoning": "Profile predicted confrontation; actual response matches",
+    }
+)
 
 
 def make_dummy_embedder():
@@ -67,6 +70,7 @@ def make_dummy_embedder():
 
 
 # ─── validator tests ─────────────────────────────────────────────────────────
+
 
 class TestPersonaValidator:
     def test_validate_returns_score_and_details(self, mock_llm_response):
@@ -96,17 +100,20 @@ class TestPersonaValidator:
 
         def fake_completion(**kwargs):
             nonlocal call_n
-            resp_json = json.dumps({
-                "predicted_response": "x",
-                "actual_response": "y",
-                "alignment_score": scores[call_n],
-                "reasoning": "ok",
-            })
+            resp_json = json.dumps(
+                {
+                    "predicted_response": "x",
+                    "actual_response": "y",
+                    "alignment_score": scores[call_n],
+                    "reasoning": "ok",
+                }
+            )
             call_n += 1
 
             class FakeChoice:
                 class FakeMessage:
                     content = resp_json
+
                 message = FakeMessage()
 
             class FakeResponse:
@@ -153,6 +160,7 @@ class TestPersonaValidator:
 
 # ─── engine tests ─────────────────────────────────────────────────────────────
 
+
 class TestPersonaEngine:
     """
     Every test patches SentenceTransformer at the engine module level so no
@@ -177,6 +185,7 @@ class TestPersonaEngine:
             class FakeChoice:
                 class FakeMessage:
                     pass
+
                 message = FakeMessage()
 
             FakeChoice.message.content = content

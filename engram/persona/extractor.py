@@ -100,9 +100,7 @@ class PersonaExtractor:
         # come from the same source in normal usage, but we default to the first.
         source = chunks[0].source
         data_type = chunks[0].type.value
-        data = "\n\n".join(
-            f"[{c.timestamp.date()}] {c.content}" for c in chunks
-        )
+        data = "\n\n".join(f"[{c.timestamp.date()}] {c.content}" for c in chunks)
 
         prompt = self._prompt_template.format(
             source=source,

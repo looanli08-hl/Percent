@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from engram.models import ChunkType, DataChunk
@@ -38,7 +38,7 @@ class YouTubeParser(DataParser):
             try:
                 timestamp = datetime.fromisoformat(time_str.replace("Z", "+00:00"))
             except (ValueError, AttributeError):
-                timestamp = datetime.now(tz=timezone.utc)
+                timestamp = datetime.now(tz=UTC)
 
             # Extract channel name from subtitles array
             subtitles: list[dict] = entry.get("subtitles", [])
@@ -88,5 +88,5 @@ class YouTubeParser(DataParser):
             "  title      — 'Watched <video title>' (str)\n"
             "  titleUrl   — YouTube video URL (str)\n"
             "  time       — ISO 8601 timestamp (str, e.g. '2024-01-15T10:30:00Z')\n"
-            "  subtitles  — array with channel info, e.g. [{\"name\": \"Channel\", ...}]\n"
+            '  subtitles  — array with channel info, e.g. [{"name": "Channel", ...}]\n'
         )

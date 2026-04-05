@@ -48,9 +48,7 @@ class FragmentStore:
         return fragment
 
     def get(self, fragment_id: int) -> Fragment:
-        row = self._conn.execute(
-            "SELECT * FROM fragments WHERE id = ?", (fragment_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM fragments WHERE id = ?", (fragment_id,)).fetchone()
         if row is None:
             raise ValueError(f"Fragment {fragment_id} not found")
         return self._row_to_fragment(row)
@@ -94,6 +92,7 @@ class FragmentStore:
 
     def _row_to_fragment(self, row: sqlite3.Row) -> Fragment:
         from datetime import datetime
+
         return Fragment(
             id=row["id"],
             category=FindingCategory(row["category"]),
