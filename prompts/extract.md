@@ -1,24 +1,30 @@
-You are a personality analyst. Analyze the following data from a person's digital life and extract personality findings.
+你是一个人格分析师。分析以下来自一个人数字生活的数据，提取人格发现。
 
-For each finding, output a JSON object with:
-- "category": one of "trait", "opinion", "preference", "relationship", "habit"
-- "content": a clear statement about this person (e.g., "Values intellectual honesty over social harmony")
-- "confidence": 0.0 to 1.0 — how confident are you in this finding
-- "evidence": the specific part of the data that supports this finding
+每个发现输出一个 JSON 对象：
+- "category": "trait"（性格特质）/ "opinion"（观点）/ "preference"（偏好）/ "relationship"（具体记忆/事件）/ "habit"（习惯）
+- "content": 用中文描述这个人的特点（例如："跟朋友说话很直接，喜欢用'哈哈哈'和表情包，不喜欢正式的表达方式"）
+- "confidence": 0.0 到 1.0
+- "evidence": 支持这个发现的具体数据片段
 
-IMPORTANT: In chat data, lines marked [我] are from THE PERSON being analyzed. Lines marked [对方] are from OTHER people. ONLY analyze [我] lines to understand this person's personality. Use [对方] lines only as context for understanding the conversation.
+重要规则：
+- 聊天数据中 [我] 标记的是被分析的人，[对方]/[其他人名] 是别人。只分析 [我] 的内容来理解这个人。
+- 所有 content 字段必须用中文写
+- 保留原始的口语化表达和特殊用词，不要书面化
 
-Extract TWO types of findings:
-1. **Personality findings** (trait/opinion/preference/habit): patterns about who this person IS
-2. **Specific memories** (relationship): concrete events, purchases, plans, people mentioned — things that a friend would remember (e.g., "Bought a second-hand iPhone from a classmate", "Has a football match every Saturday")
+提取两类发现：
+1. **人格特征**（trait/opinion/preference/habit）：这个人是什么样的人
+   - 说话方式和语气（用什么词、什么表情包、发消息长短）
+   - 对事物的真实看法（不是客套话，是跟朋友私下说的）
+   - 生活习惯和偏好
+2. **具体记忆**（relationship）：朋友会记得的具体事情
+   - 谁参与了、发生了什么、什么时候
+   - 例如："找同学买了一把二手iPhone，电池很差"、"每周六下午踢球"、"杨毅恺是最常聊天的朋友"
 
-Rules:
-- Focus on WHAT THIS DATA REVEALS ABOUT THE PERSON, not what the data contains
-- Look for patterns, not one-off mentions
-- Distinguish between what they say they believe vs what their behavior shows
-- Capture contradictions — real people are inconsistent
-- Be specific, not generic — "prefers hard sci-fi with physics-based worldbuilding" is better than "likes science fiction"
-- For specific memories, capture WHO was involved, WHAT happened, and WHEN if possible
+规则：
+- 关注数据揭示的这个人的特点，不是数据本身的内容
+- 具体比笼统好——"喜欢看利物浦和皇马的比赛，会为了看直播调整晚上的安排"比"喜欢足球"好
+- 真实的人有矛盾——如果发现矛盾，记录下来
+- 捕捉这个人独特的口头禅、常用词、表情包习惯
 
 Data source: {source}
 Data type: {data_type}

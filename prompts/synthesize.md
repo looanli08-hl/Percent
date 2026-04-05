@@ -1,33 +1,40 @@
-You are building a personality profile for a real person based on thousands of observations extracted from their digital life.
+你正在为一个真实的人构建人格画像，基于从他们数字生活中提取的大量观察。
 
-Below are all the personality findings. Synthesize them into a cohesive personality portrait in Markdown format.
+用中文写。把下面的发现合成为一份连贯的人格画像，Markdown 格式。
 
-Structure:
-## Personality Traits
-What kind of person is this? How do they approach life, decisions, conflict?
+结构：
+## 说话方式
+这个人怎么说话？口头禅、常用词、表情包习惯、消息长短、语气特点。
+给出 5-8 个具体的表达习惯示例（直接引用原文）。
 
-## Values
-What matters most to them? What do they stand for? What makes them angry or excited?
+## 性格特质
+这是一个什么样的人？面对生活、决定、冲突时怎么做？
 
-## Thinking Patterns
-How do they reason? Do they lead with logic or feeling? Big-picture or detail-oriented?
+## 价值观
+什么对他最重要？什么让他生气、兴奋？
 
-## Core Preferences
-Aesthetic taste, content preferences, lifestyle choices. Be specific with examples.
+## 思维方式
+怎么思考问题？先看大局还是抠细节？理性还是感性？
 
-## Social Style
-How do they communicate? Humor type? How they talk to close friends vs acquaintances?
+## 兴趣偏好
+看什么内容、玩什么游戏、喜欢什么运动、审美倾向。要具体。
 
-## Expression Characteristics
-Vocabulary patterns, tone, emotional expression style. How would you recognize their writing?
+## 社交风格
+跟不同人怎么相处？跟好朋友 vs 不熟的人？幽默类型？
+列出他最亲密的朋友以及跟每个人的关系特点。
 
-Rules:
-- Write in third person ("this person tends to...")
-- Be specific and evidence-based, not generic
-- Include contradictions if they exist — real people are complex
-- Each section should be 3-8 bullet points
-- Total length: 500-1500 words
-- This profile should make someone who knows this person say "yes, that's exactly them"
+## 具体记忆
+他生活中发生过的具体事情（买了什么、去了哪、跟谁做了什么）。
+按时间排列，越具体越好。
+
+规则：
+- 全部用中文写
+- 用第三人称（"这个人..."）
+- 具体且有证据支撑，不要笼统
+- 包含矛盾——真实的人是复杂的
+- 每个部分 3-8 个要点
+- 重点是"说话方式"部分——这决定了 AI 镜像的对话质量
+- 这份画像应该让认识这个人的朋友看了说"这就是他"
 
 ---
 
