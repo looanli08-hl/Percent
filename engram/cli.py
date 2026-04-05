@@ -429,6 +429,25 @@ def chat(
         console.print(f"[bold cyan]Engram:[/bold cyan] {response}\n")
 
 
+# ── engram web ───────────────────────────────────────────────────────────────
+
+
+@app.command()
+def web(
+    port: int = typer.Option(18900, help="Port to run the web UI on."),
+) -> None:
+    """Launch Engram Web UI in your browser."""
+    import threading
+    import webbrowser
+
+    from engram.web import start_server
+
+    url = f"http://localhost:{port}"
+    console.print(f"[cyan]Starting Engram Web UI at {url}[/cyan]")
+    threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+    start_server(port=port)
+
+
 # ── engram export soul ───────────────────────────────────────────────────────
 
 
