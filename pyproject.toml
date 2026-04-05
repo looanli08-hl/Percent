@@ -17,6 +17,7 @@ dependencies = [
     "zstandard>=0.25.0",
     "fastapi>=0.135.3",
     "uvicorn[standard]>=0.43.0",
+    "python-multipart>=0.0.22",
 ]
 
 [project.scripts]
