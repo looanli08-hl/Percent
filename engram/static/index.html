@@ -50,14 +50,61 @@
   </script>
 
   <style>
+    /* ── Theme Variables ───────────────────────────────────────────── */
+    :root {
+      --bg: #131211;
+      --bg-surface: #1a1816;
+      --bg-elevated: #232120;
+      --bg-chat: #131211;
+      --text-primary: #e8e2d9;
+      --text-secondary: #9c9488;
+      --text-muted: #5c5650;
+      --accent: #c4654a;
+      --accent-hover: #d47a62;
+      --accent-subtle: rgba(196, 101, 74, 0.12);
+      --border: #2a2725;
+      --border-light: #1e1c1a;
+      --user-msg-bg: rgba(196, 101, 74, 0.1);
+      --user-msg-border: rgba(196, 101, 74, 0.2);
+      --mirror-msg-color: #c8c0b4;
+      --input-bg: #1a1816;
+      --input-border: #2a2725;
+      --input-focus: #c4654a;
+      --drop-bg: rgba(19, 18, 17, 0.95);
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    :root.light {
+      --bg: #f6f3ee;
+      --bg-surface: #edeae4;
+      --bg-elevated: #ffffff;
+      --bg-chat: #f6f3ee;
+      --text-primary: #1a1816;
+      --text-secondary: #5c5650;
+      --text-muted: #9c9488;
+      --accent: #b85540;
+      --accent-hover: #a04832;
+      --accent-subtle: rgba(184, 85, 64, 0.08);
+      --border: #ddd8d0;
+      --border-light: #e8e4de;
+      --user-msg-bg: rgba(184, 85, 64, 0.06);
+      --user-msg-border: rgba(184, 85, 64, 0.15);
+      --mirror-msg-color: #3a3530;
+      --input-bg: #ffffff;
+      --input-border: #ddd8d0;
+      --input-focus: #b85540;
+      --drop-bg: rgba(246, 243, 238, 0.95);
+      --shadow: 0 1px 3px rgba(139, 109, 80, 0.08);
+    }
+
     /* ── Reset & Base ──────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { font-size: 16px; }
 
     body {
-      background: #131211;
-      color: #e8e2d9;
+      background: var(--bg);
+      color: var(--text-primary);
       font-family: 'DM Sans', system-ui, sans-serif;
       font-size: 0.9375rem;
       line-height: 1.65;
@@ -65,6 +112,7 @@
       -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
       height: 100dvh;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* ── Scrollbar ─────────────────────────────────────────────────── */
@@ -113,7 +161,7 @@
       background: rgba(19, 18, 17, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid #232120;
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       z-index: 10;
       position: relative;
@@ -144,7 +192,7 @@
     .header-btn:hover {
       border-color: #4a4540;
       color: #e8e2d9;
-      background: #232120;
+      background: var(--bg-elevated);
     }
 
     .header-btn--accent {
@@ -239,11 +287,11 @@
     }
 
     .source-item:hover {
-      background: #232120;
+      background: var(--bg-elevated);
     }
 
     .source-item.selected {
-      background: #232120;
+      background: var(--bg-elevated);
       border-color: #3a3633;
     }
 
@@ -264,7 +312,7 @@
       justify-content: center;
       font-size: 1rem;
       flex-shrink: 0;
-      background: #232120;
+      background: var(--bg-elevated);
       border: 1px solid #3a3633;
     }
 
@@ -300,7 +348,7 @@
     .source-detail {
       display: none;
       padding: 24px;
-      background: #1a1816;
+      background: var(--bg-surface);
       border: 1px solid #3a3633;
       border-radius: 10px;
       margin-bottom: 40px;
@@ -344,7 +392,7 @@
       min-width: 24px;
       height: 24px;
       border-radius: 6px;
-      background: #232120;
+      background: var(--bg-elevated);
       border: 1px solid #3a3633;
       color: #6b6460;
       font-size: 0.6875rem;
@@ -370,7 +418,7 @@
     .source-steps li code {
       font-family: 'DM Mono', 'SF Mono', monospace;
       font-size: 0.8125rem;
-      background: #232120;
+      background: var(--bg-elevated);
       padding: 1px 6px;
       border-radius: 4px;
       color: #e8917a;
@@ -426,7 +474,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      background: #232120;
+      background: var(--bg-elevated);
       border: 1px solid #3a3633;
       border-radius: 8px;
       padding: 10px 14px;
@@ -489,7 +537,7 @@
       font-size: 0.8125rem;
       color: #e8e2d9;
       font-family: inherit;
-      background: #232120;
+      background: var(--bg-elevated);
       outline: none;
       transition: border-color 0.15s;
     }
@@ -585,7 +633,7 @@
       border-radius: 16px;
       padding: 56px 72px;
       text-align: center;
-      background: #1a1816;
+      background: var(--bg-surface);
     }
 
     .drop-overlay-headline {
@@ -674,8 +722,8 @@
       min-width: 300px;
       display: flex;
       flex-direction: column;
-      border-right: 1px solid #232120;
-      background: #131211;
+      border-right: 1px solid var(--border);
+      background: var(--bg);
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -695,6 +743,51 @@
       margin-bottom: 20px;
     }
 
+    /* Collapsible profile sections */
+    .profile-details {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .profile-summary {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.125rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      padding: 14px 0;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .profile-summary::-webkit-details-marker { display: none; }
+
+    .profile-summary::after {
+      content: '›';
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .profile-details[open] .profile-summary::after {
+      transform: rotate(90deg);
+    }
+
+    .profile-details-body {
+      font-size: 0.875rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      padding: 0 0 16px 0;
+    }
+
+    .profile-details-body p { margin: 0 0 10px; }
+    .profile-details-body p:last-child { margin-bottom: 0; }
+    .profile-details-body ul { margin: 0 0 10px; padding-left: 16px; }
+    .profile-details-body li { margin-bottom: 6px; }
+    .profile-details-body strong { color: var(--text-primary); font-weight: 600; }
+
     /* Persona rendered content — editorial document style */
     .persona-document {
       font-size: 0.875rem;
@@ -709,7 +802,7 @@
       color: #e8e2d9;
       margin: 36px 0 12px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #232120;
+      border-bottom: 1px solid var(--border);
       letter-spacing: -0.01em;
     }
 
@@ -759,7 +852,7 @@
     .persona-document code {
       font-family: 'DM Mono', 'SF Mono', monospace;
       font-size: 0.8125rem;
-      background: #232120;
+      background: var(--bg-elevated);
       padding: 1px 5px;
       border-radius: 3px;
       color: #e8917a;
@@ -879,7 +972,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #1a1816;
+      background: var(--bg-surface);
     }
 
     .chat-messages {
@@ -946,7 +1039,7 @@
     }
 
     .welcome-prompt:hover {
-      background: #232120;
+      background: var(--bg-elevated);
       color: #e8e2d9;
     }
 
@@ -1031,7 +1124,7 @@
     .thread-msg.assistant .thread-msg-body code {
       font-family: 'DM Mono', 'SF Mono', monospace;
       font-size: 0.8125rem;
-      background: #232120;
+      background: var(--bg-elevated);
       padding: 1px 5px;
       border-radius: 3px;
       color: #e8917a;
@@ -1077,7 +1170,7 @@
     .chat-input-area {
       padding: 12px clamp(20px, 4vw, 48px) 20px;
       border-top: 1px solid #232120;
-      background: #1a1816;
+      background: var(--bg-surface);
     }
 
     .chat-input-container {
@@ -1095,7 +1188,7 @@
       font-size: 0.9375rem;
       color: #e8e2d9;
       font-family: 'DM Sans', system-ui, sans-serif;
-      background: #232120;
+      background: var(--bg-elevated);
       outline: none;
       resize: none;
       line-height: 1.5;
@@ -1377,6 +1470,9 @@
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         New thread
       </button>
+      <button class="header-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle light/dark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
     </div>
   </header>
 
@@ -1518,6 +1614,28 @@
     if (_analyzingInterval) clearInterval(_analyzingInterval);
     _analyzingInterval = null;
   }
+
+  // ── Theme Toggle ──────────────────────────────────────────────────────────────
+
+  function toggleTheme() {
+    const root = document.documentElement;
+    const isLight = root.classList.toggle('light');
+    localStorage.setItem('engram-theme', isLight ? 'light' : 'dark');
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.innerHTML = isLight
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    }
+  }
+
+  // Restore theme from localStorage
+  (function() {
+    const saved = localStorage.getItem('engram-theme');
+    if (saved === 'light') {
+      document.documentElement.classList.add('light');
+    }
+  })();
 
   // ── View Switching ────────────────────────────────────────────────────────────
 
@@ -1942,8 +2060,21 @@
       return;
     }
 
-    // Render as flowing document
-    container.innerHTML = `<div class="persona-document">${renderMarkdownBody(content)}</div>`;
+    // Split by ## headings into collapsible sections
+    const sections = content.split(/^## /m).filter(s => s.trim());
+    let html = '';
+    sections.forEach((section, i) => {
+      const lines = section.split('\n');
+      const title = lines[0].trim();
+      const body = lines.slice(1).join('\n').trim();
+      const isOpen = i === 0 ? 'open' : '';
+      html += `
+        <details class="profile-details" ${isOpen}>
+          <summary class="profile-summary">${escHtml(title)}</summary>
+          <div class="profile-details-body">${renderMarkdownBody(body)}</div>
+        </details>`;
+    });
+    container.innerHTML = html;
   }
 
   // WeChat emoji code → real emoji mapping
