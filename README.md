@@ -62,7 +62,7 @@ percent persona validate --num-tests 10
 ## Quick Start
 
 ```bash
-git clone https://github.com/looanli08-hl/engram && cd engram
+git clone https://github.com/looanli08-hl/Percent && cd engram
 uv sync
 uv run percent init
 uv run percent import run wechat ~/exports/wechat_chat.csv
@@ -192,7 +192,7 @@ The most impactful contributions right now:
 To add a parser, subclass `DataParser` in `percent/parsers/`, register it in `cli.py`, and add tests under `tests/test_parsers/`.
 
 ```bash
-git clone https://github.com/looanli08-hl/engram
+git clone https://github.com/looanli08-hl/Percent
 cd engram
 uv sync
 uv run pytest tests/ -v
