@@ -80,6 +80,16 @@ def get_fingerprint() -> dict:
     return {}
 
 
+@app.get("/api/big-five")
+def get_big_five() -> dict:
+    """Return Big Five personality scores."""
+    bf_path = _config.percent_dir / "big_five.json"
+    if bf_path.exists():
+        import json
+        return json.loads(bf_path.read_text(encoding="utf-8"))
+    return {}
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
     """Send a message to the persona and get a response."""

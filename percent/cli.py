@@ -364,6 +364,44 @@ def persona_deep_analyze() -> None:
     console.print(f"Updated core.md with deeper insights.")
 
 
+# ── percent persona big-five ──────────────────────────────────────────────────
+
+
+@persona_app.command("big-five")
+def persona_big_five() -> None:
+    """Compute Big Five personality scores from your profile."""
+    from percent.config import load_config
+    from percent.llm.client import LLMClient
+    from percent.persona.big_five import compute_big_five, save_big_five
+
+    config = load_config()
+
+    if not config.core_path.exists():
+        console.print(_NO_PROFILE_MSG)
+        raise typer.Exit(0)
+
+    if not config.llm_api_key:
+        console.print("[yellow]Warning: no API key configured. Run 'percent init' first.[/yellow]")
+
+    core_md = config.core_path.read_text(encoding="utf-8")
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+
+    with console.status("[bold]Computing Big Five personality scores…[/bold]"):
+        result = compute_big_five(client, core_md, prompts_dir=_PROMPTS_DIR)
+
+    big_five_path = config.percent_dir / "big_five.json"
+    save_big_five(result, big_five_path)
+
+    console.print()
+    console.print(result.format_report())
+    console.print(f"[green]Saved to {big_five_path}[/green]")
+
+
 # ── percent persona validate ──────────────────────────────────────────────────
 
 
