@@ -200,6 +200,211 @@ def import_bilibili_auto(
     console.print(f"  Core profile: {config.core_path}")
 
 
+# ── percent import wechat-auto ────────────────────────────────────────────────
+
+
+@import_app.command("wechat-auto")
+def import_wechat_auto(
+    decrypt_dir: Path = typer.Option(
+        None, "--decrypt-dir", "-d",
+        help="Path to wechat-decrypt output (auto-detect if omitted)",
+    ),
+) -> None:
+    """Auto-import WeChat from decrypted database (Windows → Mac workflow)."""
+    import platform
+
+    from percent.config import load_config
+
+    config = load_config()
+    if not config.llm_api_key:
+        console.print("[red]No API key configured. Run 'percent init' first.[/red]")
+        raise typer.Exit(1)
+
+    # Auto-detect common decrypt output paths
+    if decrypt_dir is None:
+        candidates = [
+            Path.home() / "Documents" / "wechat-decrypt" / "decrypted",
+            Path.home() / "Desktop" / "decrypted",
+            Path.home() / "Downloads" / "decrypted",
+            Path.home() / "wechat-decrypt" / "decrypted",
+        ]
+        if platform.system() == "Windows":
+            candidates.insert(0, Path("C:/wechat-decrypt/decrypted"))
+
+        for p in candidates:
+            if p.exists():
+                decrypt_dir = p
+                console.print(f"[cyan]Auto-detected: {decrypt_dir}[/cyan]")
+                break
+
+    if decrypt_dir is None or not decrypt_dir.exists():
+        console.print("[yellow]Could not find decrypted WeChat database.[/yellow]")
+        console.print("\nSteps:")
+        console.print("  1. On Windows: git clone https://github.com/ylytdeng/wechat-decrypt")
+        console.print("  2. Run: python main.py decrypt")
+        console.print("  3. Copy the 'decrypted' folder to this Mac")
+        console.print("  4. Run: percent import wechat-auto -d /path/to/decrypted")
+        raise typer.Exit(0)
+
+    # Use the wechat-db parser
+    from percent.parsers.wechat_db import WeChatDBParser
+
+    parser = WeChatDBParser()
+    if not parser.validate(decrypt_dir):
+        console.print(f"[red]No valid WeChat database found in {decrypt_dir}[/red]")
+        raise typer.Exit(1)
+
+    console.print("[cyan]Parsing WeChat database...[/cyan]")
+    chunks = parser.parse(decrypt_dir)
+
+    if not chunks:
+        console.print("[yellow]No messages found.[/yellow]")
+        raise typer.Exit(0)
+
+    console.print(f"[cyan]Parsed {len(chunks)} message groups. Running personality analysis...[/cyan]")
+
+    from percent.llm.client import LLMClient
+    from percent.persona.engine import PersonaEngine
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    engine = PersonaEngine(
+        client=client,
+        percent_dir=config.percent_dir,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=config.embedding_model,
+    )
+
+    with console.status("[bold cyan]Analyzing personality...[/bold cyan]"):
+        engine.run(chunks)
+
+    console.print("\n[green]Analysis complete![/green]")
+    console.print(f"  Message groups: {len(chunks)}")
+    console.print(f"  Core profile: {config.core_path}")
+
+
+# ── percent import telegram ───────────────────────────────────────────────────
+
+
+@import_app.command("telegram")
+def import_telegram_auto(
+    api_id: int = typer.Option(..., "--api-id", help="Telegram API ID (from my.telegram.org)"),
+    api_hash: str = typer.Option(..., "--api-hash", help="Telegram API hash"),
+    phone: str = typer.Option(..., "--phone", help="Phone number with country code"),
+    max_messages: int = typer.Option(5000, "--max-messages", help="Max messages to fetch"),
+) -> None:
+    """Import Telegram chat history directly via Telethon API."""
+    from percent.config import load_config
+
+    config = load_config()
+    if not config.llm_api_key:
+        console.print("[red]No API key configured. Run 'percent init' first.[/red]")
+        raise typer.Exit(1)
+
+    console.print("[cyan]Connecting to Telegram...[/cyan]")
+    console.print("[yellow]You may be asked to enter a verification code.[/yellow]")
+
+    try:
+        from percent.parsers.telegram_api import fetch_telegram_history
+    except ImportError:
+        console.print("[red]Telethon is required: pip install telethon[/red]")
+        raise typer.Exit(1)
+
+    session_path = config.percent_dir / "telegram_session"
+    try:
+        chunks = fetch_telegram_history(
+            api_id, api_hash, phone, max_messages, session_path
+        )
+    except Exception as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+
+    if not chunks:
+        console.print("[yellow]No messages found.[/yellow]")
+        raise typer.Exit(0)
+
+    total_msgs = sum(len(c.content.split("\n")) for c in chunks)
+    console.print(f"[cyan]Fetched ~{total_msgs} messages. Running personality analysis...[/cyan]")
+
+    from percent.llm.client import LLMClient
+    from percent.persona.engine import PersonaEngine
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    engine = PersonaEngine(
+        client=client,
+        percent_dir=config.percent_dir,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=config.embedding_model,
+    )
+
+    with console.status("[bold cyan]Analyzing personality...[/bold cyan]"):
+        engine.run(chunks)
+
+    console.print("\n[green]Analysis complete![/green]")
+    console.print(f"  Messages analyzed: ~{total_msgs}")
+    console.print(f"  Core profile: {config.core_path}")
+
+
+# ── percent import youtube ────────────────────────────────────────────────────
+
+
+@import_app.command("youtube")
+def import_youtube_auto(
+    cookie: str = typer.Option(..., "--cookie", "-c", help="Your YouTube cookie string"),
+    max_pages: int = typer.Option(20, "--max-pages", help="Maximum pages to fetch"),
+) -> None:
+    """Import YouTube watch history directly via API (no Takeout needed)."""
+    from percent.config import load_config
+    from percent.parsers.youtube_api import fetch_youtube_history
+
+    config = load_config()
+    if not config.llm_api_key:
+        console.print("[red]No API key configured. Run 'percent init' first.[/red]")
+        raise typer.Exit(1)
+
+    console.print("[cyan]Fetching YouTube watch history via API...[/cyan]")
+    try:
+        chunks = fetch_youtube_history(cookie, max_pages=max_pages)
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+        raise typer.Exit(1)
+
+    if not chunks:
+        console.print("[yellow]No watch history found. Check your cookie.[/yellow]")
+        raise typer.Exit(0)
+
+    console.print(f"[cyan]Fetched {len(chunks)} videos. Running personality analysis...[/cyan]")
+
+    from percent.llm.client import LLMClient
+    from percent.persona.engine import PersonaEngine
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    engine = PersonaEngine(
+        client=client,
+        percent_dir=config.percent_dir,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=config.embedding_model,
+    )
+
+    with console.status("[bold cyan]Analyzing personality...[/bold cyan]"):
+        engine.run(chunks)
+
+    console.print("\n[green]Analysis complete![/green]")
+    console.print(f"  Videos analyzed: {len(chunks)}")
+    console.print(f"  Core profile: {config.core_path}")
+
+
 # ── percent import guide ──────────────────────────────────────────────────────
 
 
