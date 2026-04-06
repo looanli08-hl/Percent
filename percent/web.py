@@ -9,14 +9,21 @@ from fastapi import FastAPI, Form, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from percent.config import load_config
+from percent.config import PercentConfig, load_config
 from percent.persona.fragments import FragmentStore
 
 app = FastAPI(title="Percent", description="Open-source personality modeling engine")
 
 # Global state (initialized on startup)
 _chat_engine = None
-_config = None
+_config: PercentConfig | None = None
+
+
+def _require_config() -> PercentConfig:
+    """Return config or raise if not initialized."""
+    if _config is None:
+        raise RuntimeError("Server not initialized")
+    return _config
 
 _PROMPTS_DIR = Path(__file__).parent / "prompts"
 _STATIC_DIR = Path(__file__).parent / "static"
@@ -52,7 +59,8 @@ def startup() -> None:
 @app.get("/api/persona")
 def get_persona() -> dict:
     """Return core.md content as JSON."""
-    core_path = _config.core_path
+    cfg = _require_config()
+    core_path = cfg.core_path
     if core_path.exists():
         return {"content": core_path.read_text(encoding="utf-8")}
     return {"content": "No personality profile yet. Run `percent import run` first."}
@@ -61,7 +69,7 @@ def get_persona() -> dict:
 @app.get("/api/stats")
 def get_stats() -> dict:
     """Return fragment statistics."""
-    db_path = _config.fragments_db_path
+    db_path = _require_config().fragments_db_path
     if not db_path.exists():
         return {"total": 0, "by_source": {}, "by_category": {}}
     store = FragmentStore(db_path)
@@ -71,22 +79,24 @@ def get_stats() -> dict:
 
 
 @app.get("/api/fingerprint")
-def get_fingerprint() -> dict:
+def get_fingerprint() -> dict:  # type: ignore[type-arg]
     """Return behavioral fingerprint data."""
-    fp_path = _config.percent_dir / "fingerprint.json"
+    fp_path = _require_config().percent_dir / "fingerprint.json"
     if fp_path.exists():
         import json
-        return json.loads(fp_path.read_text(encoding="utf-8"))
+        data: dict = json.loads(fp_path.read_text(encoding="utf-8"))
+        return data
     return {}
 
 
 @app.get("/api/big-five")
-def get_big_five() -> dict:
+def get_big_five() -> dict:  # type: ignore[type-arg]
     """Return Big Five personality scores."""
-    bf_path = _config.percent_dir / "big_five.json"
+    bf_path = _require_config().percent_dir / "big_five.json"
     if bf_path.exists():
         import json
-        return json.loads(bf_path.read_text(encoding="utf-8"))
+        data: dict = json.loads(bf_path.read_text(encoding="utf-8"))
+        return data
     return {}
 
 
@@ -95,7 +105,11 @@ def chat(req: ChatRequest) -> ChatResponse:
     """Send a message to the persona and get a response."""
     if _chat_engine is None:
         return ChatResponse(
-            response="No personality profile loaded. Run `percent import run` to build your persona first."
+            response=(
+                "No personality profile loaded."
+                " Run `percent import run`"
+                " to build your persona first."
+            )
         )
     response = _chat_engine.send(req.message)
     return ChatResponse(response=response)
@@ -112,7 +126,7 @@ def reset_chat() -> dict:
 @app.get("/api/has-data")
 def has_data() -> dict:
     """Check if persona data exists."""
-    has_core = _config.core_path.exists() if _config else False
+    has_core = _config is not None and _config.core_path.exists()
     return {"has_data": has_core}
 
 
@@ -132,9 +146,10 @@ async def upload_file(file: UploadFile, source: str = Form(...)) -> dict:
     import shutil
     import zipfile
 
-    raw_dir = _config.percent_dir / "raw" / source
+    cfg = _require_config()
+    raw_dir = cfg.percent_dir / "raw" / source
     raw_dir.mkdir(parents=True, exist_ok=True)
-    dest = raw_dir / file.filename
+    dest = raw_dir / (file.filename or "upload")
 
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
@@ -145,7 +160,12 @@ async def upload_file(file: UploadFile, source: str = Form(...)) -> dict:
             with zipfile.ZipFile(dest, "r") as zf:
                 zf.extractall(raw_dir)
             dest.unlink()  # Remove the zip after extraction
-            return {"status": "ok", "path": str(raw_dir), "filename": file.filename, "extracted": True}
+            return {
+                "status": "ok",
+                "path": str(raw_dir),
+                "filename": file.filename,
+                "extracted": True,
+            }
         except zipfile.BadZipFile:
             pass  # Not a valid zip, keep as-is
 
@@ -162,7 +182,8 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
     source = req.source if req else None
     import importlib
 
-    raw_dir = _config.percent_dir / "raw"
+    cfg = _require_config()
+    raw_dir = cfg.percent_dir / "raw"
     if not raw_dir.exists():
         return {"status": "error", "message": "No imported files found."}
 
@@ -217,39 +238,40 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
 
 def _run_analysis(chunks: list) -> dict:
     """Run personality analysis on chunks and reinitialize chat engine."""
+    cfg = _require_config()
+
     from percent.llm.client import LLMClient
     from percent.persona.engine import PersonaEngine
 
     client = LLMClient(
-        provider=_config.llm_provider,
-        model=_config.llm_model,
-        api_key=_config.llm_api_key,
+        provider=cfg.llm_provider,
+        model=cfg.llm_model,
+        api_key=cfg.llm_api_key,
     )
     engine = PersonaEngine(
         client=client,
-        percent_dir=_config.percent_dir,
+        percent_dir=cfg.percent_dir,
         prompts_dir=_PROMPTS_DIR,
-        embedding_model=_config.embedding_model,
+        embedding_model=cfg.embedding_model,
     )
 
     engine.run(chunks)
 
-    # Initialize or reinitialize chat engine with updated persona
     global _chat_engine
     from percent.chat.engine import ChatEngine
     _chat_engine = ChatEngine(
-        percent_dir=_config.percent_dir,
-        provider=_config.llm_provider,
-        model=_config.llm_model,
-        api_key=_config.llm_api_key,
+        percent_dir=cfg.percent_dir,
+        provider=cfg.llm_provider,
+        model=cfg.llm_model,
+        api_key=cfg.llm_api_key,
         prompts_dir=_PROMPTS_DIR,
-        embedding_model=_config.embedding_model,
+        embedding_model=cfg.embedding_model,
     )
 
     stats = engine.stats()
     return {
         "status": "ok",
-        "chunks_analyzed": len(all_chunks),
+        "chunks_analyzed": len(chunks),
         "total_fragments": stats.get("total", 0),
         "sources": list(stats.get("by_source", {}).keys()),
     }

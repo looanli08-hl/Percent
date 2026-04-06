@@ -234,7 +234,7 @@ class TelegramParser(DataParser):
         ))
         if non_self_senders:
             if len(non_self_senders) == 1:
-                return non_self_senders[0]
+                return str(non_self_senders[0])
             return ", ".join(non_self_senders[:2]) + (
                 f" +{len(non_self_senders) - 2}" if len(non_self_senders) > 2 else ""
             )

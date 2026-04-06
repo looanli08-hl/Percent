@@ -264,7 +264,10 @@ def import_wechat_auto(
         console.print("[yellow]No messages found.[/yellow]")
         raise typer.Exit(0)
 
-    console.print(f"[cyan]Parsed {len(chunks)} message groups. Running personality analysis...[/cyan]")
+    console.print(
+        f"[cyan]Parsed {len(chunks)} message groups."
+        " Running personality analysis...[/cyan]"
+    )
 
     from percent.llm.client import LLMClient
     from percent.persona.engine import PersonaEngine
@@ -471,7 +474,10 @@ def persona_view() -> None:
     config = load_config()
 
     if not config.core_path.exists():
-        console.print("[yellow]No personality profile yet. Run 'percent import run' first.[/yellow]")
+        console.print(
+            "[yellow]No personality profile yet."
+            " Run 'percent import run' first.[/yellow]"
+        )
         raise typer.Exit(0)
 
     content = config.core_path.read_text(encoding="utf-8")
@@ -567,9 +573,9 @@ def persona_deep_analyze() -> None:
         raise typer.Exit(0)
 
     stats = engine.stats()
-    console.print(f"\n[green]Deep analysis complete.[/green]")
+    console.print("\n[green]Deep analysis complete.[/green]")
     console.print(f"Total fragments: {stats['total']} (including deep analysis findings)")
-    console.print(f"Updated core.md with deeper insights.")
+    console.print("Updated core.md with deeper insights.")
 
 
 # ── percent persona big-five ──────────────────────────────────────────────────
@@ -615,13 +621,12 @@ def persona_big_five() -> None:
 
 @persona_app.command("validate")
 def persona_validate(
-    num_tests: int = typer.Option(10, help="Number of fragments to use as test cases."),
+    num_tests: int = typer.Option(10, help="Number of raw data samples to evaluate against."),
 ) -> None:
-    """Run PersonaBench — measure personality model accuracy."""
+    """Run PersonaBench — reproducible personality model evaluation against raw data."""
     from percent.config import load_config
     from percent.llm.client import LLMClient
     from percent.persona.bench import PersonaBench
-    from percent.persona.fragments import FragmentStore
     from percent.persona.validator import PersonaValidator
 
     config = load_config()
@@ -660,7 +665,10 @@ def persona_validate(
                         pass
 
     if not test_chunks:
-        console.print("[yellow]No raw data found for evaluation. Run 'percent import run' first.[/yellow]")
+        console.print(
+            "[yellow]No raw data found for evaluation."
+            " Run 'percent import run' first.[/yellow]"
+        )
         raise typer.Exit(0)
 
     # Shuffle for random sampling

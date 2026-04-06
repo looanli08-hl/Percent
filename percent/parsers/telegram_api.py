@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from percent.models import ChunkType, DataChunk
@@ -56,7 +56,7 @@ async def _fetch_history(
 
             sender = "[我]" if message.sender_id == my_id else f"[{contact_name}]"
             batch.append(f"{sender} {message.text}")
-            batch_timestamps.append(message.date.replace(tzinfo=timezone.utc))
+            batch_timestamps.append(message.date.replace(tzinfo=UTC))
             msg_count += 1
 
             if msg_count >= max_messages:
@@ -66,7 +66,7 @@ async def _fetch_history(
             # Group into chunks of ~50 messages
             for i in range(0, len(batch), 50):
                 segment = batch[i : i + 50]
-                ts = batch_timestamps[i] if i < len(batch_timestamps) else datetime.now(tz=timezone.utc)
+                ts = batch_timestamps[i] if i < len(batch_timestamps) else datetime.now(tz=UTC)
                 chunks.append(
                     DataChunk(
                         source="telegram",

@@ -11,7 +11,6 @@ import numpy as np
 from percent.llm.client import LLMClient
 from percent.models import Finding, FindingCategory, Fragment
 
-
 _DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 # Similarity threshold for considering two findings as corroborating

@@ -62,10 +62,11 @@ percent persona validate --num-tests 10
 ## Quick Start
 
 ```bash
-pip install percent
-percent init
-percent import run wechat ~/exports/wechat_chat.csv
-percent chat
+git clone https://github.com/looanli08-hl/engram && cd engram
+uv sync
+uv run percent init
+uv run percent import run wechat ~/exports/wechat_chat.csv
+uv run percent chat
 ```
 
 That's it. After `import run`, Percent has built your `core.md` and chat speaks as you.
@@ -170,8 +171,8 @@ The most impactful contributions right now:
 To add a parser, subclass `DataParser` in `percent/parsers/`, register it in `cli.py`, and add tests under `tests/test_parsers/`.
 
 ```bash
-git clone https://github.com/looanli08-hl/percent
-cd percent
+git clone https://github.com/looanli08-hl/engram
+cd engram
 uv sync
 uv run pytest tests/ -v
 ```

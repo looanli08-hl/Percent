@@ -32,7 +32,14 @@ class TestParseResult:
         assert result.conscientiousness.score == 0
 
     def test_parse_with_surrounding_text(self):
-        text = """Here are the results:\n{"openness": {"score": 60, "reasoning": "test"}, "conscientiousness": {"score": 60, "reasoning": "test"}, "extraversion": {"score": 60, "reasoning": "test"}, "agreeableness": {"score": 60, "reasoning": "test"}, "neuroticism": {"score": 60, "reasoning": "test"}}"""
+        text = (
+            'Here are the results:\n{'
+            '"openness": {"score": 60, "reasoning": "test"}, '
+            '"conscientiousness": {"score": 60, "reasoning": "test"}, '
+            '"extraversion": {"score": 60, "reasoning": "test"}, '
+            '"agreeableness": {"score": 60, "reasoning": "test"}, '
+            '"neuroticism": {"score": 60, "reasoning": "test"}}'
+        )
         result = _parse_result(text)
         assert result.openness.score == 60
 

@@ -2,12 +2,11 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
 from percent.models import ChunkType, DataChunk
-
 
 HISTORY_API = "https://api.bilibili.com/x/web-interface/history/cursor"
 
@@ -33,7 +32,7 @@ def fetch_bilibili_history(cookie: str, max_pages: int = 50) -> list[DataChunk]:
     business = ""
 
     for page in range(max_pages):
-        params = {"view_at": view_at, "business": business} if view_at else {}
+        params: dict[str, str] = {"view_at": str(view_at), "business": business} if view_at else {}
 
         try:
             resp = requests.get(HISTORY_API, headers=headers, params=params, timeout=10)
@@ -68,9 +67,9 @@ def fetch_bilibili_history(cookie: str, max_pages: int = 50) -> list[DataChunk]:
             item_view_at = item.get("view_at", 0)
 
             timestamp = (
-                datetime.fromtimestamp(item_view_at, tz=timezone.utc)
+                datetime.fromtimestamp(item_view_at, tz=UTC)
                 if item_view_at
-                else datetime.now(tz=timezone.utc)
+                else datetime.now(tz=UTC)
             )
 
             content = f"Watched: {title} (by {author})"

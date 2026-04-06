@@ -62,10 +62,11 @@ percent persona validate --num-tests 10
 ## 快速开始
 
 ```bash
-pip install percent
-percent init
-percent import run wechat ~/exports/wechat_chat.csv
-percent chat
+git clone https://github.com/looanli08-hl/engram && cd engram
+uv sync
+uv run percent init
+uv run percent import run wechat ~/exports/wechat_chat.csv
+uv run percent chat
 ```
 
 就这四步。`import run` 完成后，Percent 已经构建好你的 `core.md`，chat 就会以你的风格说话。
@@ -170,8 +171,8 @@ Percent 是开源项目，欢迎贡献。
 添加解析器：在 `percent/parsers/` 中继承 `DataParser`，在 `cli.py` 注册，并在 `tests/test_parsers/` 下添加测试。
 
 ```bash
-git clone https://github.com/looanli08-hl/percent
-cd percent
+git clone https://github.com/looanli08-hl/engram
+cd engram
 uv sync
 uv run pytest tests/ -v
 ```

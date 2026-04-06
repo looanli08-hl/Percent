@@ -1,10 +1,8 @@
 """Fetch YouTube watch history via internal API using user's cookie."""
 from __future__ import annotations
 
-import json
-import re
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
@@ -188,7 +186,7 @@ def _item_to_chunk(item: dict) -> DataChunk | None:
     return DataChunk(
         source="youtube",
         type=ChunkType.WATCH_HISTORY,
-        timestamp=datetime.now(tz=timezone.utc),
+        timestamp=datetime.now(tz=UTC),
         content=content,
         metadata=metadata,
     )

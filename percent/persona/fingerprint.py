@@ -6,9 +6,9 @@ that language models cannot infer from content alone.
 from __future__ import annotations
 
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import numpy as np
 
@@ -155,8 +155,12 @@ def analyze_fingerprint(chunks: list[DataChunk]) -> BehavioralFingerprint:
         lens = np.array(msg_lengths)
         fp.avg_length = float(lens.mean())
         fp.median_length = float(np.median(lens))
-        fp.short_msg_pct = sum(1 for l in lens if l < 5) * 100 / len(lens)
-        fp.long_msg_pct = sum(1 for l in lens if l > 50) * 100 / len(lens)
+        fp.short_msg_pct = (
+            sum(1 for length in lens if length < 5) * 100 / len(lens)
+        )
+        fp.long_msg_pct = (
+            sum(1 for length in lens if length > 50) * 100 / len(lens)
+        )
         fp.emoji_pct = emoji_count * 100 / total_self if total_self else 0
 
     # Temporal
@@ -170,7 +174,11 @@ def analyze_fingerprint(chunks: list[DataChunk]) -> BehavioralFingerprint:
     # Social
     fp.top_contacts = contact_counts.most_common(20)
     fp.unique_contacts = len(contact_counts)
-    fp.initiation_rate = total_self * 100 / (total_self + total_other) if (total_self + total_other) else 0
+    fp.initiation_rate = (
+        total_self * 100 / (total_self + total_other)
+        if (total_self + total_other)
+        else 0
+    )
 
     # Response
     if response_times:
@@ -235,7 +243,7 @@ def _process_wechat_chunk(
 
             # Approximate timestamp from position in chunk
             approx_ts = base_ts + line_offset * 30  # ~30s between messages
-            dt = datetime.fromtimestamp(approx_ts, tz=timezone.utc)
+            dt = datetime.fromtimestamp(approx_ts, tz=UTC)
             hours[dt.hour] += 1
             weekdays[dt.strftime("%A")] += 1
 

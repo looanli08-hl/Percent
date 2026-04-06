@@ -6,7 +6,7 @@ import re
 import sqlite3
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import zstandard
@@ -331,9 +331,9 @@ class WeChatDBParser(DataParser):
                 self_count = sum(1 for m in window if m.get("is_self", False))
                 ts = window[0]["timestamp"]
                 timestamp = (
-                    datetime.fromtimestamp(ts, tz=timezone.utc)
+                    datetime.fromtimestamp(ts, tz=UTC)
                     if ts
-                    else datetime.now(tz=timezone.utc)
+                    else datetime.now(tz=UTC)
                 )
                 chunks.append(DataChunk(
                     source="wechat",
@@ -387,9 +387,9 @@ class WeChatDBParser(DataParser):
 
                 ts = create_time or 0
                 timestamp = (
-                    datetime.fromtimestamp(ts, tz=timezone.utc)
+                    datetime.fromtimestamp(ts, tz=UTC)
                     if ts
-                    else datetime.now(tz=timezone.utc)
+                    else datetime.now(tz=UTC)
                 )
                 chunks.append(DataChunk(
                     source="wechat-moments",
@@ -455,7 +455,7 @@ class WeChatDBParser(DataParser):
             conn = sqlite3.connect(str(media_db))
             count = conn.execute("SELECT COUNT(*) FROM VoiceInfo").fetchone()[0]
             conn.close()
-            return count
+            return int(count)
         except Exception:
             return 0
 

@@ -254,7 +254,7 @@ class WhatsAppParser(DataParser):
 
         # Fall back to most frequent sender
         if senders:
-            return Counter(senders).most_common(1)[0][0]
+            return str(Counter(senders).most_common(1)[0][0])
         return ""
 
     def _group_into_chunks(self, messages: list[dict], my_name: str) -> list[DataChunk]:

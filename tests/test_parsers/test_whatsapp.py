@@ -169,7 +169,10 @@ def test_skips_encryption_notice(tmp_path: Path) -> None:
     f = _write_chat(
         tmp_path / "chat.txt",
         [
-            "[1/15/26, 10:00:00 AM] Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.",
+            "[1/15/26, 10:00:00 AM] Messages and calls are"
+            " end-to-end encrypted. No one outside of this"
+            " chat, not even WhatsApp, can read or listen"
+            " to them.",
             "[1/15/26, 10:30:00 AM] Me: Hello",
             "[1/15/26, 10:31:00 AM] John: Hi",
         ],

@@ -35,7 +35,17 @@ class FragmentStore:
             self._conn.execute("SELECT content_hash FROM fragments LIMIT 1")
         except sqlite3.OperationalError:
             self._conn.execute("ALTER TABLE fragments ADD COLUMN content_hash TEXT")
-        self._conn.commit()
+            self._conn.commit()
+
+        # Backfill NULL content_hash on existing rows
+        null_rows = self._conn.execute(
+            "SELECT id, content, source FROM fragments WHERE content_hash IS NULL"
+        ).fetchall()
+        for row in null_rows:
+            h = self._hash_content(row["content"], row["source"])
+            self._conn.execute("UPDATE fragments SET content_hash = ? WHERE id = ?", (h, row["id"]))
+        if null_rows:
+            self._conn.commit()
 
     @staticmethod
     def _hash_content(content: str, source: str) -> str:
@@ -53,8 +63,9 @@ class FragmentStore:
             return fragment
 
         cursor = self._conn.execute(
-            "INSERT INTO fragments (category, content, confidence, source, embedding, created_at, content_hash) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO fragments (category, content, confidence,"
+            " source, embedding, created_at, content_hash)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 fragment.category.value,
                 fragment.content,
