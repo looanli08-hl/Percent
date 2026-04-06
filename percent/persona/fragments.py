@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from pathlib import Path
@@ -25,15 +26,35 @@ class FragmentStore:
                 confidence REAL NOT NULL,
                 source TEXT NOT NULL,
                 embedding TEXT NOT NULL,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                content_hash TEXT
             )
         """)
+        # Add content_hash column if missing (migration for existing DBs)
+        try:
+            self._conn.execute("SELECT content_hash FROM fragments LIMIT 1")
+        except sqlite3.OperationalError:
+            self._conn.execute("ALTER TABLE fragments ADD COLUMN content_hash TEXT")
         self._conn.commit()
 
+    @staticmethod
+    def _hash_content(content: str, source: str) -> str:
+        return hashlib.sha256(f"{source}:{content}".encode()).hexdigest()
+
     def add(self, fragment: Fragment) -> Fragment:
+        content_hash = self._hash_content(fragment.content, fragment.source)
+
+        # Skip if duplicate content from same source already exists
+        existing = self._conn.execute(
+            "SELECT id FROM fragments WHERE content_hash = ?", (content_hash,)
+        ).fetchone()
+        if existing:
+            fragment.id = existing[0]
+            return fragment
+
         cursor = self._conn.execute(
-            "INSERT INTO fragments (category, content, confidence, source, embedding, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO fragments (category, content, confidence, source, embedding, created_at, content_hash) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 fragment.category.value,
                 fragment.content,
@@ -41,6 +62,7 @@ class FragmentStore:
                 fragment.source,
                 json.dumps(fragment.embedding),
                 fragment.created_at.isoformat(),
+                content_hash,
             ),
         )
         self._conn.commit()

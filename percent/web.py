@@ -18,7 +18,7 @@ app = FastAPI(title="Percent", description="Open-source personality modeling eng
 _chat_engine = None
 _config = None
 
-_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+_PROMPTS_DIR = Path(__file__).parent / "prompts"
 _STATIC_DIR = Path(__file__).parent / "static"
 
 
@@ -166,6 +166,21 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
     if not raw_dir.exists():
         return {"status": "error", "message": "No imported files found."}
 
+    # Handle Bilibili cookie: use API fetch instead of file parsing
+    if source == "bilibili":
+        cookie_path = raw_dir / "bilibili" / "bilibili_cookie.txt"
+        if cookie_path.exists():
+            from percent.parsers.bilibili_api import fetch_bilibili_history
+
+            cookie = cookie_path.read_text(encoding="utf-8").strip()
+            try:
+                all_chunks = fetch_bilibili_history(cookie)
+            except ValueError as e:
+                return {"status": "error", "message": str(e)}
+            if all_chunks:
+                return _run_analysis(all_chunks)
+            return {"status": "error", "message": "No watch history found. Check your cookie."}
+
     # Determine which source directories to scan
     if source and source in _PARSER_REGISTRY:
         dirs_to_scan = [raw_dir / source]
@@ -178,12 +193,15 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
             continue
         source_name = source_dir.name
 
+        # Skip cookie text files (handled by API above)
         dotted = _PARSER_REGISTRY[source_name]
         module_path, class_name = dotted.rsplit(".", 1)
         module = importlib.import_module(module_path)
         parser = getattr(module, class_name)()
 
         for file_path in sorted(source_dir.rglob("*")):
+            if file_path.is_file() and file_path.name.endswith("_cookie.txt"):
+                continue  # Skip cookie files, they're for API fetch
             if file_path.is_file() and parser.validate(file_path):
                 try:
                     chunks = parser.parse(file_path)
@@ -194,6 +212,11 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
     if not all_chunks:
         return {"status": "error", "message": "No parseable data found in uploaded files."}
 
+    return _run_analysis(all_chunks)
+
+
+def _run_analysis(chunks: list) -> dict:
+    """Run personality analysis on chunks and reinitialize chat engine."""
     from percent.llm.client import LLMClient
     from percent.persona.engine import PersonaEngine
 
@@ -209,10 +232,7 @@ def analyze_source(req: AnalyzeRequest | None = None) -> dict:
         embedding_model=_config.embedding_model,
     )
 
-    # run() is already incremental:
-    # - extracts new findings → appends to fragments.db
-    # - re-synthesizes core.md from ALL fragments (old + new)
-    engine.run(all_chunks)
+    engine.run(chunks)
 
     # Initialize or reinitialize chat engine with updated persona
     global _chat_engine

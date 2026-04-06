@@ -27,7 +27,7 @@ app.add_typer(config_app, name="config")
 
 console = Console()
 
-_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+_PROMPTS_DIR = Path(__file__).parent / "prompts"
 _NO_PROFILE_MSG = "[yellow]No personality profile found. Run 'percent import run' first.[/yellow]"
 
 # ── Supported parsers registry ───────────────────────────────────────────────
@@ -36,6 +36,9 @@ _PARSER_REGISTRY = {
     "bilibili": "percent.parsers.bilibili.BilibiliParser",
     "youtube": "percent.parsers.youtube.YouTubeParser",
     "wechat": "percent.parsers.wechat.WeChatParser",
+    "wechat-db": "percent.parsers.wechat_db.WeChatDBParser",
+    "telegram": "percent.parsers.telegram.TelegramParser",
+    "whatsapp": "percent.parsers.whatsapp.WhatsAppParser",
 }
 
 
@@ -632,27 +635,37 @@ def persona_validate(
 
     core_md = config.core_path.read_text(encoding="utf-8")
 
-    store = FragmentStore(config.fragments_db_path)
-    fragments = store.get_all()
-    store.close()
+    # Re-parse raw data files for held-out evaluation (not extracted findings)
+    import importlib
+    import random
 
-    if not fragments:
-        console.print("[yellow]No fragments found. Run 'percent import run' first.[/yellow]")
+    raw_dir = config.percent_dir / "raw"
+    test_chunks = []
+
+    if raw_dir.exists():
+        for source_dir in sorted(raw_dir.iterdir()):
+            if not source_dir.is_dir() or source_dir.name not in _PARSER_REGISTRY:
+                continue
+            dotted = _PARSER_REGISTRY[source_dir.name]
+            module_path, class_name = dotted.rsplit(".", 1)
+            mod = importlib.import_module(module_path)
+            parser = getattr(mod, class_name)()
+
+            for file_path in sorted(source_dir.rglob("*")):
+                if file_path.is_file() and not file_path.name.endswith("_cookie.txt"):
+                    try:
+                        if parser.validate(file_path):
+                            test_chunks.extend(parser.parse(file_path))
+                    except Exception:
+                        pass
+
+    if not test_chunks:
+        console.print("[yellow]No raw data found for evaluation. Run 'percent import run' first.[/yellow]")
         raise typer.Exit(0)
 
-    from datetime import datetime
-
-    from percent.models import ChunkType, DataChunk
-
-    test_chunks = [
-        DataChunk(
-            source=f.source,
-            type=ChunkType.CONVERSATION,
-            timestamp=datetime.now(),
-            content=f.content,
-        )
-        for f in fragments
-    ]
+    # Shuffle for random sampling
+    random.seed(42)  # Fixed seed for reproducibility
+    random.shuffle(test_chunks)
 
     client = LLMClient(
         provider=config.llm_provider,

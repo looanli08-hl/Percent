@@ -9,7 +9,7 @@ from pathlib import Path
 
 from percent.llm.client import LLMClient
 
-_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent.parent / "prompts"
+_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 _DIMENSIONS = ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"]
 _LABELS = {

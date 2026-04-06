@@ -7,7 +7,7 @@ from pathlib import Path
 from percent.llm.client import LLMClient
 from percent.models import DataChunk
 
-_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent.parent / "prompts"
+_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 _FALLBACK_PROMPT = """\
 ## Personality Profile

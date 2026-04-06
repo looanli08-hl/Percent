@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 from percent.llm.client import LLMClient
 from percent.persona.fragments import FragmentStore
 
-_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent.parent / "prompts"
+_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 _DEFAULT_MODEL = "all-MiniLM-L6-v2"
 
 _FALLBACK_SYSTEM = """\

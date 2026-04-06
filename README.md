@@ -24,7 +24,7 @@ Every AI assistant starts blank. It doesn't know how you think, what you care ab
 
 Feed it your WeChat history, YouTube watch list, Bilibili comments — anything that reflects how you actually think. Percent extracts your personality into a structured model (`core.md`) that any LLM can use to become *your* AI, not a generic one.
 
-- **Privacy-first.** Everything runs locally. Your data never leaves your machine.
+- **Privacy-first.** Raw data stays on your machine. When using cloud LLMs (OpenAI, Claude, DeepSeek), text fragments are sent for analysis — use Ollama for fully local processing.
 - **Source-agnostic.** WeChat, YouTube, Bilibili — more sources coming.
 - **Model-agnostic.** Works with Claude, GPT-4, DeepSeek, Ollama, any LiteLLM-compatible model.
 - **Measurable.** PersonaBench gives you a concrete score — not vibes.
@@ -37,18 +37,18 @@ PersonaBench is Percent's built-in benchmark for measuring how accurately your p
 
 ```
 PersonaBench v0.1
-Score: 84.3%  (10 tests)
+Score: 72.5%  (10 tests)
 
-  [1] 0.91  Profile predicted directness; actual response matches
-  [2] 0.88  Intellectual honesty pattern observed in challenge
-  [3] 0.79  Communication style: concise, no filler
-  [4] 0.85  Systems thinking visible in response structure
-  [5] 0.72  Preference for hard evidence confirmed
-  [6] 0.90  Low tolerance for hedging; matches profile
-  [7] 0.83  Deep-dive tendency over surface overview
-  [8] 0.81  Precise vocabulary consistent with profile
-  [9] 0.86  Confrontational on factual errors, as modeled
-  [10] 0.88  Hard sci-fi reference consistent with preferences
+  [1] 0.95  Gaming preferences and invite behavior matched exactly
+  [2] 0.90  Tech research habits and pragmatic style highly consistent
+  [3] 0.90  Tutoring details and frugal mindset aligned precisely
+  [4] 0.90  Practical values and money-saving behavior matched profile
+  [5] 0.80  Football enthusiasm and team loyalty predicted correctly
+  [6] 0.80  Direct expression style and tech curiosity confirmed
+  [7] 0.70  Emotional expression pattern partially matched
+  [8] 0.70  Venting style consistent but actual response more narrative
+  [9] 0.30  Response format deviated from predicted interaction style
+  [10] 0.30  Predicted casual tone vs actual formal description
 ```
 
 Run it yourself:
@@ -170,8 +170,8 @@ The most impactful contributions right now:
 To add a parser, subclass `DataParser` in `percent/parsers/`, register it in `cli.py`, and add tests under `tests/test_parsers/`.
 
 ```bash
-git clone https://github.com/looanli08-hl/engram
-cd engram
+git clone https://github.com/looanli08-hl/percent
+cd percent
 uv sync
 uv run pytest tests/ -v
 ```

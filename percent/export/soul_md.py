@@ -4,7 +4,7 @@ from pathlib import Path
 
 from percent.llm.client import LLMClient
 
-_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent.parent / "prompts"
+_DEFAULT_PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 _FALLBACK_TEMPLATE = """\
 Convert the following personality profile into an OpenClaw SOUL.md format.
