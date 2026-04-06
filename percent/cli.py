@@ -684,7 +684,11 @@ def persona_validate(
         api_key=config.llm_api_key,
     )
     validator = PersonaValidator(client, prompts_dir=_PROMPTS_DIR)
-    bench = PersonaBench(validator)
+    bench = PersonaBench(
+        validator,
+        model=config.llm_model,
+        provider=config.llm_provider,
+    )
 
     with console.status("[bold]Running PersonaBench…[/bold]"):
         result = bench.evaluate(core_md, test_chunks, num_tests=num_tests)
