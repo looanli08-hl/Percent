@@ -1528,7 +1528,7 @@
       </button>
       <button class="header-btn" onclick="resetChat()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        New thread
+        新对话
       </button>
       <button class="header-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle light/dark">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -1566,7 +1566,7 @@
         <div id="bigFiveSection" style="display:none;">
           <details class="profile-details" open>
             <summary class="profile-summary">
-              Big Five Personality
+              大五人格
             </summary>
             <div class="profile-details-body" id="bigFiveContent">
             </div>
@@ -1577,7 +1577,7 @@
         <div id="fingerprintSection" style="display:none;">
           <details class="profile-details">
             <summary class="profile-summary">
-              Behavioral Fingerprint
+              行为指纹
             </summary>
             <div class="profile-details-body"
                  id="fingerprintContent">
@@ -1600,7 +1600,7 @@
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              Add data source
+              添加数据源
             </button>
           </div>
         </div>
@@ -1614,17 +1614,17 @@
       <div class="chat-messages" id="chatArea">
         <!-- Welcome -->
         <div class="chat-welcome" id="chatWelcome">
-          <h2 class="welcome-serif">Talk to <em>yourself</em></h2>
+          <h2 class="welcome-serif">自言自<em>语</em></h2>
           <p class="welcome-body">
-            Your Percent responds as you — grounded in your personality profile and memory fragments. Ask it anything.
+            你的 Percent 会像你一样回应——基于你的人格档案和记忆碎片。随便问它任何问题。
           </p>
           <div class="welcome-prompts" id="welcomePrompts">
-            <button class="welcome-prompt" onclick="sendPrompt('What are my core values?')">What are my core values?</button>
-            <button class="welcome-prompt" onclick="sendPrompt('How do I approach problems?')">How do I approach problems?</button>
-            <button class="welcome-prompt" onclick="sendPrompt('What topics fascinate me most?')">What topics fascinate me most?</button>
-            <button class="welcome-prompt" onclick="sendPrompt('Describe my aesthetic preferences')">Describe my aesthetic preferences</button>
-            <button class="welcome-prompt" onclick="sendPrompt('What kind of content do I consume?')">What kind of content do I consume?</button>
-            <button class="welcome-prompt" onclick="sendPrompt('How do I make decisions?')">How do I make decisions?</button>
+            <button class="welcome-prompt" onclick="sendPrompt('我的核心价值观是什么？')">我的核心价值观是什么？</button>
+            <button class="welcome-prompt" onclick="sendPrompt('我是怎么解决问题的？')">我是怎么解决问题的？</button>
+            <button class="welcome-prompt" onclick="sendPrompt('什么话题最吸引我？')">什么话题最吸引我？</button>
+            <button class="welcome-prompt" onclick="sendPrompt('描述一下我的审美偏好')">描述一下我的审美偏好</button>
+            <button class="welcome-prompt" onclick="sendPrompt('我平时接触什么样的内容？')">我平时接触什么样的内容？</button>
+            <button class="welcome-prompt" onclick="sendPrompt('我是怎么做决定的？')">我是怎么做决定的？</button>
           </div>
         </div>
       </div>
@@ -1635,7 +1635,7 @@
           <textarea
             id="chatInput"
             class="chat-input"
-            placeholder="Ask your mirror anything..."
+            placeholder="问问镜中的自己..."
             rows="1"
             onkeydown="handleKeyDown(event)"
             oninput="autoGrow(this)"
@@ -1768,7 +1768,7 @@
         'Open a chat in WhatsApp (mobile)',
         'Tap ⋮ → More → Export chat',
         'Choose <strong>Without media</strong>',
-        'Send the .txt file to yourself and download it',
+        '把 .txt 文件发送给自己然后下载',
       ],
       dropLabel: 'Drop the <strong>.txt</strong> file here, or click to browse',
       dropAccept: '.txt',
@@ -2132,7 +2132,7 @@
       document.getElementById('personaContent').innerHTML = `
         <div class="profile-empty">
           <div class="profile-empty-text">
-            No personality profile yet.
+            暂无性格档案。
           </div>
         </div>`;
     }
@@ -2148,7 +2148,7 @@
     if (isNoProfile) {
       container.innerHTML = `
         <div class="profile-empty">
-          <div class="profile-empty-text">No personality profile yet.</div>
+          <div class="profile-empty-text">暂无性格档案。</div>
         </div>`;
       return;
     }
@@ -2167,10 +2167,10 @@
         </details>`;
     });
 
-    // Wrap all sub-sections in a parent "Personality Profile" collapsible
+    // Wrap all sub-sections in a parent "性格简介" collapsible
     container.innerHTML = `
       <details class="profile-details profile-parent" open>
-        <summary class="profile-summary profile-parent-summary">Personality Profile</summary>
+        <summary class="profile-summary profile-parent-summary">性格简介</summary>
         <div class="profile-children">${innerHtml}</div>
       </details>`;
   }
@@ -2222,22 +2222,22 @@
 
       let html = '<div style="font-size:12px;line-height:1.6;">';
 
-      html += `<div style="color:var(--text-secondary);margin-bottom:6px;">Communication</div>`;
-      html += `<div>Style: <strong>${escHtml(ms.communication_style || '—')}</strong></div>`;
-      html += `<div>Avg message: <strong>${Math.round(ms.avg_length || 0)} chars</strong></div>`;
-      if (ms.emoji_pct != null) html += `<div>Emoji usage: <strong>${ms.emoji_pct.toFixed(1)}%</strong></div>`;
+      html += `<div style="color:var(--text-secondary);margin-bottom:6px;">沟通风格</div>`;
+      html += `<div>风格：<strong>${escHtml(ms.communication_style || '—')}</strong></div>`;
+      html += `<div>平均消息：<strong>${Math.round(ms.avg_length || 0)} 字符</strong></div>`;
+      if (ms.emoji_pct != null) html += `<div>表情使用：<strong>${ms.emoji_pct.toFixed(1)}%</strong></div>`;
 
       if (tp.chronotype) {
-        html += `<div style="color:var(--text-secondary);margin-top:8px;margin-bottom:6px;">Temporal</div>`;
-        html += `<div>Chronotype: <strong>${escHtml(tp.chronotype)}</strong></div>`;
-        if (tp.peak_hour != null) html += `<div>Peak hour: <strong>${tp.peak_hour}:00</strong></div>`;
+        html += `<div style="color:var(--text-secondary);margin-top:8px;margin-bottom:6px;">时间模式</div>`;
+        html += `<div>作息类型：<strong>${escHtml(tp.chronotype)}</strong></div>`;
+        if (tp.peak_hour != null) html += `<div>活跃高峰：<strong>${tp.peak_hour}:00</strong></div>`;
       }
 
       if (sc.social_type) {
-        html += `<div style="color:var(--text-secondary);margin-top:8px;margin-bottom:6px;">Social</div>`;
-        html += `<div>Type: <strong>${escHtml(sc.social_type)}</strong></div>`;
-        html += `<div>Contacts: <strong>${sc.unique_contacts || 0}</strong></div>`;
-        if (sc.initiation_rate != null) html += `<div>Initiation: <strong>${sc.initiation_rate.toFixed(0)}%</strong></div>`;
+        html += `<div style="color:var(--text-secondary);margin-top:8px;margin-bottom:6px;">社交模式</div>`;
+        html += `<div>类型：<strong>${escHtml(sc.social_type)}</strong></div>`;
+        html += `<div>联系人：<strong>${sc.unique_contacts || 0}</strong></div>`;
+        if (sc.initiation_rate != null) html += `<div>主动发起：<strong>${sc.initiation_rate.toFixed(0)}%</strong></div>`;
       }
 
       html += '</div>';
@@ -2430,17 +2430,17 @@
     const chatArea = document.getElementById('chatArea');
     chatArea.innerHTML = `
       <div class="chat-welcome" id="chatWelcome">
-        <h2 class="welcome-serif">Talk to <em>yourself</em></h2>
+        <h2 class="welcome-serif">自言自<em>语</em></h2>
         <p class="welcome-body">
-          Your Percent responds as you — grounded in your personality profile and memory fragments. Ask it anything.
+          你的 Percent 会像你一样回应——基于你的人格档案和记忆碎片。随便问它任何问题。
         </p>
         <div class="welcome-prompts" id="welcomePrompts">
-          <button class="welcome-prompt" onclick="sendPrompt('What are my core values?')">What are my core values?</button>
-          <button class="welcome-prompt" onclick="sendPrompt('How do I approach problems?')">How do I approach problems?</button>
-          <button class="welcome-prompt" onclick="sendPrompt('What topics fascinate me most?')">What topics fascinate me most?</button>
-          <button class="welcome-prompt" onclick="sendPrompt('Describe my aesthetic preferences')">Describe my aesthetic preferences</button>
-          <button class="welcome-prompt" onclick="sendPrompt('What kind of content do I consume?')">What kind of content do I consume?</button>
-          <button class="welcome-prompt" onclick="sendPrompt('How do I make decisions?')">How do I make decisions?</button>
+          <button class="welcome-prompt" onclick="sendPrompt('我的核心价值观是什么？')">我的核心价值观是什么？</button>
+          <button class="welcome-prompt" onclick="sendPrompt('我是怎么解决问题的？')">我是怎么解决问题的？</button>
+          <button class="welcome-prompt" onclick="sendPrompt('什么话题最吸引我？')">什么话题最吸引我？</button>
+          <button class="welcome-prompt" onclick="sendPrompt('描述一下我的审美偏好')">描述一下我的审美偏好</button>
+          <button class="welcome-prompt" onclick="sendPrompt('我平时接触什么样的内容？')">我平时接触什么样的内容？</button>
+          <button class="welcome-prompt" onclick="sendPrompt('我是怎么做决定的？')">我是怎么做决定的？</button>
         </div>
       </div>`;
   }
