@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from engram.models import ChunkType
-from engram.parsers.wechat import WeChatParser
+from percent.models import ChunkType
+from percent.parsers.wechat import WeChatParser
 
 
 @pytest.fixture()

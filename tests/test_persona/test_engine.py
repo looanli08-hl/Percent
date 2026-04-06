@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from engram.models import ChunkType, DataChunk
+from percent.models import ChunkType, DataChunk
 
 # ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -75,8 +75,8 @@ def make_dummy_embedder():
 class TestPersonaValidator:
     def test_validate_returns_score_and_details(self, mock_llm_response):
         mock_llm_response(VALIDATE_RESPONSE)
-        from engram.llm.client import LLMClient
-        from engram.persona.validator import PersonaValidator
+        from percent.llm.client import LLMClient
+        from percent.persona.validator import PersonaValidator
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         validator = PersonaValidator(client, prompts_dir=None)
@@ -122,8 +122,8 @@ class TestPersonaValidator:
             return FakeResponse()
 
         with patch("litellm.completion", fake_completion):
-            from engram.llm.client import LLMClient
-            from engram.persona.validator import PersonaValidator
+            from percent.llm.client import LLMClient
+            from percent.persona.validator import PersonaValidator
 
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
             validator = PersonaValidator(client, prompts_dir=None)
@@ -136,8 +136,8 @@ class TestPersonaValidator:
 
     def test_validate_handles_invalid_json(self, mock_llm_response):
         mock_llm_response("not json")
-        from engram.llm.client import LLMClient
-        from engram.persona.validator import PersonaValidator
+        from percent.llm.client import LLMClient
+        from percent.persona.validator import PersonaValidator
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         validator = PersonaValidator(client, prompts_dir=None)
@@ -148,8 +148,8 @@ class TestPersonaValidator:
         assert result["score"] == pytest.approx(0.0)
 
     def test_validate_empty_chunks_returns_zero(self):
-        from engram.llm.client import LLMClient
-        from engram.persona.validator import PersonaValidator
+        from percent.llm.client import LLMClient
+        from percent.persona.validator import PersonaValidator
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         validator = PersonaValidator(client, prompts_dir=None)
@@ -170,7 +170,7 @@ class TestPersonaEngine:
     @pytest.fixture(autouse=True)
     def patch_embedder(self):
         dummy = make_dummy_embedder()
-        with patch("engram.persona.engine.SentenceTransformer", return_value=dummy):
+        with patch("percent.persona.engine.SentenceTransformer", return_value=dummy):
             yield dummy
 
     def _make_sequential_llm(self, responses: list[str]):
@@ -197,16 +197,16 @@ class TestPersonaEngine:
 
         return fake_completion
 
-    def test_run_returns_core_md(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_run_returns_core_md(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         responses = [EXTRACT_RESPONSE, SYNTHESIZE_RESPONSE]
         with patch("litellm.completion", self._make_sequential_llm(responses)):
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
             engine = PersonaEngine(
                 client,
-                engram_dir=tmp_engram_dir,
+                percent_dir=tmp_percent_dir,
                 prompts_dir=None,
             )
             chunks = [make_chunk("I love The Three-Body Problem")]
@@ -214,51 +214,51 @@ class TestPersonaEngine:
 
         assert "## Personality Traits" in result
 
-    def test_run_stores_fragments(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_run_stores_fragments(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         responses = [EXTRACT_RESPONSE, SYNTHESIZE_RESPONSE]
         with patch("litellm.completion", self._make_sequential_llm(responses)):
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-            engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+            engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
             chunks = [make_chunk("some text")]
             engine.run(chunks, validate=False)
 
         stats = engine.stats()
         assert stats["total"] == 1  # one finding → one fragment
 
-    def test_run_with_validate_calls_validator(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_run_with_validate_calls_validator(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         # extract → synthesize → validate
         responses = [EXTRACT_RESPONSE, SYNTHESIZE_RESPONSE, VALIDATE_RESPONSE]
         with patch("litellm.completion", self._make_sequential_llm(responses)):
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-            engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+            engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
             chunks = [make_chunk("some text")]
             result = engine.run(chunks, validate=True)
 
         assert "## Personality Traits" in result
 
-    def test_run_saves_core_md_to_disk(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_run_saves_core_md_to_disk(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         responses = [EXTRACT_RESPONSE, SYNTHESIZE_RESPONSE]
         with patch("litellm.completion", self._make_sequential_llm(responses)):
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-            engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+            engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
             engine.run([make_chunk("text")], validate=False)
 
-        core_path = tmp_engram_dir / "core.md"
+        core_path = tmp_percent_dir / "core.md"
         assert core_path.exists()
         assert "## Personality Traits" in core_path.read_text()
 
-    def test_rebuild_core_from_stored_fragments(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_rebuild_core_from_stored_fragments(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         # First run: extract + synthesize
         responses_run = [EXTRACT_RESPONSE, SYNTHESIZE_RESPONSE]
@@ -268,29 +268,29 @@ class TestPersonaEngine:
 
         with patch("litellm.completion", self._make_sequential_llm(all_responses)):
             client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-            engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+            engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
             engine.run([make_chunk("text")], validate=False)
             rebuilt = engine.rebuild_core()
 
         assert "## Personality Traits" in rebuilt
 
-    def test_embed_query_returns_list(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_embed_query_returns_list(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-        engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+        engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
         embedding = engine.embed_query("How does this person react to conflict?")
 
         assert isinstance(embedding, list)
         assert len(embedding) == 384
 
-    def test_stats_delegates_to_store(self, tmp_engram_dir):
-        from engram.llm.client import LLMClient
-        from engram.persona.engine import PersonaEngine
+    def test_stats_delegates_to_store(self, tmp_percent_dir):
+        from percent.llm.client import LLMClient
+        from percent.persona.engine import PersonaEngine
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
-        engine = PersonaEngine(client, engram_dir=tmp_engram_dir, prompts_dir=None)
+        engine = PersonaEngine(client, percent_dir=tmp_percent_dir, prompts_dir=None)
         stats = engine.stats()
 
         assert "total" in stats

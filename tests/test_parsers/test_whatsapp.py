@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from engram.models import ChunkType
-from engram.parsers.whatsapp import WhatsAppParser
+from percent.models import ChunkType
+from percent.parsers.whatsapp import WhatsAppParser
 
 
 @pytest.fixture()

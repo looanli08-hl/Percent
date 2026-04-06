@@ -1,13 +1,12 @@
 <div align="center">
 
-<!-- Logo placeholder: replace with assets/logo.svg when available -->
-<img src="assets/logo.svg" alt="Engram logo" width="80" height="80" />
+<img src="assets/logo.svg" alt="Percent logo" width="120" height="120" />
 
-# Engram
+# Percent
 
-**The Personality Engine for AI**
+**How much of you can AI understand?**
 
-[![CI](https://github.com/your-org/engram/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/engram/actions/workflows/ci.yml)
+[![CI](https://github.com/looanli08-hl/percent/actions/workflows/ci.yml/badge.svg)](https://github.com/looanli08-hl/percent/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 
@@ -17,13 +16,13 @@
 
 ---
 
-## Why Engram?
+## Why Percent?
 
 Every AI assistant starts blank. It doesn't know how you think, what you care about, or how you communicate. You re-introduce yourself every session.
 
-**Engram fixes that.**
+**Percent fixes that.**
 
-Feed it your WeChat history, YouTube watch list, Bilibili comments — anything that reflects how you actually think. Engram extracts your personality into a structured model (`core.md`) that any LLM can use to become *your* AI, not a generic one.
+Feed it your WeChat history, YouTube watch list, Bilibili comments — anything that reflects how you actually think. Percent extracts your personality into a structured model (`core.md`) that any LLM can use to become *your* AI, not a generic one.
 
 - **Privacy-first.** Everything runs locally. Your data never leaves your machine.
 - **Source-agnostic.** WeChat, YouTube, Bilibili — more sources coming.
@@ -34,7 +33,7 @@ Feed it your WeChat history, YouTube watch list, Bilibili comments — anything 
 
 ## PersonaBench
 
-PersonaBench is Engram's built-in benchmark for measuring how accurately your personality model reflects you.
+PersonaBench is Percent's built-in benchmark for measuring how accurately your personality model reflects you.
 
 ```
 PersonaBench v0.1
@@ -55,7 +54,7 @@ Score: 84.3%  (10 tests)
 Run it yourself:
 
 ```bash
-engram persona validate --num-tests 10
+percent persona validate --num-tests 10
 ```
 
 ---
@@ -63,20 +62,20 @@ engram persona validate --num-tests 10
 ## Quick Start
 
 ```bash
-pip install engram
-engram init
-engram import run wechat ~/exports/wechat_chat.csv
-engram chat
+pip install percent
+percent init
+percent import run wechat ~/exports/wechat_chat.csv
+percent chat
 ```
 
-That's it. After `import run`, Engram has built your `core.md` and chat speaks as you.
+That's it. After `import run`, Percent has built your `core.md` and chat speaks as you.
 
 ---
 
 ## How It Works
 
 ```
-Your data                Engram pipeline              Output
+Your data                Percent pipeline             Output
 ─────────────────────    ────────────────────────     ──────────────────
 WeChat CSV          ──►  Parser                  ──►  DataChunks
 YouTube Takeout     ──►  Extractor (LLM)         ──►  Findings
@@ -98,9 +97,9 @@ Bilibili History    ──►  Fragment Store (SQLite)  ──►  Embeddings
 
 | Source | Format | Command |
 |--------|--------|---------|
-| WeChat | PyWxDump CSV export | `engram import run wechat <path>` |
-| YouTube | Google Takeout JSON | `engram import run youtube <path>` |
-| Bilibili | Watch history JSON | `engram import run bilibili <path>` |
+| WeChat | PyWxDump CSV export | `percent import run wechat <path>` |
+| YouTube | Google Takeout JSON | `percent import run youtube <path>` |
+| Bilibili | Watch history JSON | `percent import run bilibili <path>` |
 
 More sources are welcome — see [Contributing](#contributing).
 
@@ -109,22 +108,22 @@ More sources are welcome — see [Contributing](#contributing).
 ## Commands Reference
 
 ```
-engram init                         Configure API key and provider
-engram import run <source> <path>   Import and analyze data
-engram import guide <source>        Show export instructions for a source
-engram import status                Show fragment store statistics
+percent init                         Configure API key and provider
+percent import run <source> <path>   Import and analyze data
+percent import guide <source>        Show export instructions for a source
+percent import status                Show fragment store statistics
 
-engram persona view                 Print current core.md
-engram persona stats                Fragment statistics
-engram persona rebuild              Rebuild core.md from all stored fragments
-engram persona validate             Run PersonaBench
+percent persona view                 Print current core.md
+percent persona stats                Fragment statistics
+percent persona rebuild              Rebuild core.md from all stored fragments
+percent persona validate             Run PersonaBench
 
-engram export soul                  Generate SOUL.md system prompt
-engram export core                  Copy core.md to a custom path
+percent export soul                  Generate SOUL.md system prompt
+percent export core                  Copy core.md to a custom path
 
-engram chat                         Start interactive chat with your persona
-engram config llm                   Change LLM provider / model / key
-engram config parsers               List available parsers
+percent chat                         Start interactive chat with your persona
+percent config llm                   Change LLM provider / model / key
+percent config parsers               List available parsers
 ```
 
 ---
@@ -132,9 +131,9 @@ engram config parsers               List available parsers
 ## Architecture
 
 ```
-engram/
+percent/
 ├── cli.py                  Typer CLI entry point
-├── config.py               EngramConfig (Pydantic), load/save YAML
+├── config.py               PercentConfig (Pydantic), load/save YAML
 ├── models.py               DataChunk, Finding, Fragment (Pydantic)
 ├── llm/
 │   └── client.py           LiteLLM wrapper (provider-agnostic)
@@ -160,7 +159,7 @@ engram/
 
 ## Contributing
 
-Engram is open-source and welcomes contributions.
+Percent is open-source and welcomes contributions.
 
 The most impactful contributions right now:
 
@@ -168,10 +167,10 @@ The most impactful contributions right now:
 - **Prompt improvements** — better extraction and synthesis prompts in `prompts/`
 - **PersonaBench datasets** — reference personas for calibration
 
-To add a parser, subclass `DataParser` in `engram/parsers/`, register it in `cli.py`, and add tests under `tests/test_parsers/`.
+To add a parser, subclass `DataParser` in `percent/parsers/`, register it in `cli.py`, and add tests under `tests/test_parsers/`.
 
 ```bash
-git clone https://github.com/your-org/engram
+git clone https://github.com/looanli08-hl/engram
 cd engram
 uv sync
 uv run pytest tests/ -v

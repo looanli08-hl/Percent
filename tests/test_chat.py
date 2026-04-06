@@ -38,26 +38,26 @@ class TestChatEngine:
     @pytest.fixture(autouse=True)
     def patch_embedder(self):
         dummy = make_dummy_embedder()
-        with patch("engram.chat.engine.SentenceTransformer", return_value=dummy):
+        with patch("percent.chat.engine.SentenceTransformer", return_value=dummy):
             yield dummy
 
     @pytest.fixture(autouse=True)
     def patch_fragment_store(self):
         dummy = make_dummy_fragment_store()
-        with patch("engram.chat.engine.FragmentStore", return_value=dummy):
+        with patch("percent.chat.engine.FragmentStore", return_value=dummy):
             yield dummy
 
     def test_send_builds_prompt_with_core_and_fragments_returns_response(
-        self, tmp_engram_dir, mock_llm_response
+        self, tmp_percent_dir, mock_llm_response
     ):
         """send() uses core.md + retrieved fragments in system prompt, returns LLM reply."""
         mock_llm_response(CHAT_RESPONSE)
-        (tmp_engram_dir / "core.md").write_text(CORE_MD)
+        (tmp_percent_dir / "core.md").write_text(CORE_MD)
 
-        from engram.chat.engine import ChatEngine
+        from percent.chat.engine import ChatEngine
 
         engine = ChatEngine(
-            engram_dir=tmp_engram_dir,
+            percent_dir=tmp_percent_dir,
             provider="openai",
             model="gpt-4o",
             api_key="test",
@@ -75,15 +75,15 @@ class TestChatEngine:
         assert engine.history[1]["role"] == "assistant"
         assert engine.history[1]["content"] == CHAT_RESPONSE
 
-    def test_history_maintained_across_turns(self, tmp_engram_dir, mock_llm_response):
+    def test_history_maintained_across_turns(self, tmp_percent_dir, mock_llm_response):
         """After 2 sends, history contains 4 entries (user+assistant each time)."""
         mock_llm_response(CHAT_RESPONSE)
-        (tmp_engram_dir / "core.md").write_text(CORE_MD)
+        (tmp_percent_dir / "core.md").write_text(CORE_MD)
 
-        from engram.chat.engine import ChatEngine
+        from percent.chat.engine import ChatEngine
 
         engine = ChatEngine(
-            engram_dir=tmp_engram_dir,
+            percent_dir=tmp_percent_dir,
             provider="openai",
             model="gpt-4o",
             api_key="test",
@@ -103,15 +103,15 @@ class TestChatEngine:
         assert engine.history[2]["content"] == "Second message"
         assert engine.history[3]["role"] == "assistant"
 
-    def test_reset_clears_history(self, tmp_engram_dir, mock_llm_response):
+    def test_reset_clears_history(self, tmp_percent_dir, mock_llm_response):
         """reset() empties history."""
         mock_llm_response(CHAT_RESPONSE)
-        (tmp_engram_dir / "core.md").write_text(CORE_MD)
+        (tmp_percent_dir / "core.md").write_text(CORE_MD)
 
-        from engram.chat.engine import ChatEngine
+        from percent.chat.engine import ChatEngine
 
         engine = ChatEngine(
-            engram_dir=tmp_engram_dir,
+            percent_dir=tmp_percent_dir,
             provider="openai",
             model="gpt-4o",
             api_key="test",

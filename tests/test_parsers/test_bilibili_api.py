@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from engram.parsers.bilibili_api import fetch_bilibili_history
+from percent.parsers.bilibili_api import fetch_bilibili_history
 
 
 def test_fetch_parses_api_response():
@@ -21,7 +21,7 @@ def test_fetch_parses_api_response():
         },
     }
 
-    with patch("engram.parsers.bilibili_api.requests.get", return_value=mock_response):
+    with patch("percent.parsers.bilibili_api.requests.get", return_value=mock_response):
         chunks = fetch_bilibili_history("fake_cookie", max_pages=1)
 
     assert len(chunks) == 1
@@ -33,7 +33,7 @@ def test_fetch_handles_expired_cookie():
     mock_response = MagicMock()
     mock_response.json.return_value = {"code": -101, "message": "账号未登录"}
 
-    with patch("engram.parsers.bilibili_api.requests.get", return_value=mock_response):
+    with patch("percent.parsers.bilibili_api.requests.get", return_value=mock_response):
         try:
             fetch_bilibili_history("expired_cookie")
             assert False, "Should have raised ValueError"

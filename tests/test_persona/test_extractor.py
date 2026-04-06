@@ -5,8 +5,8 @@ from datetime import datetime
 
 import pytest
 
-from engram.models import ChunkType, DataChunk, FindingCategory
-from engram.persona.extractor import PersonaExtractor
+from percent.models import ChunkType, DataChunk, FindingCategory
+from percent.persona.extractor import PersonaExtractor
 
 
 def make_chunk(content: str, source: str = "wechat") -> DataChunk:
@@ -38,7 +38,7 @@ VALID_FINDINGS_JSON = json.dumps(
 
 def test_extract_returns_findings(mock_llm_response, tmp_path):
     mock_llm_response(VALID_FINDINGS_JSON)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
@@ -56,7 +56,7 @@ def test_extract_returns_findings(mock_llm_response, tmp_path):
 
 def test_extract_attaches_source_from_chunk(mock_llm_response, tmp_path):
     mock_llm_response(VALID_FINDINGS_JSON)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
@@ -72,7 +72,7 @@ def test_extract_handles_json_embedded_in_text(mock_llm_response):
     """LLM sometimes wraps JSON in prose — extractor should still parse it."""
     response_with_text = "Here are my findings:\n\n" + VALID_FINDINGS_JSON + "\n\nThat's all."
     mock_llm_response(response_with_text)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
@@ -84,7 +84,7 @@ def test_extract_handles_json_embedded_in_text(mock_llm_response):
 def test_extract_handles_invalid_json_gracefully(mock_llm_response):
     """Invalid JSON should return empty list without raising."""
     mock_llm_response("This is not JSON at all!")
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)
@@ -125,7 +125,7 @@ def test_extract_batches_chunks(mock_llm_response):
     import unittest.mock
 
     with unittest.mock.patch("litellm.completion", fake_completion):
-        from engram.llm.client import LLMClient
+        from percent.llm.client import LLMClient
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         extractor = PersonaExtractor(client, prompts_dir=None, batch_size=3)
@@ -138,7 +138,7 @@ def test_extract_batches_chunks(mock_llm_response):
 
 
 def test_extract_empty_chunks_returns_empty():
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     extractor = PersonaExtractor(client, prompts_dir=None)

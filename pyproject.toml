@@ -1,5 +1,5 @@
 [project]
-name = "engram"
+name = "percent"
 version = "0.1.0"
 description = "Open-source personality modeling engine"
 readme = "README.md"
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-engram = "engram.cli:app"
+percent = "percent.cli:app"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

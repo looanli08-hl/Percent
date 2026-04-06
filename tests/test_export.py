@@ -39,7 +39,7 @@ class TestSoulMdExporter:
         core_path.write_text(CORE_MD)
         output_path = tmp_path / "SOUL.md"
 
-        from engram.export.soul_md import SoulMdExporter
+        from percent.export.soul_md import SoulMdExporter
 
         exporter = SoulMdExporter(
             provider="openai",
@@ -56,7 +56,7 @@ class TestSoulMdExporter:
 
     def test_export_raises_file_not_found_when_core_missing(self, tmp_path):
         """export() raises FileNotFoundError when core.md doesn't exist."""
-        from engram.export.soul_md import SoulMdExporter
+        from percent.export.soul_md import SoulMdExporter
 
         exporter = SoulMdExporter(
             provider="openai",

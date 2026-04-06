@@ -15,7 +15,7 @@ jobs:
         with:
           version: "latest"
       - run: uv sync
-      - run: uv run ruff check engram/ tests/
-      - run: uv run ruff format --check engram/ tests/
-      - run: uv run mypy engram/ --ignore-missing-imports
+      - run: uv run ruff check percent/ tests/
+      - run: uv run ruff format --check percent/ tests/
+      - run: uv run mypy percent/ --ignore-missing-imports
       - run: uv run pytest tests/ -v

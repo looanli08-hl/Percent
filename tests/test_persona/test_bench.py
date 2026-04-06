@@ -8,9 +8,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from engram.models import ChunkType, DataChunk
-from engram.persona.bench import PersonaBench
-from engram.persona.validator import PersonaValidator
+from percent.models import ChunkType, DataChunk
+from percent.persona.bench import PersonaBench
+from percent.persona.validator import PersonaValidator
 
 # ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -104,7 +104,7 @@ class TestPersonaBenchEvaluate:
         """Integration-style: use mock_llm_response fixture like other persona tests."""
         mock_llm_response(VALIDATE_RESPONSE)
 
-        from engram.llm.client import LLMClient
+        from percent.llm.client import LLMClient
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         validator = PersonaValidator(client, prompts_dir=None)

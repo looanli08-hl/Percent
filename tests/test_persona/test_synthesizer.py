@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from engram.models import Finding, FindingCategory
-from engram.persona.synthesizer import PersonaSynthesizer
+from percent.models import Finding, FindingCategory
+from percent.persona.synthesizer import PersonaSynthesizer
 
 
 def make_finding(content: str, category: str = "trait") -> Finding:
@@ -37,7 +37,7 @@ MOCK_PROFILE_MD = """\
 
 def test_synthesize_returns_markdown(mock_llm_response):
     mock_llm_response(MOCK_PROFILE_MD)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
@@ -55,7 +55,7 @@ def test_synthesize_returns_markdown(mock_llm_response):
 
 def test_synthesize_includes_all_sections(mock_llm_response):
     mock_llm_response(MOCK_PROFILE_MD)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
@@ -77,7 +77,7 @@ def test_synthesize_includes_all_sections(mock_llm_response):
 
 def test_synthesize_and_save_writes_file(mock_llm_response, tmp_path):
     mock_llm_response(MOCK_PROFILE_MD)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
@@ -94,7 +94,7 @@ def test_synthesize_and_save_writes_file(mock_llm_response, tmp_path):
 
 def test_synthesize_and_save_creates_parent_dirs(mock_llm_response, tmp_path):
     mock_llm_response(MOCK_PROFILE_MD)
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)
@@ -130,7 +130,7 @@ def test_synthesize_formats_findings_count(mock_llm_response):
     import unittest.mock
 
     with unittest.mock.patch("litellm.completion", fake_completion):
-        from engram.llm.client import LLMClient
+        from percent.llm.client import LLMClient
 
         client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
         synthesizer = PersonaSynthesizer(client, prompts_dir=None)
@@ -144,7 +144,7 @@ def test_synthesize_formats_findings_count(mock_llm_response):
 def test_synthesize_empty_findings(mock_llm_response):
     """Empty findings list should still call LLM and return result."""
     mock_llm_response("## Personality Traits\n- Unknown")
-    from engram.llm.client import LLMClient
+    from percent.llm.client import LLMClient
 
     client = LLMClient(provider="openai", model="gpt-4o", api_key="test")
     synthesizer = PersonaSynthesizer(client, prompts_dir=None)

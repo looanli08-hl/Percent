@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from engram.models import ChunkType
-from engram.parsers.telegram import TelegramParser
+from percent.models import ChunkType
+from percent.parsers.telegram import TelegramParser
 
 
 @pytest.fixture()

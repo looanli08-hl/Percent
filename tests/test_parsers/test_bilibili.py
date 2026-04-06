@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from engram.models import ChunkType
-from engram.parsers.bilibili import BilibiliParser
+from percent.models import ChunkType
+from percent.parsers.bilibili import BilibiliParser
 
 
 @pytest.fixture()

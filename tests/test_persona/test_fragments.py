@@ -1,11 +1,11 @@
 import numpy as np
 
-from engram.models import FindingCategory, Fragment
-from engram.persona.fragments import FragmentStore
+from percent.models import FindingCategory, Fragment
+from percent.persona.fragments import FragmentStore
 
 
-def test_store_and_retrieve_fragment(tmp_engram_dir):
-    store = FragmentStore(tmp_engram_dir / "fragments.db")
+def test_store_and_retrieve_fragment(tmp_percent_dir):
+    store = FragmentStore(tmp_percent_dir / "fragments.db")
     fragment = Fragment(
         category=FindingCategory.OPINION,
         content="Thinks The Three-Body Problem Book 1 is the best",
@@ -19,8 +19,8 @@ def test_store_and_retrieve_fragment(tmp_engram_dir):
     assert retrieved.content == fragment.content
 
 
-def test_search_fragments_by_similarity(tmp_engram_dir):
-    store = FragmentStore(tmp_engram_dir / "fragments.db")
+def test_search_fragments_by_similarity(tmp_percent_dir):
+    store = FragmentStore(tmp_percent_dir / "fragments.db")
     target_embedding = np.array([1.0, 0.0, 0.0])
 
     store.add(
@@ -47,8 +47,8 @@ def test_search_fragments_by_similarity(tmp_engram_dir):
     assert "sci-fi" in results[0].content
 
 
-def test_get_all_fragments(tmp_engram_dir):
-    store = FragmentStore(tmp_engram_dir / "fragments.db")
+def test_get_all_fragments(tmp_percent_dir):
+    store = FragmentStore(tmp_percent_dir / "fragments.db")
     store.add(
         Fragment(
             category=FindingCategory.TRAIT,
@@ -71,8 +71,8 @@ def test_get_all_fragments(tmp_engram_dir):
     assert len(all_frags) == 2
 
 
-def test_stats(tmp_engram_dir):
-    store = FragmentStore(tmp_engram_dir / "fragments.db")
+def test_stats(tmp_percent_dir):
+    store = FragmentStore(tmp_percent_dir / "fragments.db")
     store.add(
         Fragment(
             category=FindingCategory.TRAIT,

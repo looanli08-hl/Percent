@@ -1,4 +1,4 @@
-from engram.llm.client import LLMClient
+from percent.llm.client import LLMClient
 
 
 def test_llm_client_completion(mock_llm_response):

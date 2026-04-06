@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from engram.models import (
+from percent.models import (
     ChunkType,
     DataChunk,
     Finding,

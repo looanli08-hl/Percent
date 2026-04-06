@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from engram.models import ChunkType
-from engram.parsers.youtube import YouTubeParser
+from percent.models import ChunkType
+from percent.parsers.youtube import YouTubeParser
 
 
 @pytest.fixture()

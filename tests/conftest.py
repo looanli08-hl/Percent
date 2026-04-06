@@ -2,12 +2,12 @@ import pytest
 
 
 @pytest.fixture
-def tmp_engram_dir(tmp_path):
-    """Create a temporary ~/.engram/ directory for testing."""
-    engram_dir = tmp_path / ".engram"
-    engram_dir.mkdir()
-    (engram_dir / "raw").mkdir()
-    return engram_dir
+def tmp_percent_dir(tmp_path):
+    """Create a temporary ~/.percent/ directory for testing."""
+    percent_dir = tmp_path / ".percent"
+    percent_dir.mkdir()
+    (percent_dir / "raw").mkdir()
+    return percent_dir
 
 
 @pytest.fixture

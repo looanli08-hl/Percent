@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- 3D bevel: light edge on top-left, dark edge on bottom-right -->
+    <linearGradient id="bevel" x1="0" y1="0" x2="0.7" y2="0.7">
+      <stop offset="0%" stop-color="#555555" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#2a2a2a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#1a1a1a" stop-opacity="0.8"/>
+    </linearGradient>
+    <!-- Shadow under the line -->
+    <filter id="line-shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Self — solid circle -->
+  <circle cx="176" cy="176" r="80" fill="#1a1a1a"/>
+
+  <!-- Mirror axis — shadow layer -->
+  <line x1="392" y1="120" x2="120" y2="392" stroke="#3a3a3a" stroke-width="8" stroke-linecap="round" filter="url(#line-shadow)"/>
+
+  <!-- Mirror axis — bevel highlight -->
+  <line x1="391" y1="119" x2="119" y2="391" stroke="url(#bevel)" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Reflection — hollow circle -->
+  <circle cx="336" cy="336" r="80" stroke="#1a1a1a" stroke-width="6" fill="none"/>
+</svg>
