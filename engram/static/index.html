@@ -812,6 +812,23 @@
     .profile-details-body li { margin-bottom: 6px; }
     .profile-details-body strong { color: var(--text-primary); font-weight: 600; }
 
+    /* Parent level */
+    .profile-parent {
+      border-bottom: none;
+    }
+    .profile-parent-summary {
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      padding: 16px 0;
+    }
+    .profile-children {
+      padding-left: 8px;
+    }
+    .profile-sub .profile-summary {
+      font-size: 1rem;
+      padding: 10px 0;
+    }
+
     /* Persona rendered content — editorial document style */
     .persona-document {
       font-size: 0.875rem;
@@ -1533,7 +1550,7 @@
     <!-- Profile sidebar -->
     <aside class="profile-sidebar" id="leftPanel">
       <div class="profile-scroll" id="profileScroll">
-        <div class="profile-section-label">Personality Profile</div>
+        <!-- Profile label handled by parent details summary -->
 
         <div id="personaContent">
           <!-- Skeleton -->
@@ -2109,21 +2126,26 @@
       return;
     }
 
-    // Split by ## headings into collapsible sections
+    // Split by ## headings into collapsible sub-sections inside a parent
     const sections = content.split(/^## /m).filter(s => s.trim());
-    let html = '';
-    sections.forEach((section, i) => {
+    let innerHtml = '';
+    sections.forEach((section) => {
       const lines = section.split('\n');
       const title = lines[0].trim();
       const body = lines.slice(1).join('\n').trim();
-      const isOpen = i === 0 ? 'open' : '';
-      html += `
-        <details class="profile-details" ${isOpen}>
+      innerHtml += `
+        <details class="profile-details profile-sub">
           <summary class="profile-summary">${escHtml(title)}</summary>
           <div class="profile-details-body">${renderMarkdownBody(body)}</div>
         </details>`;
     });
-    container.innerHTML = html;
+
+    // Wrap all sub-sections in a parent "Personality Profile" collapsible
+    container.innerHTML = `
+      <details class="profile-details profile-parent" open>
+        <summary class="profile-summary profile-parent-summary">Personality Profile</summary>
+        <div class="profile-children">${innerHtml}</div>
+      </details>`;
   }
 
   // WeChat emoji code → real emoji mapping
