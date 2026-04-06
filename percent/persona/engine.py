@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 from percent.llm.client import LLMClient
 from percent.models import DataChunk, Finding, Fragment
+from percent.persona.cross_validate import DeepAnalyzer, cross_validate_fragments
 from percent.persona.extractor import PersonaExtractor
 from percent.persona.fragments import FragmentStore
 from percent.persona.synthesizer import PersonaSynthesizer
@@ -35,6 +36,7 @@ class PersonaEngine:
         self._extractor = PersonaExtractor(client, prompts_dir=prompts_dir, batch_size=batch_size)
         self._synthesizer = PersonaSynthesizer(client, prompts_dir=prompts_dir)
         self._validator = PersonaValidator(client, prompts_dir=prompts_dir)
+        self._deep_analyzer = DeepAnalyzer(client, prompts_dir=prompts_dir)
 
         db_path = percent_dir / "fragments.db"
         self._store = FragmentStore(db_path)
@@ -91,6 +93,48 @@ class PersonaEngine:
     def embed_query(self, text: str) -> list[float]:
         """Encode *text* for vector search against the fragment store."""
         return self._embedder.encode(text).tolist()
+
+    def deep_analyze(self) -> str:
+        """Run cross-validation + deep analysis on all stored fragments, then re-synthesize.
+
+        1. Cross-validate: adjust confidence based on cross-source corroboration
+        2. Deep analyze: LLM second pass to find deeper patterns and contradictions
+        3. Store new deep findings as fragments
+        4. Re-synthesize core.md with updated data
+
+        Returns the new core.md content.
+        """
+        all_fragments = self._store.get_all()
+        if not all_fragments:
+            return ""
+
+        # 1. Cross-validate — adjust confidence scores
+        validated = cross_validate_fragments(all_fragments)
+
+        # Update confidence in store
+        for orig, updated in zip(all_fragments, validated):
+            if orig.confidence != updated.confidence and orig.id is not None:
+                self._store.update_confidence(orig.id, updated.confidence)
+
+        # 2. Deep analysis — find deeper patterns
+        all_findings = self._fragments_to_findings(validated)
+        deep_findings = self._deep_analyzer.analyze(all_findings)
+
+        # 3. Store deep findings as new fragments
+        for finding in deep_findings:
+            embedding = self._embedder.encode(finding.content).tolist()
+            fragment = Fragment(
+                category=finding.category,
+                content=finding.content,
+                confidence=finding.confidence,
+                source=finding.source,
+                embedding=embedding,
+            )
+            self._store.add(fragment)
+
+        # 4. Re-synthesize with everything
+        all_findings = self._fragments_to_findings(self._store.get_all())
+        return self._synthesizer.synthesize_and_save(all_findings, self._core_path)
 
     # ── helpers ─────────────────────────────────────────────────────────────
 

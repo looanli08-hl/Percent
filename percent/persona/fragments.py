@@ -78,6 +78,14 @@ class FragmentStore:
         scored.sort(key=lambda x: x[0], reverse=True)
         return [self._row_to_fragment(row) for _, row in scored[:top_k]]
 
+    def update_confidence(self, fragment_id: int, confidence: float) -> None:
+        """Update the confidence score of a fragment."""
+        self._conn.execute(
+            "UPDATE fragments SET confidence = ? WHERE id = ?",
+            (confidence, fragment_id),
+        )
+        self._conn.commit()
+
     def stats(self) -> dict:
         total = self._conn.execute("SELECT COUNT(*) FROM fragments").fetchone()[0]
         source_rows = self._conn.execute(

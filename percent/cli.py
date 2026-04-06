@@ -316,6 +316,54 @@ def persona_rebuild() -> None:
     console.print("[green]core.md rebuilt successfully.[/green]")
 
 
+# ── percent persona deep-analyze ──────────────────────────────────────────────
+
+
+@persona_app.command("deep-analyze")
+def persona_deep_analyze() -> None:
+    """Run cross-validation + deep analysis to improve personality model."""
+    from percent.config import load_config
+    from percent.llm.client import LLMClient
+    from percent.persona.engine import PersonaEngine
+
+    config = load_config()
+
+    if not config.fragments_db_path.exists():
+        console.print("[yellow]No data found. Run 'percent import run' first.[/yellow]")
+        raise typer.Exit(0)
+
+    if not config.llm_api_key:
+        console.print("[yellow]Warning: no API key configured. Run 'percent init' first.[/yellow]")
+
+    client = LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+    )
+    engine = PersonaEngine(
+        client=client,
+        percent_dir=config.percent_dir,
+        prompts_dir=_PROMPTS_DIR,
+        embedding_model=config.embedding_model,
+    )
+
+    console.print("[bold]Phase 1:[/bold] Cross-source validation…")
+    console.print("[bold]Phase 2:[/bold] Deep pattern analysis…")
+    console.print("[bold]Phase 3:[/bold] Re-synthesizing core.md…")
+
+    with console.status("[bold]Running deep analysis…[/bold]"):
+        core_md = engine.deep_analyze()
+
+    if not core_md:
+        console.print("[yellow]No fragments to analyze.[/yellow]")
+        raise typer.Exit(0)
+
+    stats = engine.stats()
+    console.print(f"\n[green]Deep analysis complete.[/green]")
+    console.print(f"Total fragments: {stats['total']} (including deep analysis findings)")
+    console.print(f"Updated core.md with deeper insights.")
+
+
 # ── percent persona validate ──────────────────────────────────────────────────
 
 
