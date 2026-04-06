@@ -181,6 +181,9 @@
       flex-shrink: 0;
       z-index: 10;
       position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .header-actions {
@@ -730,12 +733,16 @@
       display: flex;
       flex: 1;
       overflow: hidden;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
     }
 
     /* Profile sidebar */
     .profile-sidebar {
-      width: 360px;
-      min-width: 300px;
+      width: clamp(300px, 35%, 420px);
       display: flex;
       flex-direction: column;
       border-right: 1px solid var(--border);
