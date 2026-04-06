@@ -96,13 +96,26 @@ Bilibili History    ──►  Fragment Store (SQLite)  ──►  Embeddings
 
 ## Supported Sources
 
+**Stable:**
+
 | Source | Format | Command |
 |--------|--------|---------|
 | WeChat | PyWxDump CSV export | `percent import run wechat <path>` |
-| YouTube | Google Takeout JSON | `percent import run youtube <path>` |
+| YouTube | Google Takeout JSON/HTML | `percent import run youtube <path>` |
 | Bilibili | Watch history JSON | `percent import run bilibili <path>` |
 
-More sources are welcome — see [Contributing](#contributing).
+**Beta:**
+
+| Source | Format | Command |
+|--------|--------|---------|
+| WeChat DB | Decrypted 4.x SQLite | `percent import run wechat-db <path>` |
+| Telegram | JSON export | `percent import run telegram <path>` |
+| WhatsApp | Chat export txt | `percent import run whatsapp <path>` |
+| Bilibili | Cookie auto-fetch | `percent import bilibili --cookie` |
+| YouTube | Cookie auto-fetch | `percent import youtube --cookie` |
+| Telegram | Telethon auto-fetch | `percent import telegram --api-id` |
+
+> Telegram auto-fetch requires `pip install percent[telegram]`.
 
 ---
 
@@ -111,19 +124,27 @@ More sources are welcome — see [Contributing](#contributing).
 ```
 percent init                         Configure API key and provider
 percent import run <source> <path>   Import and analyze data
-percent import guide <source>        Show export instructions for a source
+percent import guide <source>        Show export instructions
 percent import status                Show fragment store statistics
+percent import bilibili --cookie     Auto-fetch Bilibili via API
+percent import youtube --cookie      Auto-fetch YouTube via API
+percent import telegram --api-id     Auto-fetch Telegram via Telethon
 
 percent persona view                 Print current core.md
 percent persona stats                Fragment statistics
-percent persona rebuild              Rebuild core.md from all stored fragments
-percent persona validate             Run PersonaBench
+percent persona rebuild              Rebuild core.md from all fragments
+percent persona deep-analyze         Cross-validate + deep pattern analysis
+percent persona big-five             Compute Big Five personality scores
+percent persona validate             Run PersonaBench evaluation
 
 percent export soul                  Generate SOUL.md system prompt
 percent export core                  Copy core.md to a custom path
 
-percent chat                         Start interactive chat with your persona
+percent chat                         Interactive chat with your persona
+percent web                          Launch Web UI
+
 percent config llm                   Change LLM provider / model / key
+percent config cost                  Show estimated API cost per operation
 percent config parsers               List available parsers
 ```
 

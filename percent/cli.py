@@ -316,7 +316,10 @@ def import_telegram_auto(
     try:
         from percent.parsers.telegram_api import fetch_telegram_history
     except ImportError:
-        console.print("[red]Telethon is required: pip install telethon[/red]")
+        console.print(
+            "[red]Telethon required:"
+            " pip install percent[telegram][/red]"
+        )
         raise typer.Exit(1)
 
     session_path = config.percent_dir / "telegram_session"
