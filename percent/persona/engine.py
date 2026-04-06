@@ -6,9 +6,13 @@ from sentence_transformers import SentenceTransformer
 
 from percent.llm.client import LLMClient
 from percent.models import DataChunk, Finding, Fragment
-from percent.persona.cross_validate import DeepAnalyzer, cross_validate_fragments
+from percent.persona.cross_validate import (
+    DeepAnalyzer,
+    cross_validate_fragments,
+)
 from percent.persona.extractor import PersonaExtractor
 from percent.persona.fragments import FragmentStore
+from percent.persona.manifest import ImportManifest
 from percent.persona.synthesizer import PersonaSynthesizer
 from percent.persona.validator import PersonaValidator
 
@@ -41,7 +45,10 @@ class PersonaEngine:
         db_path = percent_dir / "fragments.db"
         self._store = FragmentStore(db_path)
 
-        self._embedder: SentenceTransformer = SentenceTransformer(embedding_model)
+        self._embedder: SentenceTransformer = SentenceTransformer(
+            embedding_model
+        )
+        self._manifest = ImportManifest(percent_dir / "imports.json")
 
     # ── public API ──────────────────────────────────────────────────────────
 
@@ -56,6 +63,10 @@ class PersonaEngine:
 
         Returns the core.md content as a string.
         """
+        # Track state for manifest
+        fragments_before = self._store.stats().get("total", 0)
+        sources = list({c.source for c in chunks})
+
         # 1. Extract
         findings = self._extractor.extract(chunks)
 
@@ -80,7 +91,23 @@ class PersonaEngine:
         # 4. Generate behavioral fingerprint
         self._generate_fingerprint(chunks)
 
-        # 5. Validate
+        # 5. Record import manifest
+        fragments_after = self._store.stats().get("total", 0)
+        artifacts = ["core.md"]
+        if (self.percent_dir / "fingerprint.json").exists():
+            artifacts.append("fingerprint.json")
+        for src in sources:
+            self._manifest.record(
+                source=src,
+                chunks_parsed=len(
+                    [c for c in chunks if c.source == src]
+                ),
+                fragments_before=fragments_before,
+                fragments_after=fragments_after,
+                artifacts=artifacts,
+            )
+
+        # 6. Validate
         if validate and chunks:
             self._validator.validate(core_md, test_chunks=chunks[:5])
 
@@ -145,10 +172,10 @@ class PersonaEngine:
         """Generate behavioral fingerprint from chunks if applicable."""
         import json
 
-        from percent.persona.fingerprint import BehavioralFingerprint
+        from percent.persona.fingerprint import analyze_fingerprint
 
         try:
-            fp = BehavioralFingerprint.from_chunks(chunks)
+            fp = analyze_fingerprint(chunks)
             fp_path = self.percent_dir / "fingerprint.json"
             fp_path.write_text(
                 json.dumps(fp.to_dict(), ensure_ascii=False, indent=2),

@@ -100,6 +100,20 @@ def get_big_five() -> dict:  # type: ignore[type-arg]
     return {}
 
 
+@app.get("/api/imports")
+def get_imports() -> dict:  # type: ignore[type-arg]
+    """Return import history."""
+    cfg = _require_config()
+    manifest_path = cfg.percent_dir / "imports.json"
+    if manifest_path.exists():
+        import json
+        data: list = json.loads(
+            manifest_path.read_text(encoding="utf-8")
+        )
+        return {"imports": data, "total": len(data)}
+    return {"imports": [], "total": 0}
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
     """Send a message to the persona and get a response."""
