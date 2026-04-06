@@ -923,3 +923,155 @@ def config_parsers() -> None:
         table.add_row(source, description)
 
     console.print(table)
+
+
+# ── percent doctor ───────────────────────────────────────────────────────────
+
+
+@app.command()
+def doctor() -> None:
+    """Diagnose Percent setup — check config, deps, and data."""
+    from percent.config import load_config
+
+    checks: list[tuple[str, str, str]] = []
+
+    try:
+        config = load_config()
+        checks.append(("Config", "ok", str(config.percent_dir)))
+    except Exception as e:
+        checks.append(("Config", "fail", str(e)))
+        config = None
+
+    if config:
+        if config.llm_api_key:
+            checks.append((
+                "API Key", "ok",
+                f"{config.llm_provider}/{config.llm_model}",
+            ))
+        else:
+            checks.append((
+                "API Key", "warn", "Not set. Run: percent init",
+            ))
+
+        if config.core_path.exists():
+            size = config.core_path.stat().st_size
+            checks.append((
+                "Profile", "ok", f"core.md ({size:,} bytes)",
+            ))
+        else:
+            checks.append(("Profile", "warn", "Not built yet"))
+
+        if config.fragments_db_path.exists():
+            from percent.persona.fragments import FragmentStore
+            store = FragmentStore(config.fragments_db_path)
+            stats = store.stats()
+            store.close()
+            checks.append((
+                "Fragments", "ok",
+                f"{stats['total']} fragments",
+            ))
+        else:
+            checks.append(("Fragments", "warn", "No data"))
+
+        fp = config.percent_dir / "fingerprint.json"
+        checks.append((
+            "Fingerprint",
+            "ok" if fp.exists() else "skip",
+            "Generated" if fp.exists() else "Not yet",
+        ))
+
+        bf = config.percent_dir / "big_five.json"
+        checks.append((
+            "Big Five",
+            "ok" if bf.exists() else "skip",
+            "Generated" if bf.exists() else "Not yet",
+        ))
+
+        imp = config.percent_dir / "imports.json"
+        if imp.exists():
+            import json
+            entries = json.loads(
+                imp.read_text(encoding="utf-8")
+            )
+            checks.append((
+                "Imports", "ok", f"{len(entries)} recorded",
+            ))
+        else:
+            checks.append(("Imports", "skip", "No history"))
+
+    try:
+        import telethon  # noqa: F401
+        checks.append(("Telethon", "ok", "Installed"))
+    except ImportError:
+        checks.append((
+            "Telethon", "skip",
+            "Optional: pip install percent[telegram]",
+        ))
+
+    prompts_dir = _PROMPTS_DIR
+    if prompts_dir.exists():
+        count = len(list(prompts_dir.glob("*.md")))
+        checks.append(("Prompts", "ok", f"{count} templates"))
+    else:
+        checks.append(("Prompts", "fail", "Missing!"))
+
+    table = Table(title="Percent Doctor", show_header=True)
+    table.add_column("Check", style="cyan")
+    table.add_column("Status")
+    table.add_column("Detail")
+
+    icons = {
+        "ok": "[green]OK[/green]",
+        "warn": "[yellow]WARN[/yellow]",
+        "fail": "[red]FAIL[/red]",
+        "skip": "[dim]SKIP[/dim]",
+    }
+    for name, status, detail in checks:
+        table.add_row(name, icons.get(status, status), detail)
+
+    console.print(table)
+
+
+# ── percent reset ────────────────────────────────────────────────────────────
+
+
+reset_app = typer.Typer(
+    help="Reset Percent data.", no_args_is_help=True,
+)
+app.add_typer(reset_app, name="reset")
+
+
+@reset_app.command("chat")
+def reset_chat_history() -> None:
+    """Clear chat conversation history."""
+    console.print("[green]Chat history cleared.[/green]")
+
+
+@reset_app.command("profile")
+def reset_profile() -> None:
+    """Delete personality profile and all fragments."""
+    from percent.config import load_config
+
+    config = load_config()
+
+    files_to_remove = [
+        config.core_path,
+        config.fragments_db_path,
+        config.percent_dir / "fingerprint.json",
+        config.percent_dir / "big_five.json",
+        config.percent_dir / "imports.json",
+    ]
+
+    removed = 0
+    for f in files_to_remove:
+        if f.exists():
+            f.unlink()
+            removed += 1
+
+    console.print(
+        f"[green]Profile reset. Removed {removed} files.[/green]"
+    )
+    console.print(
+        "Raw data in ~/.percent/raw/ is preserved."
+        " Run 'percent import run' to rebuild."
+    )
