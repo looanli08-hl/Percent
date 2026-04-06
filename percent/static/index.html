@@ -155,31 +155,9 @@
     .wordmark-icon {
       width: 28px;
       height: 28px;
-      border-radius: 7px;
-      background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .wordmark-icon::before {
-      content: '';
-      width: 10px;
-      height: 10px;
-      border: 2px solid rgba(255,255,255,0.9);
-      border-radius: 50%;
-      position: absolute;
-    }
-    .wordmark-icon::after {
-      content: '';
-      width: 4px;
-      height: 4px;
-      background: rgba(255,255,255,0.9);
-      border-radius: 50%;
-      position: absolute;
-      top: 8px;
-      right: 8px;
     }
     .wordmark-text {
       font-family: 'Instrument Serif', Georgia, serif;
@@ -1398,7 +1376,7 @@
 <div class="import-view" id="importView">
 
   <header class="site-header">
-    <div class="wordmark"><div class="wordmark-icon"></div><span class="wordmark-text">Percent</span></div>
+    <div class="wordmark"><div class="wordmark-icon"><svg viewBox="0 0 512 512" width="24" height="24" fill="none"><defs><linearGradient id="wm-bevel" x1="0" y1="0" x2="0.7" y2="0.7"><stop offset="0%" stop-color="currentColor" stop-opacity="0.9"/><stop offset="50%" stop-color="currentColor" stop-opacity="0.6"/><stop offset="100%" stop-color="currentColor" stop-opacity="0.4"/></linearGradient></defs><circle cx="176" cy="176" r="80" fill="currentColor"/><line x1="392" y1="120" x2="120" y2="392" stroke="currentColor" stroke-width="8" stroke-linecap="round" opacity="0.5"/><line x1="391" y1="119" x2="119" y2="391" stroke="url(#wm-bevel)" stroke-width="6" stroke-linecap="round"/><circle cx="336" cy="336" r="80" stroke="currentColor" stroke-width="6" fill="none"/></svg></div><span class="wordmark-text">Percent</span></div>
   </header>
 
   <div class="import-scroll">
@@ -1540,7 +1518,7 @@
 <div class="chat-view view-hidden" id="chatView">
 
   <header class="site-header">
-    <div class="wordmark"><div class="wordmark-icon"></div><span class="wordmark-text">Percent</span></div>
+    <div class="wordmark"><div class="wordmark-icon"><svg viewBox="0 0 512 512" width="24" height="24" fill="none"><defs><linearGradient id="wm-bevel" x1="0" y1="0" x2="0.7" y2="0.7"><stop offset="0%" stop-color="currentColor" stop-opacity="0.9"/><stop offset="50%" stop-color="currentColor" stop-opacity="0.6"/><stop offset="100%" stop-color="currentColor" stop-opacity="0.4"/></linearGradient></defs><circle cx="176" cy="176" r="80" fill="currentColor"/><line x1="392" y1="120" x2="120" y2="392" stroke="currentColor" stroke-width="8" stroke-linecap="round" opacity="0.5"/><line x1="391" y1="119" x2="119" y2="391" stroke="url(#wm-bevel)" stroke-width="6" stroke-linecap="round"/><circle cx="336" cy="336" r="80" stroke="currentColor" stroke-width="6" fill="none"/></svg></div><span class="wordmark-text">Percent</span></div>
     <div class="header-actions">
       <button class="header-btn mobile-only" id="profileToggle" onclick="toggleProfile()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
