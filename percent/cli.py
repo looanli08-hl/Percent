@@ -621,6 +621,59 @@ def config_llm() -> None:
     console.print("[green]LLM configuration saved.[/green]")
 
 
+# ── percent config cost ───────────────────────────────────────────────────────
+
+
+@config_app.command("cost")
+def config_cost() -> None:
+    """Show estimated API cost per operation for the current model."""
+    from percent.config import load_config
+    from percent.llm.client import _PRICING
+
+    config = load_config()
+    model = config.llm_model
+
+    # Find pricing
+    pricing = _PRICING.get(model)
+    if pricing is None:
+        for key, val in _PRICING.items():
+            if key in model or model in key:
+                pricing = val
+                model = key
+                break
+
+    if pricing is None:
+        console.print(f"[yellow]No pricing data for model '{config.llm_model}'.[/yellow]")
+        console.print("Known models: " + ", ".join(_PRICING.keys()))
+        raise typer.Exit(0)
+
+    input_price, output_price = pricing
+
+    # Typical token usage per operation (estimates)
+    ops = [
+        ("import run (per batch)", 2000, 1500),
+        ("persona rebuild", 8000, 3000),
+        ("persona deep-analyze", 10000, 4000),
+        ("persona big-five", 5000, 500),
+        ("persona validate (10 tests)", 15000, 5000),
+        ("chat (per message)", 3000, 500),
+        ("export soul", 5000, 2000),
+    ]
+
+    table = Table(title=f"Estimated Costs — {config.llm_model}", show_header=True)
+    table.add_column("Operation", style="cyan")
+    table.add_column("Input tokens", justify="right")
+    table.add_column("Output tokens", justify="right")
+    table.add_column("Est. cost", justify="right", style="green")
+
+    for name, inp, out in ops:
+        cost = (inp / 1_000_000) * input_price + (out / 1_000_000) * output_price
+        table.add_row(name, f"{inp:,}", f"{out:,}", f"${cost:.4f}")
+
+    console.print(table)
+    console.print(f"\nPricing: ${input_price}/M input, ${output_price}/M output")
+
+
 # ── percent config parsers ────────────────────────────────────────────────────
 
 
