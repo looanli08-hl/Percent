@@ -51,7 +51,8 @@ class PersonaEngine:
           1. Extract findings from chunks
           2. Embed each finding and store as a Fragment
           3. Synthesize core.md from all stored fragments
-          4. Optionally validate against the input chunks
+          4. Generate behavioral fingerprint
+          5. Optionally validate against the input chunks
 
         Returns the core.md content as a string.
         """
@@ -70,12 +71,16 @@ class PersonaEngine:
             )
             self._store.add(fragment)
 
-        # 3. Synthesize — build findings list from all stored fragments for
-        #    consistency (in case prior fragments exist too)
+        # 3. Synthesize
         all_findings = self._fragments_to_findings(self._store.get_all())
-        core_md = self._synthesizer.synthesize_and_save(all_findings, self._core_path)
+        core_md = self._synthesizer.synthesize_and_save(
+            all_findings, self._core_path
+        )
 
-        # 4. Validate
+        # 4. Generate behavioral fingerprint
+        self._generate_fingerprint(chunks)
+
+        # 5. Validate
         if validate and chunks:
             self._validator.validate(core_md, test_chunks=chunks[:5])
 
@@ -135,6 +140,22 @@ class PersonaEngine:
         # 4. Re-synthesize with everything
         all_findings = self._fragments_to_findings(self._store.get_all())
         return self._synthesizer.synthesize_and_save(all_findings, self._core_path)
+
+    def _generate_fingerprint(self, chunks: list[DataChunk]) -> None:
+        """Generate behavioral fingerprint from chunks if applicable."""
+        import json
+
+        from percent.persona.fingerprint import BehavioralFingerprint
+
+        try:
+            fp = BehavioralFingerprint.from_chunks(chunks)
+            fp_path = self.percent_dir / "fingerprint.json"
+            fp_path.write_text(
+                json.dumps(fp.to_dict(), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass  # Fingerprint is best-effort, don't block pipeline
 
     # ── helpers ─────────────────────────────────────────────────────────────
 
