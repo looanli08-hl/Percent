@@ -105,6 +105,7 @@ def get_fragments_by_source(source: str) -> dict:
             "category": f.category.value,
             "content": f.content,
             "confidence": f.confidence,
+            "evidence": f.evidence,
             "created_at": f.created_at.isoformat() if f.created_at else "",
         }
         for f in all_frags
