@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from percent.config import PercentConfig, load_config
 from percent.persona.fragments import FragmentStore
+from percent.persona.spectrum import generate_card_data, CardData
 
 app = FastAPI(title="Percent", description="Open-source personality modeling engine")
 
@@ -88,6 +89,39 @@ def get_insights() -> dict:
     insights = store.get_cross_source_insights()
     store.close()
     return {"insights": insights}
+
+
+@app.get("/api/spectrum")
+def get_spectrum() -> dict:
+    """Return persona spectrum: dimension scores, label, insights, eligibility."""
+    cfg = _require_config()
+    db_path = cfg.fragments_db_path
+    if not db_path.exists():
+        return {"eligible": False, "reason": "没有数据"}
+
+    store = FragmentStore(db_path)
+    fragments = store.get_all()
+    store.close()
+
+    from percent.llm.client import LLMClient
+    client = LLMClient(
+        provider=cfg.llm_provider,
+        model=cfg.llm_model,
+        api_key=cfg.llm_api_key,
+    )
+    prompts_dir = Path(__file__).parent / "prompts"
+
+    card = generate_card_data(fragments, client, prompts_dir)
+
+    return {
+        "eligible": card.spectrum.eligible,
+        "reason": card.spectrum.ineligible_reason,
+        "dimensions": card.spectrum.dimensions,
+        "metrics": card.spectrum.metrics,
+        "label": card.label,
+        "description": card.description,
+        "insights": card.insights,
+    }
 
 
 @app.get("/api/fragments/{source}")
