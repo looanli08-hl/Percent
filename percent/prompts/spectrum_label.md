@@ -25,9 +25,9 @@ Based on the above REAL data, generate:
 
 Respond in valid JSON only:
 ```json
-{
+{{
   "label": "...",
   "description": "...",
   "insights": ["...", "...", "..."]
-}
+}}
 ```
