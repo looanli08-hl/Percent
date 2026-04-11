@@ -102,8 +102,12 @@ class SpectrumEngine:
                     f"Single source with only {n} fragments (need 50 for single source or use 2+ sources)",
                 )
 
-        if span < 7:
-            return False, f"Data span too short: {span} days (minimum 7)"
+        # Note: data_span is based on fragment created_at (import time), not
+        # original data timestamps.  For batch imports the span is always short,
+        # so we only enforce the span check when there is a single source with
+        # borderline fragment count.  Multi-source or high-fragment users pass.
+        if sources < 2 and n < 50 and span < 7:
+            return False, f"Data span too short: {span} days (minimum 7 for single source)"
 
         return True, ""
 

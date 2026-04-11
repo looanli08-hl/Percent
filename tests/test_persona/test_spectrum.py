@@ -436,20 +436,18 @@ class TestEligibilityGate:
         result = engine.compute(frags)
         assert result.eligible is True
 
-    def test_short_data_span_ineligible(self):
+    def test_short_data_span_multi_source_still_eligible(self):
         from percent.persona.spectrum import SpectrumEngine
 
         engine = SpectrumEngine()
-        # 35 fragments, 2 sources, but only 3-day span
+        # 35 fragments, 2 sources, short span — eligible because multi-source
         frags = []
         for i in range(35):
             src = "wechat" if i % 2 == 0 else "bilibili"
-            # 3 days = 72 hours max
             hours_offset = (i % 72)
             frags.append(_frag(f"msg {i}", source=src, hours_offset=hours_offset))
         result = engine.compute(frags)
-        assert result.eligible is False
-        assert "span" in result.ineligible_reason.lower() or "day" in result.ineligible_reason.lower()
+        assert result.eligible is True
 
     def test_exactly_7_days_span_eligible(self):
         from percent.persona.spectrum import SpectrumEngine
