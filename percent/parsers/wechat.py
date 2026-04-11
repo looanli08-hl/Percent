@@ -8,17 +8,38 @@ from pathlib import Path
 from percent.models import ChunkType, DataChunk
 from percent.parsers.base import DataParser
 
-# Only process text messages (Type == 1 in PyWxDump CSV)
-_TEXT_TYPE = "1"
+# Text message type identifiers across different export formats
+_TEXT_TYPES = {"1", "text", "文本"}
 # Gap between messages (seconds) that starts a new conversation window
 _WINDOW_GAP_SECONDS = 30 * 60  # 30 minutes
+
+# Column name mappings for different CSV export tools
+# Each tuple: (talker_col, content_col, time_col, type_col)
+_CSV_FORMATS = [
+    # Original raw DB format
+    {"talker": "StrTalker", "content": "StrContent", "time": "CreateTime", "type": "Type"},
+    # WeFlow / PyWxDump export format
+    {"talker": "talker", "content": "msg", "time": "CreateTime", "type": "type_name"},
+    # MemoTrace export format (Chinese headers)
+    {"talker": "发送人", "content": "内容", "time": "时间", "type": "类型"},
+]
+
+
+def _detect_csv_format(fieldnames: list[str]) -> dict[str, str] | None:
+    """Detect which CSV format matches the given column headers."""
+    field_set = set(fieldnames)
+    for fmt in _CSV_FORMATS:
+        required = {fmt["talker"], fmt["content"], fmt["time"]}
+        if required.issubset(field_set):
+            return fmt
+    return None
 
 
 class WeChatParser(DataParser):
     name = "wechat"
     description = (
-        "Parses WeChat chat logs exported by PyWxDump (CSV) or WechatExporter (JSON). "
-        "Supports single files or a directory of files."
+        "Parses WeChat chat logs exported by WeFlow, MemoTrace, PyWxDump (CSV) "
+        "or WechatExporter (JSON). Supports single files or a directory of files."
     )
 
     def validate(self, path: Path) -> bool:
@@ -39,10 +60,9 @@ class WeChatParser(DataParser):
         try:
             with path.open(encoding="utf-8") as f:
                 reader = csv.DictReader(f)
-                required = {"StrTalker", "StrContent", "CreateTime", "Type"}
                 if reader.fieldnames is None:
                     return False
-                return required.issubset(set(reader.fieldnames))
+                return _detect_csv_format(list(reader.fieldnames)) is not None
         except (OSError, csv.Error):
             return False
 
@@ -80,12 +100,21 @@ class WeChatParser(DataParser):
         try:
             with path.open(encoding="utf-8") as f:
                 reader = csv.DictReader(f)
+                if reader.fieldnames is None:
+                    return messages
+                fmt = _detect_csv_format(list(reader.fieldnames))
+                if fmt is None:
+                    return messages
+
                 for row in reader:
-                    if row.get("Type") != _TEXT_TYPE:
+                    # Filter text messages only (skip if type column exists)
+                    type_val = row.get(fmt["type"], "").strip().lower()
+                    if type_val and type_val not in _TEXT_TYPES:
                         continue
-                    content = row.get("StrContent", "").strip()
-                    talker = row.get("StrTalker", "unknown").strip()
-                    raw_time = row.get("CreateTime", "").strip()
+
+                    content = row.get(fmt["content"], "").strip()
+                    talker = row.get(fmt["talker"], "unknown").strip()
+                    raw_time = row.get(fmt["time"], "").strip()
                     ts = self._parse_timestamp(raw_time)
                     if content:
                         messages.append((talker, ts, content))
@@ -99,10 +128,10 @@ class WeChatParser(DataParser):
             data: list[dict] = json.loads(path.read_text(encoding="utf-8"))
             for entry in data:
                 # Skip non-text messages; JSON exports may use "type" or "msg_type"
-                msg_type = str(entry.get("type", entry.get("msg_type", _TEXT_TYPE)))
-                if msg_type != _TEXT_TYPE:
+                msg_type = str(entry.get("type", entry.get("msg_type", "1"))).strip().lower()
+                if msg_type not in _TEXT_TYPES:
                     continue
-                content = entry.get("content", entry.get("StrContent", "")).strip()
+                content = entry.get("content", entry.get("msg", entry.get("StrContent", ""))).strip()
                 talker = entry.get("talker", entry.get("StrTalker", "unknown")).strip()
                 raw_time = str(entry.get("create_time", entry.get("CreateTime", "")))
                 ts = self._parse_timestamp(raw_time)
@@ -113,11 +142,14 @@ class WeChatParser(DataParser):
         return messages
 
     def _parse_timestamp(self, raw: str) -> datetime:
-        """Parse a Unix timestamp string or ISO 8601 string into a datetime."""
+        """Parse a Unix timestamp string, ISO 8601 string, or Chinese date format."""
         raw = raw.strip()
         # Try as Unix timestamp (int or float)
         try:
-            return datetime.fromtimestamp(float(raw), tz=UTC)
+            ts = float(raw)
+            if ts > 1e12:  # milliseconds
+                ts /= 1000
+            return datetime.fromtimestamp(ts, tz=UTC)
         except (ValueError, OSError):
             pass
         # Try ISO 8601
@@ -125,6 +157,12 @@ class WeChatParser(DataParser):
             return datetime.fromisoformat(raw.replace("Z", "+00:00"))
         except (ValueError, AttributeError):
             pass
+        # Try common Chinese date formats: "2024-01-15 14:30:00"
+        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+            try:
+                return datetime.strptime(raw, fmt).replace(tzinfo=UTC)
+            except ValueError:
+                continue
         return datetime.now(tz=UTC)
 
     def _group_into_chunks(self, messages: list[tuple[str, datetime, str]]) -> list[DataChunk]:
@@ -177,19 +215,18 @@ class WeChatParser(DataParser):
             "WeChat Chat Log Export Guide\n"
             "=============================\n"
             "\n"
-            "Option A — PyWxDump (Windows, exports CSV):\n"
-            "  1. Download PyWxDump from https://github.com/xaoyaoo/PyWxDump\n"
+            "Option A — WeFlow (macOS, recommended):\n"
+            "  1. Download WeFlow from https://github.com/hicccc77/WeFlow/releases\n"
+            "  2. Install the .dmg and open while WeChat is running.\n"
+            "  3. Export chats as CSV.\n"
+            "  4. Upload the exported file(s) here.\n"
+            "\n"
+            "Option B — MemoTrace (Windows, recommended):\n"
+            "  1. Download MemoTrace from https://github.com/shixiaogaoya/MemoTrace/releases\n"
             "  2. Run the tool while WeChat is logged in on your PC.\n"
-            "  3. Export the desired chat to CSV format.\n"
-            "  4. The CSV must contain columns: StrTalker, StrContent, CreateTime, Type.\n"
-            "  5. Pass the CSV file (or a directory of CSV files) to the parser.\n"
+            "  3. Export chats as CSV.\n"
+            "  4. Upload the exported file(s) here.\n"
             "\n"
-            "Option B — WechatExporter / manual JSON:\n"
-            "  1. Export your chat history to JSON format.\n"
-            "  2. Each entry should include: talker/StrTalker, content/StrContent,\n"
-            "     create_time/CreateTime, type/msg_type (1 = text).\n"
-            "  3. Pass the JSON file to the parser.\n"
-            "\n"
-            "Note: Only text messages (Type=1) are imported.\n"
+            "Note: Only text messages are imported.\n"
             "      Messages within a 30-minute gap are grouped into one conversation chunk.\n"
         )

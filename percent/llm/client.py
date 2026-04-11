@@ -66,6 +66,7 @@ class LLMClient:
         "openai": "openai",
         "deepseek": "deepseek",
         "ollama": "ollama",
+        "openrouter": "openrouter",
     }
 
     def __init__(self, provider: str, model: str, api_key: str = "") -> None:

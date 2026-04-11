@@ -78,6 +78,43 @@ def get_stats() -> dict:
     return stats
 
 
+@app.get("/api/insights")
+def get_insights() -> dict:
+    """Return cross-source validated insights with evidence."""
+    db_path = _require_config().fragments_db_path
+    if not db_path.exists():
+        return {"insights": []}
+    store = FragmentStore(db_path)
+    insights = store.get_cross_source_insights()
+    store.close()
+    return {"insights": insights}
+
+
+@app.get("/api/fragments/{source}")
+def get_fragments_by_source(source: str) -> dict:
+    """Return all fragments for a specific data source."""
+    db_path = _require_config().fragments_db_path
+    if not db_path.exists():
+        return {"source": source, "fragments": []}
+    store = FragmentStore(db_path)
+    all_frags = store.get_all()
+    store.close()
+    filtered = [
+        {
+            "id": f.id,
+            "category": f.category.value,
+            "content": f.content,
+            "confidence": f.confidence,
+            "created_at": f.created_at.isoformat() if f.created_at else "",
+        }
+        for f in all_frags
+        if f.source == source
+    ]
+    # Sort by confidence descending
+    filtered.sort(key=lambda x: x["confidence"], reverse=True)
+    return {"source": source, "fragments": filtered}
+
+
 @app.get("/api/fingerprint")
 def get_fingerprint() -> dict:  # type: ignore[type-arg]
     """Return behavioral fingerprint data."""
@@ -151,6 +188,7 @@ _PARSER_REGISTRY = {
     "youtube": "percent.parsers.youtube.YouTubeParser",
     "bilibili": "percent.parsers.bilibili.BilibiliParser",
     "wechat": "percent.parsers.wechat.WeChatParser",
+    "xiaohongshu": "percent.parsers.xiaohongshu.XiaohongshuParser",
 }
 
 
@@ -289,6 +327,17 @@ def _run_analysis(chunks: list) -> dict:
         "total_fragments": stats.get("total", 0),
         "sources": list(stats.get("by_source", {}).keys()),
     }
+
+
+@app.get("/static/{filename}")
+def static_file(filename: str) -> FileResponse:
+    """Serve static files."""
+    path = _STATIC_DIR / filename
+    if not path.exists() or not path.is_file():
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "not found"}, status_code=404)
+    media_type = "application/javascript" if filename.endswith(".js") else None
+    return FileResponse(path, media_type=media_type)
 
 
 @app.get("/")

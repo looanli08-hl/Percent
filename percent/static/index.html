@@ -1444,7 +1444,7 @@
           </div>
           <div>
             <div class="source-item-name">WeChat</div>
-            <div class="source-item-desc">Windows decrypted files</div>
+            <div class="source-item-desc">Mac or Windows — export guide included</div>
           </div>
           <div class="source-item-arrow">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -1458,6 +1458,19 @@
           <div>
             <div class="source-item-name">Bilibili</div>
             <div class="source-item-desc">Auto-fetch via cookie</div>
+          </div>
+          <div class="source-item-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="source-item" onclick="selectSource('xiaohongshu')">
+          <div class="source-item-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="source-item-name">Xiaohongshu</div>
+            <div class="source-item-desc">Liked & bookmarked notes</div>
           </div>
           <div class="source-item-arrow">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -1602,6 +1615,15 @@
               </svg>
               添加数据源
             </button>
+          </div>
+
+          <!-- Cross-Source Insights -->
+          <div style="margin-top:24px;">
+            <div class="profile-section-label" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleInsightsPanel()">
+              <span>Cross-Source Insights</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.4;transition:transform 0.2s;" id="insights-arrow"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div id="insightsContainer" style="display:none;max-height:400px;overflow-y:auto;"></div>
           </div>
         </div>
 
@@ -1789,14 +1811,13 @@
     wechat: {
       name: 'WeChat',
       steps: [
-        'Requires <strong>Windows</strong> with WeChat installed',
-        'Install the <code>wechat-decrypt</code> tool',
-        'Run the tool while WeChat is open to decrypt your database',
-        'Copy the decrypted folder or files here',
+        'Download <a href="https://github.com/hicccc77/WeFlow/releases" target="_blank" rel="noopener">WeFlow</a> — supports macOS (.dmg) and Windows (.exe)',
+        'Open WeFlow while WeChat is running → select chats → export as CSV',
+        'Drag the exported CSV file here',
       ],
-      dropLabel: 'Drop decrypted files here, or click to browse',
-      dropAccept: '',
-      hint: 'Accepts: decrypted WeChat database files',
+      dropLabel: 'Drop exported <strong>CSV</strong> file here, or click to browse',
+      dropAccept: '.csv,.json,.db',
+      hint: 'Accepts: CSV (MemoTrace/WeFlow), JSON, or .db files',
     },
     bilibili: {
       name: 'Bilibili',
@@ -1809,6 +1830,19 @@
       dropLabel: null,
       cookieMode: true,
       hint: 'No file needed — imports directly via API',
+    },
+    xiaohongshu: {
+      name: 'Xiaohongshu',
+      steps: [
+        'Log in to <a href="https://www.xiaohongshu.com" target="_blank" rel="noopener">xiaohongshu.com</a>',
+        'Open browser Console: <strong>Cmd+Option+J</strong> (Mac) or <strong>F12</strong> (Windows → Console tab)',
+        'Click the button below to copy the script, then click the <strong>bottom input line</strong> (starts with <code>&gt;</code>) in the console, paste with Ctrl/Cmd+V, and press Enter',
+        'A JSON file will download automatically — drag it here',
+      ],
+      dropLabel: 'Drop exported <strong>JSON</strong> file here, or click to browse',
+      dropAccept: '.json,.csv',
+      hint: 'Accepts: JSON or CSV',
+      scriptMode: true,
     },
   };
 
@@ -1825,7 +1859,7 @@
     activeSource = source;
 
     const items = document.querySelectorAll('#sourceList .source-item');
-    const sourceKeys = ['telegram','whatsapp','youtube','wechat','bilibili'];
+    const sourceKeys = ['telegram','whatsapp','youtube','wechat','bilibili','xiaohongshu'];
     items.forEach((item, i) => {
       item.classList.toggle('selected', sourceKeys[i] === source);
     });
@@ -1857,6 +1891,19 @@
           <button class="cookie-submit" onclick="importBilibili()">Import</button>
         </div>
         <div id="bilibiliStatus" style="margin-top:10px;font-size:0.8125rem;color:#6b6460;"></div>`;
+    } else if (cfg.scriptMode) {
+      dropArea.innerHTML = `
+        <button class="cookie-submit" style="margin-bottom:12px;width:100%;" onclick="copyXhsScript()">Copy export script</button>
+        <div id="xhsCopyStatus" style="margin-bottom:12px;font-size:0.8125rem;color:#6b6460;"></div>
+        <div class="drop-zone" id="sourceDropZone"
+             ondragover="dzDragOver(event,'sourceDropZone')"
+             ondragleave="dzDragLeave('sourceDropZone')"
+             ondrop="dzDrop(event,'sourceDropZone','${source}')">
+          <input type="file" accept="${cfg.dropAccept}" onchange="fileInputChange(this,'${source}')" />
+          <div class="drop-zone-label">${cfg.dropLabel}</div>
+          <div class="drop-zone-hint">${cfg.hint}</div>
+        </div>
+        <div id="sourceFileList"></div>`;
     } else {
       dropArea.innerHTML = `
         <div class="drop-zone" id="sourceDropZone"
@@ -1944,6 +1991,7 @@
 
   function autoDetectSource(file) {
     const name = file.name.toLowerCase();
+    if (name.includes('xiaohongshu') || name.includes('xhs')) return 'xiaohongshu';
     if (name.endsWith('.json')) {
       if (name.includes('watch') || name.includes('youtube')) return 'youtube';
       return 'telegram';
@@ -2062,6 +2110,37 @@
   function updateAnalyzeBtn() {
     const btn = document.getElementById('analyzeBtn');
     btn.disabled = uploadedFiles.length === 0;
+  }
+
+  // ── Insights panel toggle ──────────────────────────────────────────────────
+
+  function toggleInsightsPanel() {
+    const container = document.getElementById('insightsContainer');
+    const arrow = document.getElementById('insights-arrow');
+    if (!container) return;
+    if (container.style.display !== 'none') {
+      container.style.display = 'none';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    } else {
+      container.style.display = 'block';
+      if (arrow) arrow.style.transform = 'rotate(180deg)';
+      loadInsights();
+    }
+  }
+
+  // ── Xiaohongshu script copy ──────────────────────────────────────────────────
+
+  async function copyXhsScript() {
+    try {
+      const res = await fetch('/static/xhs_export.js');
+      const script = await res.text();
+      await navigator.clipboard.writeText(script);
+      const status = document.getElementById('xhsCopyStatus');
+      status.textContent = 'Copied! Now paste it into the xiaohongshu.com console and press Enter.';
+      status.style.color = 'var(--accent)';
+    } catch(e) {
+      alert('Failed to copy. Please try again.');
+    }
   }
 
   // ── Bilibili cookie import ────────────────────────────────────────────────────
@@ -2326,14 +2405,127 @@
       for (const [source, count] of Object.entries(stats.by_source)) {
         const label = formatSourceLabel(source);
         html += `
-          <div class="stats-source-row">
+          <div class="stats-source-row" onclick="toggleSourceDetail('${escHtml(source)}')" style="cursor:pointer;">
             <span class="stats-source-name">${escHtml(label)}</span>
-            <span class="stats-source-count">${count.toLocaleString()}</span>
-          </div>`;
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="stats-source-count">${count.toLocaleString()}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.4;transition:transform 0.2s;" id="arrow-${escHtml(source)}"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+          <div id="detail-${escHtml(source)}" style="display:none;"></div>`;
       }
     }
 
     container.innerHTML = html;
+  }
+
+  async function toggleSourceDetail(source) {
+    const detail = document.getElementById('detail-' + source);
+    const arrow = document.getElementById('arrow-' + source);
+    if (!detail) return;
+
+    if (detail.style.display !== 'none') {
+      detail.style.display = 'none';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+      return;
+    }
+
+    detail.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(90deg)';
+    detail.innerHTML = '<div style="padding:8px 0;font-size:0.75rem;color:var(--text-muted);">Loading...</div>';
+
+    try {
+      const res = await fetch(`/api/fragments/${source}`);
+      const data = await res.json();
+
+      if (!data.fragments || data.fragments.length === 0) {
+        detail.innerHTML = '<div style="padding:8px 0;font-size:0.75rem;color:var(--text-muted);">No fragments found.</div>';
+        return;
+      }
+
+      let html = '<div style="padding:4px 0 12px;display:flex;flex-direction:column;gap:6px;">';
+      for (const frag of data.fragments) {
+        const conf = Math.round(frag.confidence * 100);
+        const catLabel = frag.category.charAt(0).toUpperCase() + frag.category.slice(1);
+        html += `
+          <div style="padding:10px 12px;background:var(--bg-elevated);border-radius:8px;font-size:0.8125rem;line-height:1.55;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);opacity:0.8;">${escHtml(catLabel)}</span>
+              <span style="font-size:0.6875rem;color:var(--text-muted);">${conf}%</span>
+            </div>
+            <div style="color:var(--text-primary);">${escHtml(frag.content)}</div>
+            ${frag.evidence ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);line-height:1.5;">📎 ${escHtml(frag.evidence)}</div>` : ''}
+          </div>`;
+      }
+      html += '</div>';
+      detail.innerHTML = html;
+    } catch(e) {
+      detail.innerHTML = '<div style="padding:8px 0;font-size:0.75rem;color:var(--error);">Failed to load.</div>';
+    }
+  }
+
+  // ── Cross-Source Insights View ──────────────────────────────────────────────
+
+  let insightsLoaded = false;
+
+  async function loadInsights() {
+    if (insightsLoaded) return;
+    const container = document.getElementById('insightsContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div style="padding:16px 0;font-size:0.8125rem;color:var(--text-muted);">Loading insights...</div>';
+
+    try {
+      const res = await fetch('/api/insights');
+      const data = await res.json();
+
+      if (!data.insights || data.insights.length === 0) {
+        container.innerHTML = '<div style="padding:16px 0;font-size:0.8125rem;color:var(--text-muted);">No cross-source insights yet. Add more data sources.</div>';
+        return;
+      }
+
+      let html = '';
+      for (const insight of data.insights) {
+        const conf = Math.round(insight.confidence * 100);
+        const sourceCount = insight.source_count;
+        const catLabel = insight.category.charAt(0).toUpperCase() + insight.category.slice(1);
+
+        // Source badges
+        const sourceBadges = Object.keys(insight.sources).map(s =>
+          `<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.6875rem;background:var(--accent-subtle);color:var(--accent);font-weight:500;">${escHtml(formatSourceLabel(s))}</span>`
+        ).join(' ');
+
+        // Evidence per source
+        let evidenceHtml = '';
+        for (const [src, items] of Object.entries(insight.sources)) {
+          const label = formatSourceLabel(src);
+          for (const item of items) {
+            if (item.evidence) {
+              evidenceHtml += `<div style="padding:4px 0;font-size:0.75rem;color:var(--text-muted);line-height:1.5;"><span style="color:var(--accent);font-weight:500;">${escHtml(label)}</span> — ${escHtml(item.evidence)}</div>`;
+            }
+          }
+        }
+
+        html += `
+          <div style="padding:14px 16px;background:var(--bg-elevated);border-radius:10px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);opacity:0.8;">${escHtml(catLabel)}</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                ${sourceCount > 1 ? `<span style="font-size:0.625rem;padding:1px 6px;border-radius:3px;background:rgba(92,180,120,0.15);color:#5cb478;font-weight:600;">${sourceCount} sources</span>` : ''}
+                <span style="font-size:0.6875rem;color:var(--text-muted);">${conf}%</span>
+              </div>
+            </div>
+            <div style="color:var(--text-primary);font-size:0.875rem;line-height:1.6;margin-bottom:8px;">${escHtml(insight.content)}</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:${evidenceHtml ? '8' : '0'}px;">${sourceBadges}</div>
+            ${evidenceHtml ? `<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">${evidenceHtml}</div>` : ''}
+          </div>`;
+      }
+
+      container.innerHTML = html;
+      insightsLoaded = true;
+    } catch(e) {
+      container.innerHTML = '<div style="padding:16px 0;font-size:0.8125rem;color:var(--error);">Failed to load insights.</div>';
+    }
   }
 
   function formatSourceLabel(source) {
@@ -2343,6 +2535,7 @@
       youtube: 'YouTube',
       telegram: 'Telegram',
       whatsapp: 'WhatsApp',
+      xiaohongshu: 'Xiaohongshu',
     };
     return labels[source.toLowerCase()] || source;
   }

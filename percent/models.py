@@ -11,6 +11,7 @@ class ChunkType(StrEnum):
     WATCH_HISTORY = "watch_history"
     LISTEN_HISTORY = "listen_history"
     POST = "post"
+    SOCIAL_INTERACTION = "social_interaction"
 
 
 class DataChunk(BaseModel):
@@ -43,5 +44,6 @@ class Fragment(BaseModel):
     content: str
     confidence: float = Field(ge=0.0, le=1.0)
     source: str
+    evidence: str = ""
     embedding: list[float] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=datetime.now)

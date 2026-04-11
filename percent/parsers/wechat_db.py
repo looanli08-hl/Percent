@@ -463,9 +463,20 @@ class WeChatDBParser(DataParser):
 
     def get_import_guide(self) -> str:
         return (
-            "WeChat 4.x decrypted database import:\n"
-            "1. Use wechat-decrypt (github.com/ylytdeng/wechat-decrypt) to decrypt\n"
-            "2. Run: python main.py decrypt\n"
-            "3. Copy the 'decrypted' folder to your Mac\n"
-            "4. Run: percent import run wechat-db /path/to/decrypted"
+            "WeChat 4.x Decrypted Database Import\n"
+            "=====================================\n"
+            "\n"
+            "Option A — wechat-decrypt (Mac & Windows):\n"
+            "  1. Install: https://github.com/ylytdeng/wechat-decrypt\n"
+            "  2. Run while WeChat is open: python main.py decrypt\n"
+            "  3. Upload the 'decrypted' folder here, or run:\n"
+            "     percent import run wechat-db /path/to/decrypted\n"
+            "\n"
+            "Option B — WeFlow (macOS, GUI):\n"
+            "  1. Install WeFlow: https://github.com/hicccc77/WeFlow\n"
+            "  2. Open while WeChat is running\n"
+            "  3. Export as CSV/JSON, then use the 'wechat' parser instead\n"
+            "\n"
+            "Note: This parser reads decrypted SQLite .db files directly.\n"
+            "      For CSV/JSON exports, use the 'wechat' parser.\n"
         )

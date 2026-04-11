@@ -70,7 +70,7 @@ class PersonaEngine:
         # 1. Extract
         findings = self._extractor.extract(chunks)
 
-        # 2. Embed + store
+        # 2. Embed + store (with evidence from LLM extraction)
         for finding in findings:
             embedding = self._embedder.encode(finding.content).tolist()
             fragment = Fragment(
@@ -78,6 +78,7 @@ class PersonaEngine:
                 content=finding.content,
                 confidence=finding.confidence,
                 source=finding.source,
+                evidence=finding.evidence,
                 embedding=embedding,
             )
             self._store.add(fragment)
