@@ -10,6 +10,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import timezone
+from pathlib import Path
 
 from percent.models import Fragment
 
@@ -308,3 +309,76 @@ class SpectrumEngine:
         # Max possible diff = 2.0 (completely disjoint distributions)
         contrast = total_diff / 2.0
         return self._clamp(contrast)
+
+
+# ─── Card data ───────────────────────────────────────────────────────────────
+
+
+@dataclass
+class CardData:
+    """Complete data needed to render a persona card."""
+
+    spectrum: SpectrumResult
+    label: str = ""
+    description: str = ""
+    insights: list[str] = field(default_factory=list)
+
+
+def generate_card_data(
+    fragments: list[Fragment],
+    llm_client,
+    prompts_dir: Path | None = None,
+) -> CardData:
+    """Compute spectrum + generate label/description/insights via LLM."""
+    engine = SpectrumEngine()
+    spectrum = engine.compute(fragments)
+
+    card = CardData(spectrum=spectrum)
+    if not spectrum.eligible:
+        return card
+
+    # Prepare prompt inputs
+    dim_text = "\n".join(f"- {k}: {v}/100" for k, v in spectrum.dimensions.items())
+    metrics_text = "\n".join(f"- {k}: {v}" for k, v in spectrum.metrics.items())
+
+    # Select top fragments by confidence
+    sorted_frags = sorted(fragments, key=lambda f: f.confidence, reverse=True)[:10]
+    frag_text = "\n".join(
+        f"- [{f.source}] {f.content[:100]} (confidence: {f.confidence})"
+        for f in sorted_frags
+    )
+
+    # Load prompt template
+    if prompts_dir is None:
+        prompts_dir = Path(__file__).parent.parent / "prompts"
+    template_path = prompts_dir / "spectrum_label.md"
+    template = template_path.read_text(encoding="utf-8")
+
+    prompt = template.format(
+        dimensions=dim_text,
+        metrics=metrics_text,
+        fragments=frag_text,
+    )
+
+    # Call LLM
+    raw = llm_client.complete(prompt)
+
+    # Parse JSON response
+    try:
+        import json as json_mod
+
+        json_str = raw
+        if "```json" in raw:
+            json_str = raw.split("```json")[1].split("```")[0]
+        elif "```" in raw:
+            json_str = raw.split("```")[1].split("```")[0]
+        data = json_mod.loads(json_str.strip())
+        card.label = data.get("label", "")
+        card.description = data.get("description", "")
+        card.insights = data.get("insights", [])[:3]
+    except (json_mod.JSONDecodeError, IndexError, KeyError):
+        card.label = "数字旅人"
+        card.description = "你的数据正在讲述你的故事"
+        card.insights = []
+
+    return card
