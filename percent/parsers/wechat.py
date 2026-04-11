@@ -29,7 +29,7 @@ def _detect_csv_format(fieldnames: list[str]) -> dict[str, str] | None:
     """Detect which CSV format matches the given column headers."""
     field_set = set(fieldnames)
     for fmt in _CSV_FORMATS:
-        required = {fmt["talker"], fmt["content"], fmt["time"]}
+        required = {fmt["talker"], fmt["content"], fmt["time"], fmt["type"]}
         if required.issubset(field_set):
             return fmt
     return None
@@ -226,6 +226,10 @@ class WeChatParser(DataParser):
             "  2. Run the tool while WeChat is logged in on your PC.\n"
             "  3. Export chats as CSV.\n"
             "  4. Upload the exported file(s) here.\n"
+            "\n"
+            "Option C — PyWxDump (advanced):\n"
+            "  1. See https://github.com/xaoyaoo/PyWxDump for instructions.\n"
+            "  2. Export chats as CSV.\n"
             "\n"
             "Note: Only text messages are imported.\n"
             "      Messages within a 30-minute gap are grouped into one conversation chunk.\n"
