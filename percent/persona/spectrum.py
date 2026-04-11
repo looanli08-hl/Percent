@@ -395,7 +395,7 @@ def generate_card_data(
 
         card.label = data.get("label", "")
         card.description = data.get("description", "")
-        card.insights = data.get("insights", [])[:3]
+        card.insights = data.get("insights", [])[:5]
     except (json_mod.JSONDecodeError, IndexError, KeyError):
         card.label = "数字旅人"
         card.description = "你的数据正在讲述你的故事"
