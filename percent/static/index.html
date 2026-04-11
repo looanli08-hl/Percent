@@ -2274,7 +2274,7 @@
         if (btn) {
           btn.disabled = false;
           btn.textContent = `${data.total_fragments} fragments analyzed — Enter`;
-          btn.onclick = () => showChatView();
+          btn.onclick = () => showCardView();
         }
       } else {
         if (btn) {
@@ -2407,7 +2407,7 @@
 
       if (data.status === 'ok') {
         uploadedFiles = [];
-        showChatView();
+        showCardView();
       } else {
         alert('Analysis failed: ' + (data.message || 'Unknown error'));
       }
