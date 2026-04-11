@@ -15,6 +15,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+  <!-- modern-screenshot for card export -->
+  <script type="module">
+    import { domToPng } from 'https://esm.sh/modern-screenshot@4';
+    window.domToPng = domToPng;
+  </script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -1368,6 +1374,171 @@
     @media (min-width: 769px) {
       .mobile-only { display: none !important; }
     }
+
+    /* ── CARD VIEW ────────────────────────────────────────────────────── */
+    .card-view {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .card-scroll {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px 60px;
+    }
+
+    .card-canvas {
+      position: relative;
+      width: 360px;
+      aspect-ratio: 3 / 4;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card-brand {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px;
+      color: var(--text-dimmer);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .card-label {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: var(--text-primary);
+      text-align: center;
+      margin-top: 32px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+
+    .card-description {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 15px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 12px;
+      max-width: 20ch;
+      align-self: center;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .card-chart-wrap {
+      margin: 24px auto 0;
+      width: 240px;
+      height: 240px;
+      flex-shrink: 0;
+    }
+
+    .card-insights {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .card-insight-item {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding-left: 12px;
+      border-left: 2px solid rgba(196, 101, 74, 0.3);
+      line-height: 1.4;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 11px;
+      color: var(--text-dimmer);
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .card-domain {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 10px;
+      color: var(--text-dimmer);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .card-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      border-radius: 16px;
+    }
+
+    .card-export-btn {
+      margin-top: 24px;
+      padding: 10px 28px;
+      background: var(--accent);
+      color: var(--text-on-accent);
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .card-export-btn:hover { background: var(--accent-hover); }
+    .card-export-btn:active { transform: scale(0.97); }
+    .card-export-btn:disabled {
+      background: var(--scrollbar);
+      cursor: not-allowed;
+    }
+
+    .card-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .card-fallback-icon {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 3rem;
+      color: var(--text-dimmer);
+      margin-bottom: 16px;
+    }
+
+    .card-fallback-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .card-fallback-text {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      max-width: 28ch;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -1539,6 +1710,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
         Profile
       </button>
+      <button class="header-btn header-btn--accent" onclick="showCardView()">人格画像</button>
       <button class="header-btn" onclick="resetChat()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         新对话
@@ -1687,6 +1859,52 @@
 
 
 <!-- ═══════════════════════════════════════════════════════════════════
+     CARD VIEW
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="card-view view-hidden" id="cardView">
+
+  <header class="site-header">
+    <div class="wordmark"><div class="wordmark-icon"><svg viewBox="0 0 512 512" width="24" height="24" fill="none"><defs><linearGradient id="wm-bevel-card" x1="0" y1="0" x2="0.7" y2="0.7"><stop offset="0%" stop-color="currentColor" stop-opacity="0.9"/><stop offset="50%" stop-color="currentColor" stop-opacity="0.6"/><stop offset="100%" stop-color="currentColor" stop-opacity="0.4"/></linearGradient></defs><circle cx="176" cy="176" r="80" fill="currentColor"/><line x1="392" y1="120" x2="120" y2="392" stroke="currentColor" stroke-width="8" stroke-linecap="round" opacity="0.5"/><line x1="391" y1="119" x2="119" y2="391" stroke="url(#wm-bevel-card)" stroke-width="6" stroke-linecap="round"/><circle cx="336" cy="336" r="80" stroke="currentColor" stroke-width="6" fill="none"/></svg></div><span class="wordmark-text">Percent</span></div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="showImportWizard()">导入数据</button>
+      <button class="header-btn" onclick="showChatViewFromCard()">对话</button>
+    </div>
+  </header>
+
+  <div class="card-scroll">
+    <!-- The card canvas — gets exported as image -->
+    <div class="card-canvas" id="cardCanvas">
+      <div class="card-brand">% Percent</div>
+      <div class="card-label" id="cardLabel">「」</div>
+      <div class="card-description" id="cardDescription"></div>
+      <div class="card-chart-wrap">
+        <svg id="stellarChart" viewBox="0 0 400 400" width="100%" height="100%"></svg>
+      </div>
+      <div class="card-insights" id="cardInsights"></div>
+      <div class="card-footer" id="cardFooter"></div>
+      <div class="card-domain">percent.dev</div>
+      <!-- SVG grain texture -->
+      <svg class="card-grain" xmlns="http://www.w3.org/2000/svg">
+        <filter id="cardGrain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter>
+        <rect width="100%" height="100%" filter="url(#cardGrain)" opacity="0.03"/>
+      </svg>
+    </div>
+
+    <!-- Export button -->
+    <button class="card-export-btn" id="cardExportBtn" onclick="exportCard()">保存为图片</button>
+
+    <!-- Fallback when ineligible -->
+    <div class="card-fallback view-hidden" id="cardFallback">
+      <div class="card-fallback-icon">%</div>
+      <div class="card-fallback-title">数据还在积累中</div>
+      <div class="card-fallback-text">再导入一些数据解锁你的人格画像</div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
      JAVASCRIPT
      ═══════════════════════════════════════════════════════════════════ -->
 <script>
@@ -1755,6 +1973,7 @@
   function showImportWizard() {
     document.getElementById('importView').classList.add('active');
     document.getElementById('chatView').classList.add('view-hidden');
+    document.getElementById('cardView').classList.add('view-hidden');
     setupGlobalDrop();
   }
 
@@ -1762,6 +1981,7 @@
     document.getElementById('importView').classList.remove('active');
     document.getElementById('chatView').classList.remove('view-hidden');
     document.getElementById('chatView').classList.add('fade-in');
+    document.getElementById('cardView').classList.add('view-hidden');
     teardownGlobalDrop();
     loadPersona();
     loadStats();
@@ -2717,6 +2937,134 @@
 
   function escHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Card View ─────────────────────────────────────────────────────────────────
+
+  function renderStellarChart(svgEl, dimensions) {
+    const cx = 200, cy = 200, maxR = 150;
+    const entries = Object.entries(dimensions);
+    const n = entries.length;
+    if (n === 0) return;
+
+    let svg = '';
+    // Guide circles
+    for (const r of [0.25, 0.5, 0.75, 1.0]) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="${maxR * r}" fill="none" stroke="var(--border)" stroke-width="0.5" opacity="0.08"/>`;
+    }
+
+    const angleStep = (2 * Math.PI) / n;
+    entries.forEach(([name, score], i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const r = (score / 100) * maxR;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+
+      // Tapered bar
+      const perpAngle = angle + Math.PI / 2;
+      const baseW = 6;
+      const bx1 = cx + Math.cos(perpAngle) * baseW;
+      const by1 = cy + Math.sin(perpAngle) * baseW;
+      const bx2 = cx - Math.cos(perpAngle) * baseW;
+      const by2 = cy - Math.sin(perpAngle) * baseW;
+
+      const opacity = (0.3 + (score / 100) * 0.7).toFixed(2);
+      svg += `<polygon points="${bx1.toFixed(1)},${by1.toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)} ${bx2.toFixed(1)},${by2.toFixed(1)}" fill="var(--accent)" opacity="${opacity}"/>`;
+
+      // Label
+      const labelR = maxR + 20;
+      const lx = cx + Math.cos(angle) * labelR;
+      const ly = cy + Math.sin(angle) * labelR;
+      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="var(--text-dim)" font-size="11" font-family="'DM Sans', sans-serif">${name}</text>`;
+    });
+
+    // Center dot
+    svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--accent)" opacity="0.5"/>`;
+
+    svgEl.innerHTML = svg;
+  }
+
+  async function loadCard() {
+    try {
+      const resp = await fetch('/api/spectrum');
+      const data = await resp.json();
+
+      const canvas = document.getElementById('cardCanvas');
+      const exportBtn = document.getElementById('cardExportBtn');
+      const fallback = document.getElementById('cardFallback');
+
+      if (!data.eligible) {
+        canvas.classList.add('view-hidden');
+        exportBtn.classList.add('view-hidden');
+        fallback.classList.remove('view-hidden');
+        return;
+      }
+
+      canvas.classList.remove('view-hidden');
+      exportBtn.classList.remove('view-hidden');
+      fallback.classList.add('view-hidden');
+
+      document.getElementById('cardLabel').textContent = `「${data.label}」`;
+      document.getElementById('cardDescription').textContent = data.description;
+
+      renderStellarChart(document.getElementById('stellarChart'), data.dimensions);
+
+      const insightsEl = document.getElementById('cardInsights');
+      insightsEl.innerHTML = (data.insights || [])
+        .map(i => `<div class="card-insight-item">${escHtml(i)}</div>`)
+        .join('');
+
+      const m = data.metrics || {};
+      document.getElementById('cardFooter').textContent =
+        `${m.source_count || 0} sources · ${m.fragment_count || 0} fragments · ${m.data_span_days || 0} days`;
+
+    } catch (e) {
+      console.error('Failed to load card:', e);
+    }
+  }
+
+  async function exportCard() {
+    const el = document.getElementById('cardCanvas');
+    const btn = document.getElementById('cardExportBtn');
+    btn.textContent = '正在生成...';
+    btn.disabled = true;
+
+    try {
+      await document.fonts.ready;
+      const dataUrl = await window.domToPng(el, {
+        scale: 3,
+        quality: 1.0,
+        backgroundColor: '#131211',
+      });
+
+      const link = document.createElement('a');
+      link.download = 'percent-persona.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      console.error('Export failed:', e);
+      alert('导出失败，请重试');
+    } finally {
+      btn.textContent = '保存为图片';
+      btn.disabled = false;
+    }
+  }
+
+  function showCardView() {
+    document.getElementById('importView').classList.remove('active');
+    document.getElementById('chatView').classList.add('view-hidden');
+    document.getElementById('cardView').classList.remove('view-hidden');
+    document.getElementById('cardView').classList.add('fade-in');
+    teardownGlobalDrop();
+    loadCard();
+  }
+
+  function showChatViewFromCard() {
+    document.getElementById('cardView').classList.add('view-hidden');
+    document.getElementById('chatView').classList.remove('view-hidden');
+    document.getElementById('chatView').classList.add('fade-in');
+    loadPersona();
+    loadStats();
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────────
