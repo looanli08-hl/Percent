@@ -1396,11 +1396,10 @@
     .card-canvas {
       position: relative;
       width: 380px;
-      min-height: 480px;
+      min-height: 520px;
       background: #131211;
-      border: 1px solid #2a2725;
       border-radius: 16px;
-      padding: 48px 36px 36px;
+      padding: 40px 32px 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1409,113 +1408,104 @@
 
     .card-brand {
       font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 11px;
-      color: #4a4540;
-      display: flex;
-      align-items: center;
+      font-size: 10px;
+      color: #7d756b;
       flex-shrink: 0;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       font-weight: 500;
     }
 
     .card-label {
       font-family: 'Instrument Serif', Georgia, serif;
-      font-size: clamp(2rem, 6vw, 3rem);
-      color: #e8e2d9;
+      font-size: 2.25rem;
+      color: #ece6dd;
       text-align: center;
-      margin-top: 40px;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      margin-top: 36px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
       flex-shrink: 0;
+    }
+
+    .card-label-mark {
+      color: #4a4035;
+      font-weight: 300;
+      font-size: 0.85em;
     }
 
     .card-description {
       font-family: 'Instrument Serif', Georgia, serif;
       font-style: italic;
-      font-size: 14px;
-      color: #9c9488;
+      font-size: 15px;
+      color: #7d756b;
       text-align: center;
-      margin-top: 16px;
-      max-width: 22ch;
-      align-self: center;
-      line-height: 1.55;
+      margin-top: 12px;
+      line-height: 1.5;
       flex-shrink: 0;
     }
 
-    .card-chart-wrap {
-      margin: 32px auto 0;
-      width: 280px;
-      height: 280px;
-      flex-shrink: 0;
-    }
-
-    .card-insights {
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      flex-shrink: 0;
-      width: 100%;
-    }
-
-    .card-insight-item {
-      font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 13.5px;
-      color: #9c9488;
-      padding-left: 24px;
-      line-height: 1.65;
-      position: relative;
-    }
-
-    .card-insight-item .insight-number {
-      position: absolute;
-      left: 0;
-      top: 0;
-      font-size: 10px;
-      font-weight: 500;
-      color: #3a3633;
-      letter-spacing: 0.02em;
-      line-height: 1.65;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .card-insight-item .insight-dot {
-      position: absolute;
-      left: 16px;
-      top: 8px;
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: #c4654a;
-      opacity: 0.5;
-    }
-
-    .card-footer-separator {
-      width: 40px;
+    .card-divider {
+      width: 24px;
       height: 1px;
-      background: #2a2725;
+      background: linear-gradient(90deg, transparent, #c4654a, transparent);
+      opacity: 0.3;
       margin: 28px auto 0;
       flex-shrink: 0;
     }
 
-    .card-footer {
-      margin-top: 16px;
+    .card-chart-wrap {
+      margin: 24px auto 0;
+      width: 310px;
+      height: 310px;
+      flex-shrink: 0;
+    }
+
+    .card-insights {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+      width: 100%;
+      align-self: stretch;
+    }
+
+    .card-insight-item {
       font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 11px;
-      color: #4a4540;
+      font-size: 12.5px;
+      color: #7d756b;
+      padding-left: 14px;
+      line-height: 1.6;
+      border-left: 1.5px solid rgba(196, 101, 74, 0.2);
+    }
+
+    .card-footer-separator {
+      width: 24px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #2a2520, transparent);
+      margin: 24px auto 0;
+      flex-shrink: 0;
+    }
+
+    .card-footer {
+      margin-top: 14px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 10px;
+      color: #5a554e;
       text-align: center;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.05em;
       flex-shrink: 0;
     }
 
     .card-domain {
       font-family: 'DM Sans', system-ui, sans-serif;
       font-size: 10px;
-      color: #3a3633;
+      color: #6b6460;
       text-align: center;
       margin-top: 8px;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
+      font-weight: 500;
       flex-shrink: 0;
     }
 
@@ -1526,6 +1516,10 @@
       z-index: 1;
       border-radius: 16px;
       overflow: hidden;
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAbkElEQVR42k3bBbSWVRMF4GNjKxbWiIkd2ImNoihYmCh2d3ejgooFqNhiFzaoWNidYHd3t/7rmX+Ny7vWXffyfe97zsyevffMeb9LW3755WOKKaaIgQMHxlFHHRX7779/dO/ePZZaaqlYeOGFY9y4cTHNNNPE1FNPHYsttljss88+ccghh8SUU04ZO+20U7z66qux7777xkcffRRnnHFGTDDBBNG7d++876abbsrXNtxww9h7773jhhtuyHWt89BDD8USSywRd911V9xyyy3Rv3//mHHGGeOLL76Ibt26xYMPPhjzzz9/DB48OEaOHBnbb799zD333DHTTDPFgQceGOeee26+L5Yll1wy17PXp59+GqNGjYqNN9447rvvvrjjjjtijz32iFNOOSXmmWee6NOnT+bp/S+//DKaG0877bRM4qqrrorZZpstDjrooEz6sssui2eeeSZOPfXUmHPOOWPPPffM1/z8559/4sknn4zPP/881l133UwAcEcffXScfPLJ8cYbb8TTTz+dwVt77bXXjj///DMWXXTR6NSpUyy33HKxwQYb/AtW586d45FHHomHH344vvnmmzj22GNjookmihVWWCGDB6ZiAeTtt9+OXr16ZbLjjTde7rfVVlvFMsssE0OHDs3CWPv++++PjTbaKFprMXz48Pj9999j0kknzXXEddFFF0U7/PDDY/bZZ48jjjgiEV1ooYXi119/TbRXXXXVWG211eKHH36ITTbZJJMULAB23nnnuOSSSzJJG7377rvxySefxMorr5wgHHDAAZnUjTfeGJNNNlmCCggMUQlfXptrrrkS7GuvvTZfP+yww7KSYthrr71ijTXWiO+//z6OPPLI/Pn8889Hv379YvHFF08Gvfnmm1llcb344osJ3qyzzhpdu3aNOeaYI5599tmMYdlll41jjjkmmeR+jFWw5sZtttkmN0UJF80333zx/vvv5yIzzzxzTDLJJElbwW266aYZhAB//vnnDBJLfAEJo1TlscceS8BU6eyzz84Af/vtt5SDAIYMGZJyAr5AL7300vzdfj/++GNW2L8XWGCB2HbbbbMgwDr00EMzqQJ6+umnz2tIETtPOumk2HXXXXM9xRUDpgLy/PPPT8a6bt55540JJ5wwmhdoyAuScYOLb7311tyUXmjprLPOyqBU+oILLsibLbj00kvHmmuumfetuOKKSUNJDhgwIAYNGpT6u/nmmzMo16Ahes8yyywJKmBOP/301D/grrvuulh99dWT1uirEK+//nruh7qKs/7660fHjh0zrvXWWy9ZgKkzzDBD0poHAIa/2F9ReQ+mKJ74FJMPtC233DJeeumlNEI6EgAquYn2aBR9aHO66aaLb7/9Nvbbb7+UAMO67bbbYtiwYWlMDNQ6aEYa11xzTTILkH661uvoPtVUUyVgKmZf4FjfXjTOGFXxnXfeyev4A+Ycf/zxCZbXaXvHHXfMhIFgH2u7j5Eq0MUXXxwvvPBCXH311ckczAOWGMeOHft/E9xiiy2yqs8991wueuGFFyZtoWfhK6+8Mr7++uushm9MocfNNtssPQM7rr/++qwoitqUBzAjFQIK98YmfoJtn332Wbz88suxww47xJgxY+Kvv/5KcGjdPeOPP36y6bXXXkvvUKivvvoqJaI4q6yySq6BfV6//PLL/2XLhx9+mIWz18cffxwnnnhiygXTSJc0dL333nsvWpcuXTJZgaOtRK644orUFefu2bNnHHzwwRkkZ5U8cxM8OkEcOP5Ny7vttlsiywOYH4Bpmvndfvvt6dLeq/bJF/y0t6oKEDtco20qCm9hbiqn/T7xxBP5c8EFF8xus9Zaa6V/8TIAYZV9VZ1h8yG/W6/apRiPO+64aBJFa+2BLtEUldGJjvR/6KG8hIAAQR0CC7QpZgaEE044Ie699940Sq/TmE6B1gL2+wMPPBBPPfVUsoOeVZw+MZCx0fGIESMyMRoXhxY48cQTZ9A8BDPeeuutbGVkKCaywRIt/Zdffsl4AKqFa4HYZ66RPFbYF3NSApCBOhqaBSCpMtBjHCgkiDPPPDNppD/TI/prn5ggML+j3R9//JFtpkOHDikLvZtvqKaNeQagAEjraI5JGKJaknANs8Q+wNAs9/Z7375989+GK8mKieEyc5Kic5509913p78AVydTNNQnR63yvPPOi+ZFAasClOkZI3766afUiMRtiB0og86qazDS/txL0xYkFw7NQ4BDqyuttFK88sor6QnAhj6tkoIqS9SXlrv77rsn6AwRM3UdbNt8882TLf6tUzA164hTEuYIQJ1zzjkJBBDNFKZEa2EbkMUtDjEy+HXWWSdaDSV0poVYRKvjonQnGe5JoyY57wmOPNAQvVQKxU15hhtSQT3XMFiBShr9tt5666Qm4FzvPS1XUjoQw9VatUBdREfCTHEBXPuT4CKLLJKMUBQx6BTiZOL8QGdTlO222y6lYnIVg0JqyQDQ7lslzHw4KylAnYvSLOqgOCpDD4o2UFnas7AqAIgRouR3332XVOfSPXr0SAMlGWZF0yjrWuwSiKqqHFaQkgpxcmuRCGCcDawHIEmJ0bqqDCStUScgKy1b28RI4AEN08mMTDDbT+s1CZrlVcCAgGqqgjpGSIal4qqBwjbhDxaVjO4BRJpTUWaEzjb44IMP0hD1Y8DSXp03+IJBxRit1QKKUUkGSxxasMd4LiH+8vfff2es6K4IZgIm6KdBifGJhVTIUsUBaH8SwFRJ8wSyAGCDMlc1GdlIUEzE9+STT55jJOOwgRYjCG0T1ZmWFqa6Ftc2zeeobxaA9LTTTpuDCroByLpaEgZIUHfx3j333JMsIkXdxJjtWkXAOnJUHLrFRIVxjzXFqJCKRrokwmRNk3IaPXp0diJswU5ziRgYc9PTtQOoYAEtOSSolsmMB9C+1yWn4qj86KOP5kZalZ6OPZJSfTQmG12DQblGq8QI39agS9cKFOhmCEmRB0DJ0foSZIx8RQHIgbxQ2syBhcxTR5AgphqkyMpamGW0ViCAO4XyK6ADrdlc9RmJtuUiSDILm+i9KgAoLU57EzxEnf6gSH8AdK4wN0hGF2FaJjPXMj3JoyZJ0bJAdZNqT+ShYuQhedIAkv0l6N/2JDcmhx2uM0EC3wnRGGxPP0mDxHgVb3CYAqgOxdOYeFNVFIGSLwhCnxbrmAkM2mKKaM+lVUXVUdXgJElDlIoKmOOjqlYHcWbHB+gb1UlEAu4xJXqdvoGmqqgOTAFL3gCFaRJmnnSOWWICnKTEKSbvYQug7cULeACj9zuwvG7dJlhGAV30MAcwOS2RDGicxhiXQLUQ1QYAzUPZ0xmaMqS4hk9YD5sAyzx5BkC1XVQ38WmHJlBGZiRXNYAZmMwO1hWff5OARJmj67FQK7QGDyMLvwOQcYq5QMZS0nF2sY81DUzab1MBVKRLwxDNMCEuaQBBH+ZjzOQF/IIMSEYf1mqYHXpVv+cbKA00jEF7wXBuFOYtzvrYwlAFpdJc2TXAMehod6RCevYhLa+L0xFb1cXIdI3r2rlvLZzxYrb2yq/4GzCwxHmH9LC90Y2eqfKGCj0YWuiDhgAS/OOPP57VtKl/o6QFHFDqXK8qKuqna9Da4Qll0c/4ShaYg6oS5/RaJlCM5MzJ2oB3lrCGziAxXkOakuNbPEXcCsIAzQb2VQgVBrDiABUQ/IWMDFm6jzhaPZygZYhBVyuxsNOWi+kF8piCZqqFVl5DIxqnK5MX6jEejAIsIP2bT/AAJ03GpgrYJgjJY4IWpQNJQFKOxOgMVKykWQUCNrnyJUCQJN/yrBEIkmTIjNt1hjUGb5bgMwY3UjM1NhT1Bs159KTCDhEoTXeOpQKCPipJBlMseOedd+Z1PMQazBF7nNFdb2204wWkozM4aGmjghOkgYrr77LLLnmPypAAeakmv+Dg9nStFgkse0vYdKdAiqbiCqQrqLwC2F9efMm3axiy4jLGBmGGhWoCoTks8DpjQ1EHFqOp9mKyQz3S8JpgJWoCpHva5hmMC1XpkZtDHo0NRtpePd8zzJAM/ZsZUB+zODxG2otUMMW1AGGWuozDFkPDQEmqtCIZ0w1BnguIkQyBphUDGFsUgTc1psRIbOS8jKLO40yCCxsjtRVVFCgqW8BC6IqCzFEQmANhUxu/sJ51qpIYQMMMyeaAMFr7XdJGWWziK5hiDb2amaowcBgsTyBNRsxTxEuyikbSHpMphvVdz6N0APfrIrxG4UgyH4hod4Yfj8BIQcXQBQD0ZVw2p6uqA4teLGhfwEG3OgihulbJ+FRdtYAqMdSUlOpqXV4nHYkDFTUBwdEZsBlFPxcHhtC2qmMVdlqbJPxb9QHvpxYufqM8v/IEidzsxUcwlnys3bijExOdo4mZ31BDFvW0F/UcNf0Ell7LODktVjAjgNCcBIzAaKiSkhAA76BHawBGm7WOFlZjN5rzEJp3aGF4WCZZYOkK1sJKVTRy+12b5EnYxxMYn0ICAjOtJw8TpLgxERPMJ42zGyLoz40Q5bqqCmGo68FGT5VFYW6tJwvYHG5A8aBE+3IPSRlW9GrDj82xQxtUXfrFJPT1E4DWkRBJCFB3QWPvYYdgdRhM0j2wAo29j/pkYAbRLdxP94zV0yUmKVaF1SXkq/r2b/onVPRiSUJQgv7tJq0IzR1uIC1R+rcxw8QaX6Yyx1SV5BcqYHji3PSPZYxK4K7BNMmTgpZIw6TFTzAPnQUONJ8HiAsDUFmS1nKYwQRG7Tr7kimzxhoehGVmHU+1sEn8vIOUTK2NU9IXR+aYdGjAoX3P/rzP3Lyv6qhNs+hFezY0j3tdIGhoRjBCS8SGzEdyZMArAOx0iA08yL6kxO0lax/VIwGGJxnVdSJ1AsQU2nYfg7S2AcrapKMTGX7EWEd6I7sTon3JlezMEw2l9GRfDiGCIweV5dbao5bhVCgB05QhxRMalJeARFEWCB5C0in96xg2FYRqM0i9t84GACAV9DUZOr4af4EgBvKrAUbiWidmaqWSZ2TM2fyg0tosRksSMCqOcV7jIRhbgxMfyucBaM9I6A3yaIRCKGsDAEnaAmgNFJVxDwBQi8kIkqa8bnHJqoT13QckPZr+VIOfoDX9Vt/XrngQSXqmCGQmqWKAkRh98wtmqcWRgYOZ+xTA+/awPunRvMSZPeCx1yMA7MDuht5ahjeMqLqBZC0gKKYmCZSBGANSFTdLDO1RXO8lHZW1kcpoSTRKs2hrEFFxPVkr8lOVvAdIX6prkAI+jdqbF/EXDGDI/AMY6I6VvpisU6zY3MesPeX2b8XFaL/rbvVRug7VVFP1mIhxk2vzAeipjg3oXOCQrSqjPpqqmvclrWKMEv0EqdUYOQFhUlRxhsS9AaVyrufUAJZ4PUUSpHFY0CqOVWLiE/ZniOI2qluXjwGzOkJ9RG40Bp61zSbW4ClmHSbb0E9l9EjzNVqbvrispJwNVJleUVFC6Knq3vdTENoXNkGWQekeaGbC9LokjdjMijtbXzX4iQ7jPT1bN1EEwGqvZguVdIDBBjISk2JgkBiKSeKibz91E2zlb8Z3BeAxvAyAGAPMlIDxUYJ0j8pajUSYH52hFCelOxuiujlB+5KE6yxKa1okHZKONghxkpIAoAUuMUCrNsN0ZjDTu5fpAoKLm0wZm3sZNP/BJsmKCwOwVhE4OgYqElDrkRwj1YrlCbj6QwkgA6Zx0PrIWjIS1/7Qx0didO+b65KD5wIMjhYZpCes0HQSxBStyEZalnFWd9AmDUU0y81d73X0p8P66xJA0TkwxQUUHcS9AtcSAciotWAxM2xgoTkp8hLswmJFM++bOjHdERhbsdOgJJZmKkMTFHSjUVWFigmCcLJiVKqKgkDwuiSYmetMf1qd5Dm+a7kyF3aaBIgDDhABYx3VYXD0q4L2Z2TWUh17GrhU3Hs8QSL0zcn5jActGPjfj9kxBdsUgwStYz3ypX0zSn2k1jgkY7MRLUnGInqxJOkJKIwL7bmvXg4wspG0hQQGKKDQuKoCQN9FZcdnFVBFCUHfty/vkYP9TWmC07+ZMdOUIFf3RcdOebwElemc9MRCTpIFsLgBQGrYxQT5ijONohvYDFAN4lzRwOICAEAXK+hXwgLn2ICpj5uNrlqc050qoKnWxc3JR9fg4I6xdWLMj6Jay/VMepJgWuisEPYvT1ItzwMAZi5AZ0wy1Lif0QLHeuhs4mRq1lRQlccQ32LzwBbLvO9aD2d1ooY2nFdFfaMudOgQPQ1BKK0NMSILCkpCKmdzfqBCxlWAYYCJTaUBYI9iABrXn9OpZn2KDFDmBxDMMPiQGl9BeVJSAF0BOxkgQ5SILgE4nUiC5MXtMZecTLfMUUF4jOEJW/OxuEnLl2obFtAGUhxUFTgsyvjdgw191pBkdMUcQdZDDz23/uyu/iBB+6F/dDMfuI6JqYjAgcx09XUDmR7OfGkWA9Ad68iJfnUeQOrhWCoRlXcvhgHCPsCxhmJioOlTgcWi5WM8o22CECzqQkpLUjEDkmFEC2FW5npaUy0TIMfW220uUAmhqntcW88NsMaUaRTVDeqUJlhsEqD2R/daW/3lhtf1cmYsPizTjhmczkMKwLIGUEiB3s0eOhIW8R+xM0RfvIHXkJrkdY48C0iA9tGRrlCeoTAO5wNVpHULCtQYjMqukRDqMRpVEZj7aJx5aV/Yor2STj36IjUDEOB4jmnPGhIAgGcI3qN1FQQOtqKtPT3H8J6CGOB4hDM+6YoPyzBGa7Su6+SmZWICGXrOkAyQpF4vyXpSAxSAoKOE9GNU9z6Dqc8D9GIL6RIWFwQ3rz6MmgLhJXo2TRpCeIfWxvxUxZyBdc4CKk77aMxbDDVixBzXYijpqC72SM5DnPp02/WM2ZyCtTwBW2vIwl6tUFzNgjSL/m5WQa7MxBgVs9GO6MpNFpOAREx6WIEB7jV0mAtQjYmhcGkeDT0IUTVr2cd6Hr1zZRQGJuYohLnd+jqOLwVQdWt7ckWqjM1cAWjx6kpM1D3Yhzl8SacToziwhUT9bnJsKOdxuIraUCCMTW83uLgRO+hKNQUgUNqXPB1ClOHoJvSomoytHrSqEPfVCZwMycI+2iZXNzOopjVIEnCCcz1dS05VtTdmidKSxxaxA1EMqC9O72l9DmPu9wS55gDPJU2iqm/ybXRZf32t3dhMgkzEGZvpSKT+hEXS9bSWB6isTuFeDsxdUR1dBSdwNHUP+llXYLzEidKzBM6sEDoRJhpm7IktGGe8dTRHcT9JB8iMTBfQkvmK34Gka5AM47QvKZMDcHUA79Uk2szjHnf5yUDqk1Xoohwjcrio8dRA5OisPdG9lukeIKKve/hGzfWAsJnkjNh6P8PlPQLQ07Ve+nevAjBMP7VlgfMBgNA+bQONnMRkPdNdfbTudfEromIplNyAwtewhVSYqq6UHqCKpjfo6ACAMNQwEDdqe+hN114HQv3FOA3SNN9gkhYVEA3yBEECDAt4DTmQlzYoOKxhrMxQ69MBgGWAQlMeJHCsUHUyBQB5AIckAI4thil7kpW1vcdsSRgzsE8+WA2I/Gtxi5meBOoFBuGIaewUlArTkRnfeOu9+stQhiNYbUWPBkZJhc594GpYgbhKFQNo1TUArQcywAEc5mhR5MJzdAMJYouWhk31GSGdS06FmbDCkVd9zIf+JMXfrMHTeJRiuo+ZNwnTn9ERbaAtQAuohgnMYzIaN3Za0MmLNGhSIvU3eTSnPam24CBd/6PE3CAwuufKni2oZv0/AUdU5gZ0xqmVYpXKC1hnIDNTIKD81D3Iwr2ob19FMOpib33G4X3MwwKswVLrKVyeBVSbvlHYBCcppzE0VT0bk4akBARt1WOggrFJ/bk8NpGItiUJVDaTCxCTjKTc3zeWoKLfGSGpmTE8dHEftmEok0VfDMU6xeIRenvNA9xfsTDQKZaPYBB5AYZB8iixKwxm5X+nMV250CSGsljAFLk5o4K+vqs1oSutaSkC0NKMk4CyIKOqP2n3vl5rfWDSev0Bk2RNZcCWlCRQ15MmAWqLtKptYSTg0VdijM4DHHuaPOkdE4CiiExVEXxhEGAAq/VZFwsBXHNLQ4V6oupmjqutCI5+yUHgwFBhfVTwJj20AppZQCAAIgUzgLZKOk5wmAI0ZouaNA9ohyxgWVffxybg6yr8Bht0IEUwFTJBUlJpRcM8NHYfGfIG84UicXmsAZShyuAkNns5mNkfu5o3aA+6TIM5qL6bmIR+TVcoBRTJYAOjQiWvo7VDC1nwBvOBmZ3+6bD+05J2Zw30dibwPmlJjk5JAbAKwh8YMwNTReYHvP9+SswvmDCG8Cx5WA+j6vMOxWPaZMBbsJEPYImDW6s/NDbCGlrQpf6Tk6pL0OmL4Xn6AkVtz4JGZDpyvYcY3jdkkIMjs3aHagJTKeh7Jqc/ewIlYetKzr6Ctb59rUez2i7z0iKBzIAlixlAwiyDEbCAXx+mMEkMI0ssF6dCAbr+k4dDWnoAkwGE4yyTQVWBGymNwmZ205jBhq5UEu1oVHvEGv3Wwr7pXZCQ16LoHMNIBY1JwLHX3qoKBO+TEV9hZEDHPNeTp6mvPgR1j+cTGEv3WjADV2FxeGRXR2IGrnvJ0ZqkJUambEhr9bf+6AB1F3N0fdOwozroqgejZ31YoZK0aHNegdrWAhzW1B9X2ERCDEiipjQDDv3xCeAamurpj5apC0melzh7kIypU/XIy2irc0kYnXUdlHetSiuWougiGANc5idPJ1Zxik9B86/ETIHaBaSh48REewyJm5uwPNiwGEaYAIHCtQUCXV4CHNTT/gSL0k6UgnEqMwRhB53ah+QEpMqAs5YY+IUOYmYwqfIb9K+nP2jPAOu8DwAGyLDNKcxY6wUq2Um2/nMVg+Qb4gVw/s/RelJb/9sKG+iZGQkMVes/OGl7Kk5bDiaOtaqDbpLDGO7PabHCveTFA5iWJCRnJqBXgUpKIbwmYEnxJNW1p06DaWLUocTrgab7AAQASfMCrPJRO3a6hlyBjQXWAbpv7Mk5QNsztNAknam8NyAmeAcUpkdrZIFKAlQBzEBHjs+UoG8TPR1g1kZpPRxg1uDYwMEoAQKB9rmyypMX8+P0kqJzZsdL6FZivMc+zE3bc6w1ByiIHLDQ2q4hO+cGLOcN8mKGZgfFa8xEIloaA9LK0BfipXGVUWEUdx2E63+IGmxoDf10DhVFdTTTCWgTk7BKgH53vfFbhV2nbVXFsFABSK/+W279iavX65MdVMZSoDM6s0I9JCU5e5kngKZ1Wke3MnZjoPmELzU6gLg3adwxGM3puD5TIxNIoxdTk6BpDE2ZGkZoi2Zwla2TmQ7B+V2vlVlf9XUQSdSzO2YLUOake5hBtGYFIQ2tEFOAh6kAMUNwdNOcSrseQxmbqmMgQBVNEcSqGwHIDKENY9L/ALux/R3y7GKBAAAAAElFTkSuQmCC') repeat;
+      background-size: 128px 128px;
+      opacity: 0.5;
+      mix-blend-mode: multiply;
     }
 
     .card-export-btn {
@@ -1556,6 +1550,89 @@
       color: var(--text-dimmer);
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    /* ── Insight Picker (outside card, not exported) ── */
+    .insight-edit-btn {
+      margin-top: 12px;
+      padding: 6px 16px;
+      background: transparent;
+      color: #5a554e;
+      border: 1px solid rgba(196, 101, 74, 0.12);
+      border-radius: 6px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      align-self: center;
+    }
+    .insight-edit-btn:hover {
+      color: #7d756b;
+      border-color: rgba(196, 101, 74, 0.25);
+    }
+
+    .insight-picker {
+      margin-top: 16px;
+      padding: 20px 24px;
+      background: rgba(19, 18, 17, 0.6);
+      border: 1px solid rgba(196, 101, 74, 0.08);
+      border-radius: 12px;
+      width: 380px;
+      align-self: center;
+    }
+    .insight-picker-title {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 11px;
+      color: #5a554e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+    .insight-picker-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .insight-picker-item:hover { opacity: 0.85; }
+    .insight-picker-item input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid rgba(196, 101, 74, 0.25);
+      border-radius: 3px;
+      background: transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.15s;
+    }
+    .insight-picker-item input[type="checkbox"]:checked {
+      background: rgba(196, 101, 74, 0.6);
+      border-color: rgba(196, 101, 74, 0.6);
+    }
+    .insight-picker-item label {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12.5px;
+      color: #7d756b;
+      line-height: 1.6;
+      cursor: pointer;
+    }
+    .insight-picker-item.disabled label {
+      color: #3a3530;
+    }
+    .insight-picker-item.disabled input[type="checkbox"] {
+      border-color: rgba(196, 101, 74, 0.08);
+      cursor: not-allowed;
+    }
+    .insight-picker-hint {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 11px;
+      color: #3a3530;
+      margin-top: 12px;
     }
 
     /* ── Card Loading State ── */
@@ -1951,8 +2028,9 @@
     <!-- The card canvas — gets exported as image -->
     <div class="card-canvas view-hidden" id="cardCanvas">
       <div class="card-brand">% Percent</div>
-      <div class="card-label" id="cardLabel">「」</div>
+      <div class="card-label" id="cardLabel"></div>
       <div class="card-description" id="cardDescription"></div>
+      <div class="card-divider"></div>
       <div class="card-chart-wrap">
         <svg id="stellarChart" viewBox="0 0 400 400" width="100%" height="100%"></svg>
       </div>
@@ -1960,12 +2038,15 @@
       <div class="card-footer-separator"></div>
       <div class="card-footer" id="cardFooter"></div>
       <div class="card-domain">percent.dev</div>
-      <!-- SVG grain texture -->
-      <svg class="card-grain" xmlns="http://www.w3.org/2000/svg">
-        <filter id="cardGrain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter>
-        <rect width="100%" height="100%" filter="url(#cardGrain)" opacity="0.03"/>
-      </svg>
+      <!-- Grain texture (PNG-based for reliable export) -->
+      <div class="card-grain"></div>
     </div>
+
+    <!-- Edit insights button (outside card canvas, not exported) -->
+    <button class="insight-edit-btn view-hidden" id="insightEditBtn" onclick="toggleInsightPicker()">编辑洞察</button>
+
+    <!-- Insight picker (outside card canvas, not exported) -->
+    <div class="insight-picker view-hidden" id="insightPicker"></div>
 
     <!-- Export button -->
     <button class="card-export-btn view-hidden" id="cardExportBtn" onclick="exportCard()">保存为图片 ↓</button>
@@ -3019,88 +3100,161 @@
   // ── Card View ─────────────────────────────────────────────────────────────────
 
   function renderStellarChart(svgEl, dimensions) {
-    const cx = 200, cy = 200, maxR = 140;
+    const cx = 200, cy = 200, maxR = 150;
     const entries = Object.entries(dimensions);
     const n = entries.length;
     if (n === 0) return;
 
+    const angleStep = (2 * Math.PI) / n;
     let svg = '';
 
-    // Defs for gradients
+    // Defs
     svg += `<defs>`;
-    entries.forEach(([, ], i) => {
-      const angle = -Math.PI / 2 + i * (2 * Math.PI / n);
-      const tipX = cx + Math.cos(angle) * maxR;
-      const tipY = cy + Math.sin(angle) * maxR;
-      svg += `<linearGradient id="barGrad${i}" x1="${cx}" y1="${cy}" x2="${tipX.toFixed(1)}" y2="${tipY.toFixed(1)}" gradientUnits="userSpaceOnUse">`;
-      svg += `<stop offset="0%" stop-color="#c4654a" stop-opacity="0"/>`;
-      svg += `<stop offset="100%" stop-color="#c4654a" stop-opacity="1"/>`;
-      svg += `</linearGradient>`;
-    });
-    // Glow filter for center
+    svg += `<radialGradient id="shapeGrad" cx="50%" cy="50%" r="50%">`;
+    svg += `<stop offset="0%" stop-color="#c4654a" stop-opacity="0.03"/>`;
+    svg += `<stop offset="100%" stop-color="#c4654a" stop-opacity="0.12"/>`;
+    svg += `</radialGradient>`;
     svg += `<radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">`;
-    svg += `<stop offset="0%" stop-color="#c4654a" stop-opacity="0.15"/>`;
+    svg += `<stop offset="0%" stop-color="#c4654a" stop-opacity="0.2"/>`;
     svg += `<stop offset="100%" stop-color="#c4654a" stop-opacity="0"/>`;
     svg += `</radialGradient>`;
     svg += `</defs>`;
 
-    // Guide circles — subtle dotted
+    // Guide circles
     for (const r of [0.25, 0.5, 0.75, 1.0]) {
       const radius = maxR * r;
-      svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="#2a2725" stroke-width="0.5" stroke-dasharray="2 6" opacity="0.5"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="#252220" stroke-width="0.5" stroke-dasharray="2 8" opacity="${r === 1.0 ? 0.4 : 0.25}"/>`;
     }
 
-    const angleStep = (2 * Math.PI) / n;
+    // Axis lines
+    entries.forEach(([, ], i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const x = cx + Math.cos(angle) * maxR;
+      const y = cy + Math.sin(angle) * maxR;
+      svg += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#252220" stroke-width="0.3" opacity="0.3"/>`;
+    });
 
-    // Draw bars
-    entries.forEach(([name, score], i) => {
+    // Compute data points
+    const points = entries.map(([, score], i) => {
       const angle = -Math.PI / 2 + i * angleStep;
       const r = (score / 100) * maxR;
-      const x = cx + Math.cos(angle) * r;
-      const y = cy + Math.sin(angle) * r;
-
-      // Tapered bar with gradient
-      const perpAngle = angle + Math.PI / 2;
-      const baseW = 5;
-      const bx1 = cx + Math.cos(perpAngle) * baseW;
-      const by1 = cy + Math.sin(perpAngle) * baseW;
-      const bx2 = cx - Math.cos(perpAngle) * baseW;
-      const by2 = cy - Math.sin(perpAngle) * baseW;
-
-      const opacity = (0.35 + (score / 100) * 0.65).toFixed(2);
-      svg += `<polygon points="${bx1.toFixed(1)},${by1.toFixed(1)} ${x.toFixed(1)},${y.toFixed(1)} ${bx2.toFixed(1)},${by2.toFixed(1)}" fill="url(#barGrad${i})" opacity="${opacity}"/>`;
-
-      // Small dot at tip
-      svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#c4654a" opacity="${(0.4 + (score / 100) * 0.6).toFixed(2)}"/>`;
+      return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, score };
     });
 
-    // Labels — pushed further out
-    entries.forEach(([name], i) => {
+    // Filled polygon — the personality "shape"
+    const polyPoints = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    svg += `<polygon points="${polyPoints}" fill="url(#shapeGrad)" stroke="#c4654a" stroke-width="0.8" stroke-opacity="0.35"/>`;
+
+    // Data point dots
+    points.forEach((p) => {
+      const op = (0.3 + (p.score / 100) * 0.7).toFixed(2);
+      svg += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="#c4654a" opacity="${op}"/>`;
+    });
+
+    // Labels
+    entries.forEach(([name, score], i) => {
       const angle = -Math.PI / 2 + i * angleStep;
-      const labelR = maxR + 26;
+      const labelR = maxR + 22;
       const lx = cx + Math.cos(angle) * labelR;
       const ly = cy + Math.sin(angle) * labelR;
-      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="#6b6460" font-size="10" font-family="'DM Sans', sans-serif">${name}</text>`;
+      svg += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="#5a5550" font-size="11" font-family="'DM Sans', sans-serif">${name}</text>`;
     });
 
-    // Center glow ring
-    svg += `<circle cx="${cx}" cy="${cy}" r="16" fill="url(#centerGlow)"/>`;
-    // Center dot
-    svg += `<circle cx="${cx}" cy="${cy}" r="2.5" fill="#c4654a" opacity="0.6"/>`;
+    // Center glow
+    svg += `<circle cx="${cx}" cy="${cy}" r="20" fill="url(#centerGlow)"/>`;
+    svg += `<circle cx="${cx}" cy="${cy}" r="2" fill="#c4654a" opacity="0.5"/>`;
 
     svgEl.innerHTML = svg;
+  }
+
+  // ── Insight selection state ──
+  let _allInsights = [];
+  let _selectedIndices = [];
+
+  function _loadSavedSelection(total) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('percent_insight_selection') || 'null');
+      if (saved && Array.isArray(saved) && saved.every(i => i >= 0 && i < total)) return saved;
+    } catch {}
+    // Default: first 5 (or all if fewer)
+    return Array.from({length: Math.min(5, total)}, (_, i) => i);
+  }
+
+  function _saveSelection(indices) {
+    localStorage.setItem('percent_insight_selection', JSON.stringify(indices));
+  }
+
+  function renderSelectedInsights() {
+    const insightsEl = document.getElementById('cardInsights');
+    insightsEl.innerHTML = _selectedIndices
+      .map(i => _allInsights[i])
+      .filter(Boolean)
+      .map(text => `<div class="card-insight-item">${escHtml(text)}</div>`)
+      .join('');
+  }
+
+  function toggleInsightPicker() {
+    const picker = document.getElementById('insightPicker');
+    const btn = document.getElementById('insightEditBtn');
+    if (!picker.classList.contains('view-hidden')) {
+      picker.classList.add('view-hidden');
+      btn.textContent = '编辑洞察';
+      return;
+    }
+    btn.textContent = '收起';
+    _renderPicker();
+    picker.classList.remove('view-hidden');
+  }
+
+  function _renderPicker() {
+    const picker = document.getElementById('insightPicker');
+    const count = _selectedIndices.length;
+    const atMax = count >= 5;
+    const atMin = count <= 3;
+
+    picker.innerHTML = `
+      <div class="insight-picker-title">选择 3-5 条洞察显示在卡片上</div>
+      ${_allInsights.map((text, i) => {
+        const checked = _selectedIndices.includes(i);
+        const disabled = !checked && atMax;
+        return `<div class="insight-picker-item${disabled ? ' disabled' : ''}" onclick="toggleInsight(${i})">
+          <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} tabindex="-1">
+          <label>${escHtml(text)}</label>
+        </div>`;
+      }).join('')}
+      <div class="insight-picker-hint">${count}/5 已选${atMax ? '（已达上限）' : ''}</div>
+    `;
+  }
+
+  function toggleInsight(index) {
+    const pos = _selectedIndices.indexOf(index);
+    if (pos >= 0) {
+      if (_selectedIndices.length <= 3) return; // min 3
+      _selectedIndices.splice(pos, 1);
+    } else {
+      if (_selectedIndices.length >= 5) return; // max 5
+      _selectedIndices.push(index);
+      _selectedIndices.sort((a, b) => a - b);
+    }
+    _saveSelection(_selectedIndices);
+    renderSelectedInsights();
+    _renderPicker();
   }
 
   async function loadCard() {
     const loading = document.getElementById('cardLoading');
     const canvas = document.getElementById('cardCanvas');
     const exportBtn = document.getElementById('cardExportBtn');
+    const editBtn = document.getElementById('insightEditBtn');
+    const picker = document.getElementById('insightPicker');
     const fallback = document.getElementById('cardFallback');
 
     // Show loading, hide everything else
     loading.classList.remove('view-hidden');
     canvas.classList.add('view-hidden');
     exportBtn.classList.add('view-hidden');
+    editBtn.classList.add('view-hidden');
+    picker.classList.add('view-hidden');
     fallback.classList.add('view-hidden');
 
     try {
@@ -3113,26 +3267,25 @@
       if (!data.eligible) {
         canvas.classList.add('view-hidden');
         exportBtn.classList.add('view-hidden');
+        editBtn.classList.add('view-hidden');
         fallback.classList.remove('view-hidden');
         return;
       }
 
       canvas.classList.remove('view-hidden');
       exportBtn.classList.remove('view-hidden');
+      editBtn.classList.remove('view-hidden');
       fallback.classList.add('view-hidden');
 
-      document.getElementById('cardLabel').textContent = `「${data.label}」`;
+      document.getElementById('cardLabel').innerHTML = `<span class="card-label-mark">「</span>${escHtml(data.label)}<span class="card-label-mark">」</span>`;
       document.getElementById('cardDescription').textContent = data.description;
 
       renderStellarChart(document.getElementById('stellarChart'), data.dimensions);
 
-      const insightsEl = document.getElementById('cardInsights');
-      insightsEl.innerHTML = (data.insights || [])
-        .map((text, idx) => {
-          const num = String(idx + 1).padStart(2, '0');
-          return `<div class="card-insight-item"><span class="insight-number">${num}</span><span class="insight-dot"></span>${escHtml(text)}</div>`;
-        })
-        .join('');
+      // Insight selection
+      _allInsights = data.insights || [];
+      _selectedIndices = _loadSavedSelection(_allInsights.length);
+      renderSelectedInsights();
 
       const m = data.metrics || {};
       document.getElementById('cardFooter').textContent =

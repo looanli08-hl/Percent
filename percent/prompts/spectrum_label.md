@@ -29,7 +29,7 @@ Read every fragment carefully. Score based on EVIDENCE in the fragments, not ass
 
 - **description**: One poetic Chinese sentence (max 18 chars). Should feel like a fortune cookie that's uncomfortably accurate — something between a compliment and a gentle roast. NOT a literal summary of what they do. Good: "你的沉默比回复说的更多". Bad: "约球比备课更积极".
 
-- **insights**: Exactly 5 observations. Each must be specific (reference actual content from fragments) and written like a friend gently teasing you. Include contrast or surprise when possible. Cover different aspects of personality — don't repeat the same angle twice.
+- **insights**: Exactly 8 observations. Each must be specific (reference actual content from fragments) and written like a friend gently teasing you. Include contrast or surprise when possible. Cover different aspects of personality — don't repeat the same angle twice. Put the most striking/unique ones first.
 
 Respond in valid JSON only:
 ```json
@@ -46,6 +46,6 @@ Respond in valid JSON only:
   }},
   "label": "...",
   "description": "...",
-  "insights": ["...", "...", "..."]
+  "insights": ["...", "...", "...", "...", "...", "...", "...", "..."]
 }}
 ```
