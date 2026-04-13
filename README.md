@@ -22,10 +22,10 @@ Every AI assistant starts blank. It doesn't know how you think, what you care ab
 
 **Percent fixes that.**
 
-Feed it your WeChat history, YouTube watch list, Bilibili comments — anything that reflects how you actually think. Percent extracts your personality into a structured model (`core.md`) that any LLM can use to become *your* AI, not a generic one.
+Feed it your WeChat history, YouTube watch list, Bilibili comments, Xiaohongshu posts — anything that reflects how you actually think. Percent extracts your personality into a structured model (`core.md`) and a shareable **Persona Card** that any LLM can use to become *your* AI, not a generic one.
 
 - **Privacy-first.** Raw data stays on your machine. When using cloud LLMs (OpenAI, Claude, DeepSeek), text fragments are sent for analysis — use Ollama for fully local processing.
-- **Source-agnostic.** WeChat, YouTube, Bilibili — more sources coming.
+- **Source-agnostic.** WeChat, YouTube, Bilibili, Xiaohongshu — more sources coming.
 - **Model-agnostic.** Works with Claude, GPT-4, DeepSeek, Ollama, any LiteLLM-compatible model.
 - **Measurable.** PersonaBench gives you a concrete score — not vibes.
 
@@ -94,6 +94,19 @@ Bilibili History    ──►  Fragment Store (SQLite)  ──►  Embeddings
 
 ---
 
+## Persona Card
+
+After analysis, Percent generates a **Persona Card** — a visual personality profile with:
+
+- **8-dimension spectrum** — Night Owl, Reply Inertia, Expression Sharpness, Social Temperature Gap, Emotional Visibility, Content Omnivore, Taste Exclusivity, Cross-platform Contrast
+- **Persona label** — an AI-generated archetype name (e.g. "深夜哲学家")
+- **Personality insights** — specific observations drawn from your data
+- **PNG export** — shareable card image
+
+Launch the Web UI with `percent web` and navigate to the card view.
+
+---
+
 ## Supported Sources
 
 **Stable:**
@@ -103,6 +116,7 @@ Bilibili History    ──►  Fragment Store (SQLite)  ──►  Embeddings
 | WeChat | PyWxDump CSV export | `percent import run wechat <path>` |
 | YouTube | Google Takeout JSON/HTML | `percent import run youtube <path>` |
 | Bilibili | Watch history JSON | `percent import run bilibili <path>` |
+| Xiaohongshu | Browser export (JS) | `percent import run xiaohongshu <path>` |
 
 **Beta:**
 
@@ -163,14 +177,16 @@ percent/
 │   ├── base.py             DataParser ABC
 │   ├── bilibili.py         Bilibili watch history
 │   ├── youtube.py          YouTube Takeout
-│   └── wechat.py           WeChat PyWxDump CSV
+│   ├── wechat.py           WeChat PyWxDump CSV
+│   └── xiaohongshu.py      Xiaohongshu (Little Red Book)
 ├── persona/
 │   ├── engine.py           PersonaEngine (orchestrates extract→synthesize)
 │   ├── extractor.py        LLM-based finding extractor
 │   ├── synthesizer.py      LLM-based core.md synthesizer
 │   ├── fragments.py        FragmentStore (SQLite + cosine search)
+│   ├── spectrum.py         8-dimension personality spectrum + card data
 │   ├── validator.py        PersonaValidator (alignment scoring)
-│   └── bench.py            PersonaBench v0.1
+│   └── bench.py            PersonaBench v0.2
 ├── export/
 │   └── soul_md.py          SOUL.md exporter
 └── chat/
