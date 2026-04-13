@@ -39,6 +39,7 @@ _PARSER_REGISTRY = {
     "wechat-db": "percent.parsers.wechat_db.WeChatDBParser",
     "telegram": "percent.parsers.telegram.TelegramParser",
     "whatsapp": "percent.parsers.whatsapp.WhatsAppParser",
+    "xiaohongshu": "percent.parsers.xiaohongshu.XiaohongshuParser",
 }
 
 
@@ -99,7 +100,7 @@ def init() -> None:
 
 @import_app.command("run")
 def import_run(
-    source: str = typer.Argument(..., help="Data source: bilibili, youtube, wechat"),
+    source: str = typer.Argument(..., help="Data source: bilibili, youtube, wechat, xiaohongshu"),
     path: Path = typer.Argument(..., help="Path to the exported data file or directory"),
 ) -> None:
     """Import and analyze data from a source."""
@@ -419,7 +420,7 @@ def import_youtube_auto(
 
 @import_app.command("guide")
 def import_guide(
-    source: str = typer.Argument(..., help="Data source: bilibili, youtube, wechat"),
+    source: str = typer.Argument(..., help="Data source: bilibili, youtube, wechat, xiaohongshu"),
 ) -> None:
     """Show export instructions for a data source."""
     parser = _get_parser(source)

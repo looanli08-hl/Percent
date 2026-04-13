@@ -36,7 +36,7 @@ Feed it your WeChat history, YouTube watch list, Bilibili comments — anything 
 PersonaBench is Percent's built-in benchmark for measuring how accurately your personality model reflects you.
 
 ```
-PersonaBench v0.1
+PersonaBench v0.2
 Score: 72.5%  (10 tests)
 
   [1] 0.95  Gaming preferences and invite behavior matched exactly
@@ -62,7 +62,7 @@ percent persona validate --num-tests 10
 ## Quick Start
 
 ```bash
-git clone https://github.com/looanli08-hl/Percent && cd engram
+git clone https://github.com/looanli08-hl/Percent && cd Percent
 uv sync
 uv run percent init
 uv run percent import run wechat ~/exports/wechat_chat.csv
@@ -193,7 +193,7 @@ To add a parser, subclass `DataParser` in `percent/parsers/`, register it in `cl
 
 ```bash
 git clone https://github.com/looanli08-hl/Percent
-cd engram
+cd Percent
 uv sync
 uv run pytest tests/ -v
 ```

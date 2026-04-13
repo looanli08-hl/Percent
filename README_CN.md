@@ -36,7 +36,7 @@
 PersonaBench 是 Percent 内置的人格一致性基准测试，衡量你的人格模型有多准确地反映了真实的你。
 
 ```
-PersonaBench v0.1
+PersonaBench v0.2
 Score: 72.5%  (10 tests)
 
   [1] 0.95  游戏偏好和主动邀约行为完全一致
@@ -62,7 +62,7 @@ percent persona validate --num-tests 10
 ## 快速开始
 
 ```bash
-git clone https://github.com/looanli08-hl/Percent && cd engram
+git clone https://github.com/looanli08-hl/Percent && cd Percent
 uv sync
 uv run percent init
 uv run percent import run wechat ~/exports/wechat_chat.csv
@@ -193,7 +193,7 @@ Percent 是开源项目，欢迎贡献。
 
 ```bash
 git clone https://github.com/looanli08-hl/Percent
-cd engram
+cd Percent
 uv sync
 uv run pytest tests/ -v
 ```

@@ -27,7 +27,8 @@ class FragmentStore:
                 source TEXT NOT NULL,
                 embedding TEXT NOT NULL,
                 created_at TEXT NOT NULL,
-                content_hash TEXT
+                content_hash TEXT,
+                evidence TEXT DEFAULT ''
             )
         """)
         # Add content_hash column if missing (migration for existing DBs)
@@ -35,6 +36,12 @@ class FragmentStore:
             self._conn.execute("SELECT content_hash FROM fragments LIMIT 1")
         except sqlite3.OperationalError:
             self._conn.execute("ALTER TABLE fragments ADD COLUMN content_hash TEXT")
+            self._conn.commit()
+        # Add evidence column if missing (migration)
+        try:
+            self._conn.execute("SELECT evidence FROM fragments LIMIT 1")
+        except sqlite3.OperationalError:
+            self._conn.execute("ALTER TABLE fragments ADD COLUMN evidence TEXT DEFAULT ''")
             self._conn.commit()
 
         # Backfill NULL content_hash on existing rows
@@ -64,8 +71,8 @@ class FragmentStore:
 
         cursor = self._conn.execute(
             "INSERT INTO fragments (category, content, confidence,"
-            " source, embedding, created_at, content_hash)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            " source, embedding, created_at, content_hash, evidence)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 fragment.category.value,
                 fragment.content,
@@ -74,6 +81,7 @@ class FragmentStore:
                 json.dumps(fragment.embedding),
                 fragment.created_at.isoformat(),
                 content_hash,
+                getattr(fragment, 'evidence', ''),
             ),
         )
         self._conn.commit()
@@ -140,9 +148,84 @@ class FragmentStore:
             content=row["content"],
             confidence=row["confidence"],
             source=row["source"],
+            evidence=row["evidence"] if "evidence" in row.keys() else "",
             embedding=json.loads(row["embedding"]),
             created_at=datetime.fromisoformat(row["created_at"]),
         )
+
+    def get_cross_source_insights(self, similarity_threshold: float = 0.75) -> list[dict]:
+        """Group similar fragments across data sources into cross-validated insights."""
+        fragments = self.get_all()
+        if not fragments:
+            return []
+
+        # Build embeddings matrix
+        embeddings = []
+        for f in fragments:
+            if f.embedding:
+                embeddings.append(np.array(f.embedding))
+            else:
+                embeddings.append(np.zeros(384))
+
+        # Group fragments by similarity
+        used = set()
+        insights = []
+
+        for i, frag in enumerate(fragments):
+            if i in used:
+                continue
+
+            group = [frag]
+            used.add(i)
+            sources = {frag.source}
+
+            # Find similar fragments from OTHER sources
+            for j, other in enumerate(fragments):
+                if j in used or other.source == frag.source:
+                    continue
+                if len(embeddings[i]) != len(embeddings[j]):
+                    continue
+                norm_i = np.linalg.norm(embeddings[i])
+                norm_j = np.linalg.norm(embeddings[j])
+                if norm_i == 0 or norm_j == 0:
+                    continue
+                sim = float(np.dot(embeddings[i], embeddings[j]) / (norm_i * norm_j))
+                if sim >= similarity_threshold:
+                    group.append(other)
+                    used.add(j)
+                    sources.add(other.source)
+
+            # Build insight
+            # Use highest-confidence fragment as the main content
+            group.sort(key=lambda f: f.confidence, reverse=True)
+            main = group[0]
+
+            evidence_by_source = {}
+            for f in group:
+                if f.source not in evidence_by_source:
+                    evidence_by_source[f.source] = []
+                evidence_by_source[f.source].append({
+                    "content": f.content,
+                    "evidence": f.evidence,
+                    "confidence": f.confidence,
+                })
+
+            # Cross-source boost: more sources = higher confidence
+            base_conf = main.confidence
+            source_boost = min(len(sources) * 0.05, 0.15)
+            boosted_conf = min(base_conf + source_boost, 1.0)
+
+            insights.append({
+                "content": main.content,
+                "category": main.category.value,
+                "confidence": round(boosted_conf, 2),
+                "source_count": len(sources),
+                "sources": evidence_by_source,
+            })
+
+        # Sort by confidence descending, then by source_count
+        insights.sort(key=lambda x: (x["source_count"], x["confidence"]), reverse=True)
+        return insights
 
     def close(self) -> None:
         self._conn.close()
