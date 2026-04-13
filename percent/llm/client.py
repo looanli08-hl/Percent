@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import litellm
 
@@ -69,15 +72,51 @@ class LLMClient:
         "openrouter": "openrouter",
     }
 
-    def __init__(self, provider: str, model: str, api_key: str = "") -> None:
+    def __init__(
+        self,
+        provider: str,
+        model: str,
+        api_key: str = "",
+        cache_dir: Path | None = None,
+    ) -> None:
         self.provider = provider
         self.model = model
         self.api_key = api_key
         prefix = self.PROVIDER_PREFIXES.get(provider, provider)
         self.model_id = f"{prefix}/{model}"
         self.usage = UsageStats()
+        self._cache_dir = cache_dir
 
-    def complete(self, prompt: str, system: str = "") -> str:
+    def _cache_key(self, prompt: str, system: str) -> str:
+        raw = f"{self.model_id}\n{system}\n{prompt}"
+        return hashlib.sha256(raw.encode()).hexdigest()
+
+    def _read_cache(self, key: str) -> str | None:
+        if not self._cache_dir:
+            return None
+        path = self._cache_dir / f"{key}.json"
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return data.get("response")
+        return None
+
+    def _write_cache(self, key: str, response: str) -> None:
+        if not self._cache_dir:
+            return
+        self._cache_dir.mkdir(parents=True, exist_ok=True)
+        path = self._cache_dir / f"{key}.json"
+        path.write_text(
+            json.dumps({"model": self.model_id, "response": response}, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    def complete(self, prompt: str, system: str = "", temperature: float = 0.0) -> str:
+        # Check cache for deterministic calls
+        cache_key = self._cache_key(prompt, system)
+        cached = self._read_cache(cache_key)
+        if cached is not None:
+            return cached
+
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -87,11 +126,16 @@ class LLMClient:
             model=self.model_id,
             messages=messages,
             api_key=self.api_key if self.api_key else None,
+            temperature=temperature,
         )
         self._track_usage(response)
-        return str(response.choices[0].message.content)
+        result = str(response.choices[0].message.content)
+
+        self._write_cache(cache_key, result)
+        return result
 
     def complete_chat(self, messages: list[dict], system: str = "") -> str:
+        """Chat completion — no caching, temperature 0.7 for natural conversation."""
         full_messages = []
         if system:
             full_messages.append({"role": "system", "content": system})
@@ -101,6 +145,7 @@ class LLMClient:
             model=self.model_id,
             messages=full_messages,
             api_key=self.api_key if self.api_key else None,
+            temperature=0.7,
         )
         self._track_usage(response)
         return str(response.choices[0].message.content)

@@ -26,6 +26,10 @@ class PercentConfig(BaseModel):
     def raw_dir(self) -> Path:
         return self.percent_dir / "raw"
 
+    @property
+    def cache_dir(self) -> Path:
+        return self.percent_dir / "cache"
+
 
 _SAVED_FIELDS = {
     "llm_provider",
@@ -41,6 +45,18 @@ def save_config(config: PercentConfig) -> None:
     data = {k: v for k, v in config.model_dump().items() if k in _SAVED_FIELDS}
     data = {k: str(v) if isinstance(v, Path) else v for k, v in data.items()}
     (config.percent_dir / "config.yaml").write_text(yaml.dump(data, default_flow_style=False))
+
+
+def make_llm_client(config: PercentConfig):
+    """Create an LLMClient with caching enabled from config."""
+    from percent.llm.client import LLMClient
+
+    return LLMClient(
+        provider=config.llm_provider,
+        model=config.llm_model,
+        api_key=config.llm_api_key,
+        cache_dir=config.cache_dir,
+    )
 
 
 def load_config(percent_dir: Path | None = None) -> PercentConfig:

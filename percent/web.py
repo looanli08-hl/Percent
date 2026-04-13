@@ -92,8 +92,11 @@ def get_insights() -> dict:
 
 
 @app.get("/api/spectrum")
-def get_spectrum() -> dict:
-    """Return persona spectrum: dimension scores, label, insights, eligibility."""
+def get_spectrum(regenerate: bool = False) -> dict:
+    """Return persona spectrum. Cached to disk; pass ?regenerate=true to force refresh."""
+    import json as json_mod
+    import hashlib
+
     cfg = _require_config()
     db_path = cfg.fragments_db_path
     if not db_path.exists():
@@ -103,17 +106,33 @@ def get_spectrum() -> dict:
     fragments = store.get_all()
     store.close()
 
-    from percent.llm.client import LLMClient
-    client = LLMClient(
-        provider=cfg.llm_provider,
-        model=cfg.llm_model,
-        api_key=cfg.llm_api_key,
-    )
+    # Hash fragment contents to detect data changes
+    frag_hash = hashlib.sha256(
+        "".join(f"{f.source}:{f.content}" for f in fragments).encode()
+    ).hexdigest()[:16]
+
+    try:
+        cache_path = cfg.percent_dir / "spectrum_cache.json"
+    except TypeError:
+        cache_path = None
+
+    # Return cached result if data hasn't changed
+    if not regenerate and cache_path and cache_path.exists():
+        try:
+            cached = json_mod.loads(cache_path.read_text(encoding="utf-8"))
+            if cached.get("_hash") == frag_hash:
+                cached.pop("_hash", None)
+                return cached
+        except (json_mod.JSONDecodeError, KeyError, TypeError):
+            pass
+
+    from percent.config import make_llm_client
+    client = make_llm_client(cfg)
     prompts_dir = Path(__file__).parent / "prompts"
 
     card = generate_card_data(fragments, client, prompts_dir)
 
-    return {
+    result = {
         "eligible": card.spectrum.eligible,
         "reason": card.spectrum.ineligible_reason,
         "dimensions": card.spectrum.dimensions,
@@ -122,6 +141,19 @@ def get_spectrum() -> dict:
         "description": card.description,
         "insights": card.insights,
     }
+
+    # Persist to disk with hash
+    if cache_path:
+        try:
+            cache_data = {**result, "_hash": frag_hash}
+            cfg.percent_dir.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(
+                json_mod.dumps(cache_data, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        except (TypeError, OSError):
+            pass
+
+    return result
 
 
 @app.get("/api/fragments/{source}")
@@ -327,14 +359,10 @@ def _run_analysis(chunks: list) -> dict:
     """Run personality analysis on chunks and reinitialize chat engine."""
     cfg = _require_config()
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=cfg.llm_provider,
-        model=cfg.llm_model,
-        api_key=cfg.llm_api_key,
-    )
+    client = make_llm_client(cfg)
     engine = PersonaEngine(
         client=client,
         percent_dir=cfg.percent_dir,

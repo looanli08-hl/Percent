@@ -130,14 +130,10 @@ def import_run(
     if not config.llm_api_key:
         console.print("[yellow]Warning: no API key configured. Run 'percent init' first.[/yellow]")
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -181,14 +177,10 @@ def import_bilibili_auto(
 
     console.print(f"[cyan]Fetched {len(chunks)} videos. Running personality analysis...[/cyan]")
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -270,14 +262,10 @@ def import_wechat_auto(
         " Running personality analysis...[/cyan]"
     )
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -339,14 +327,10 @@ def import_telegram_auto(
     total_msgs = sum(len(c.content.split("\n")) for c in chunks)
     console.print(f"[cyan]Fetched ~{total_msgs} messages. Running personality analysis...[/cyan]")
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -392,14 +376,10 @@ def import_youtube_auto(
 
     console.print(f"[cyan]Fetched {len(chunks)} videos. Running personality analysis...[/cyan]")
 
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -504,7 +484,7 @@ def persona_stats() -> None:
 def persona_rebuild() -> None:
     """Rebuild core.md from all stored fragments."""
     from percent.config import load_config
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
     config = load_config()
@@ -516,11 +496,7 @@ def persona_rebuild() -> None:
     if not config.llm_api_key:
         console.print("[yellow]Warning: no API key configured. Run 'percent init' first.[/yellow]")
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -541,7 +517,7 @@ def persona_rebuild() -> None:
 def persona_deep_analyze() -> None:
     """Run cross-validation + deep analysis to improve personality model."""
     from percent.config import load_config
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.engine import PersonaEngine
 
     config = load_config()
@@ -553,11 +529,7 @@ def persona_deep_analyze() -> None:
     if not config.llm_api_key:
         console.print("[yellow]Warning: no API key configured. Run 'percent init' first.[/yellow]")
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     engine = PersonaEngine(
         client=client,
         percent_dir=config.percent_dir,
@@ -589,7 +561,7 @@ def persona_deep_analyze() -> None:
 def persona_big_five() -> None:
     """Compute Big Five personality scores from your profile."""
     from percent.config import load_config
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.big_five import compute_big_five, save_big_five
 
     config = load_config()
@@ -603,11 +575,7 @@ def persona_big_five() -> None:
 
     core_md = config.core_path.read_text(encoding="utf-8")
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
 
     with console.status("[bold]Computing Big Five personality scores…[/bold]"):
         result = compute_big_five(client, core_md, prompts_dir=_PROMPTS_DIR)
@@ -629,7 +597,7 @@ def persona_validate(
 ) -> None:
     """Run PersonaBench — reproducible personality model evaluation against raw data."""
     from percent.config import load_config
-    from percent.llm.client import LLMClient
+    from percent.config import make_llm_client
     from percent.persona.bench import PersonaBench
     from percent.persona.validator import PersonaValidator
 
@@ -679,11 +647,7 @@ def persona_validate(
     random.seed(42)  # Fixed seed for reproducibility
     random.shuffle(test_chunks)
 
-    client = LLMClient(
-        provider=config.llm_provider,
-        model=config.llm_model,
-        api_key=config.llm_api_key,
-    )
+    client = make_llm_client(config)
     validator = PersonaValidator(client, prompts_dir=_PROMPTS_DIR)
     bench = PersonaBench(
         validator,

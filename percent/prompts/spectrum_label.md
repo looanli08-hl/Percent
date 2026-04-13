@@ -6,22 +6,31 @@ You are analyzing a person's digital personality based on real behavioral data e
 ## Statistical Metrics
 {metrics}
 
+## Rule-based Dimension Scores (already computed from raw data)
+{rule_dimensions}
+
+These scores were computed statistically from actual behavioral data (message timestamps, word frequency, emoji usage, etc.). They are authoritative for the dimensions they cover. Do NOT re-score these dimensions.
+
+## Dimensions Still Needing Scores
+{missing_dimensions}
+
+Only score the dimensions listed above. For dimensions already scored by rules, leave them as-is.
+
 ## Your Task
 
-Based on ALL fragments above, do two things:
+### 1. Score ONLY the missing dimensions (0-100)
 
-### 1. Score these 8 dimensions (0-100)
+Score based on EVIDENCE in the fragments, not assumptions. Only provide scores for dimensions not already computed by rules.
 
-Read every fragment carefully. Score based on EVIDENCE in the fragments, not assumptions.
-
-- **夜行性** (Night Owl): Do fragments mention late-night activity, staying up late, or nocturnal habits? 0=daytime person, 100=extreme night owl
-- **回复惯性** (Reply Inertia): Do fragments suggest slow/lazy replying, ignoring messages, or being hard to reach? 0=always responsive, 100=chronic non-replier
-- **表达锋利度** (Expression Sharpness): Is their communication style direct, blunt, unfiltered? Or hedging, vague, diplomatic? 0=very indirect, 100=brutally direct
-- **社交温差** (Social Temperature Gap): Do they have deep few relationships vs broad shallow ones? 0=social butterfly, 100=only a few close friends
-- **情绪外显度** (Emotional Visibility): Do fragments show emoji use, exclamations, emotional outbursts, or expressive language? 0=stoic, 100=very expressive
-- **内容杂食度** (Content Omnivore): How diverse are their interests? Few focused topics or many varied ones? 0=single-focus, 100=interests everywhere
-- **品味独占欲** (Taste Exclusivity): Are their preferences niche/unique or mainstream? 0=follows trends, 100=very niche taste
-- **跨平台反差** (Cross-platform Contrast): Do they behave differently across platforms? 0=consistent everywhere, 100=completely different person on each platform
+Dimension definitions for reference:
+- **夜行性** (Night Owl): 0=daytime person, 100=extreme night owl
+- **回复惯性** (Reply Inertia): 0=always responsive, 100=chronic non-replier
+- **表达锋利度** (Expression Sharpness): 0=very indirect, 100=brutally direct
+- **社交温差** (Social Temperature Gap): 0=social butterfly, 100=only a few close friends
+- **情绪外显度** (Emotional Visibility): 0=stoic, 100=very expressive
+- **内容杂食度** (Content Omnivore): 0=single-focus, 100=interests everywhere
+- **品味独占欲** (Taste Exclusivity): 0=follows trends, 100=very niche taste
+- **跨平台反差** (Cross-platform Contrast): 0=consistent everywhere, 100=completely different person on each platform
 
 ### 2. Generate card content
 
@@ -35,14 +44,6 @@ Respond in valid JSON only:
 ```json
 {{
   "dimensions": {{
-    "夜行性": 0,
-    "回复惯性": 0,
-    "表达锋利度": 0,
-    "社交温差": 0,
-    "情绪外显度": 0,
-    "内容杂食度": 0,
-    "品味独占欲": 0,
-    "跨平台反差": 0
   }},
   "label": "...",
   "description": "...",

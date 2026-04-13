@@ -346,8 +346,16 @@ def generate_card_data(
     if not spectrum.eligible:
         return card
 
-    # Prepare prompt inputs — give LLM ALL fragments for accurate scoring
+    # Prepare prompt inputs
     metrics_text = "\n".join(f"- {k}: {v}" for k, v in spectrum.metrics.items())
+
+    # Tell LLM which dimensions already have rule-based scores
+    rule_dims = spectrum.dimensions
+    rule_dims_text = "\n".join(f"- {k}: {v}" for k, v in rule_dims.items())
+
+    # All 8 dimension names — LLM should fill in any missing ones
+    all_dims = ["夜行性", "回复惯性", "表达锋利度", "社交温差", "情绪外显度", "内容杂食度", "品味独占欲", "跨平台反差"]
+    missing_dims = [d for d in all_dims if d not in rule_dims]
 
     # Include all fragments grouped by source for context
     by_source: dict[str, list[str]] = {}
@@ -370,6 +378,8 @@ def generate_card_data(
     prompt = template.format(
         metrics=metrics_text,
         fragments=frag_text,
+        rule_dimensions=rule_dims_text,
+        missing_dimensions=", ".join(missing_dims) if missing_dims else "（无，全部已有规则分数）",
     )
 
     # Call LLM
@@ -386,11 +396,11 @@ def generate_card_data(
             json_str = raw.split("```")[1].split("```")[0]
         data = json_mod.loads(json_str.strip())
 
-        # LLM-scored dimensions override statistical ones
+        # LLM only fills dimensions that rules couldn't compute
         llm_dims = data.get("dimensions", {})
         if llm_dims:
             for k, v in llm_dims.items():
-                if isinstance(v, (int, float)):
+                if k in missing_dims and isinstance(v, (int, float)):
                     spectrum.dimensions[k] = max(0, min(100, int(v)))
 
         card.label = data.get("label", "")
