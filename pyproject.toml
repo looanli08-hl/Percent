@@ -1,5 +1,5 @@
 [project]
-name = "percent"
+name = "percent-ai"
 version = "0.2.0"
 description = "Open-source personality modeling engine"
 readme = "README.md"
