@@ -58,16 +58,25 @@ class FragmentStore:
     def _hash_content(content: str, source: str) -> str:
         return hashlib.sha256(f"{source}:{content}".encode()).hexdigest()
 
+    # Semantic similarity threshold — fragments above this are considered duplicates
+    DEDUP_SIMILARITY_THRESHOLD = 0.85
+
     def add(self, fragment: Fragment) -> Fragment:
         content_hash = self._hash_content(fragment.content, fragment.source)
 
-        # Skip if duplicate content from same source already exists
+        # Skip if exact duplicate content from same source already exists
         existing = self._conn.execute(
             "SELECT id FROM fragments WHERE content_hash = ?", (content_hash,)
         ).fetchone()
         if existing:
             fragment.id = existing[0]
             return fragment
+
+        # Semantic dedup: check if a similar fragment from the same source exists
+        if fragment.embedding:
+            merged = self._try_merge_similar(fragment)
+            if merged:
+                return merged
 
         cursor = self._conn.execute(
             "INSERT INTO fragments (category, content, confidence,"
@@ -87,6 +96,59 @@ class FragmentStore:
         self._conn.commit()
         fragment.id = cursor.lastrowid
         return fragment
+
+    def _try_merge_similar(self, fragment: Fragment) -> Fragment | None:
+        """If a semantically similar fragment from the same source exists, keep the better one."""
+        rows = self._conn.execute(
+            "SELECT * FROM fragments WHERE source = ?", (fragment.source,)
+        ).fetchall()
+
+        if not rows:
+            return None
+
+        new_vec = np.array(fragment.embedding)
+        norm_new = np.linalg.norm(new_vec)
+        if norm_new == 0:
+            return None
+
+        for row in rows:
+            existing_emb = np.array(json.loads(row["embedding"]))
+            if len(existing_emb) != len(new_vec):
+                continue
+            norm_existing = np.linalg.norm(existing_emb)
+            if norm_existing == 0:
+                continue
+            similarity = float(np.dot(new_vec, existing_emb) / (norm_new * norm_existing))
+
+            if similarity >= self.DEDUP_SIMILARITY_THRESHOLD:
+                # Keep the one with more content (more specific), break ties by confidence
+                existing_frag = self._row_to_fragment(row)
+                if len(fragment.content) > len(existing_frag.content) or (
+                    len(fragment.content) == len(existing_frag.content)
+                    and fragment.confidence > existing_frag.confidence
+                ):
+                    # New one is better — replace existing
+                    new_hash = self._hash_content(fragment.content, fragment.source)
+                    self._conn.execute(
+                        "UPDATE fragments SET content = ?, confidence = ?, "
+                        "embedding = ?, content_hash = ?, evidence = ? WHERE id = ?",
+                        (
+                            fragment.content,
+                            fragment.confidence,
+                            json.dumps(fragment.embedding),
+                            new_hash,
+                            getattr(fragment, 'evidence', ''),
+                            row["id"],
+                        ),
+                    )
+                    self._conn.commit()
+                    fragment.id = row["id"]
+                else:
+                    # Existing one is better — skip new
+                    fragment.id = row["id"]
+                return fragment
+
+        return None
 
     def get(self, fragment_id: int) -> Fragment:
         row = self._conn.execute("SELECT * FROM fragments WHERE id = ?", (fragment_id,)).fetchone()
