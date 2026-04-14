@@ -84,14 +84,30 @@ class PersonaExtractor:
         self.batch_size = batch_size
         self._prompt_template = _load_prompt(prompts_dir)
 
+    # Max characters per batch — keeps each LLM call under context limits.
+    # ~50K chars ≈ ~100K tokens for Chinese, well under DeepSeek's 131K limit.
+    MAX_BATCH_CHARS = 50_000
+
     def extract(self, chunks: list[DataChunk]) -> list[Finding]:
-        """Process chunks in batches and return all findings."""
+        """Process chunks in token-aware batches and return all findings."""
         if not chunks:
             return []
 
         all_findings: list[Finding] = []
-        for i in range(0, len(chunks), self.batch_size):
-            batch = chunks[i : i + self.batch_size]
+        batch: list[DataChunk] = []
+        batch_chars = 0
+
+        for chunk in chunks:
+            chunk_chars = len(chunk.content)
+            if batch and (batch_chars + chunk_chars > self.MAX_BATCH_CHARS
+                          or len(batch) >= self.batch_size):
+                all_findings.extend(self._extract_batch(batch))
+                batch = []
+                batch_chars = 0
+            batch.append(chunk)
+            batch_chars += chunk_chars
+
+        if batch:
             all_findings.extend(self._extract_batch(batch))
         return all_findings
 

@@ -31,7 +31,7 @@ class PersonaEngine:
         percent_dir: Path,
         prompts_dir: Path | None = None,
         embedding_model: str = _DEFAULT_MODEL,
-        batch_size: int = 20,
+        batch_size: int = 10,
     ) -> None:
         self.client = client
         self.percent_dir = percent_dir
@@ -52,14 +52,89 @@ class PersonaEngine:
 
     # ── public API ──────────────────────────────────────────────────────────
 
+    # Chat sources where merging by talker makes sense
+    _CHAT_SOURCES = frozenset({"wechat", "telegram", "whatsapp"})
+
+    @staticmethod
+    def _prepare_chunks(
+        chunks: list[DataChunk],
+        slice_size: int = 3000,
+    ) -> list[DataChunk]:
+        """Prepare chunks for efficient LLM extraction.
+
+        - Chat sources: merge per-talker conversation windows into slices.
+          Long conversations are split into overlapping slices (not truncated).
+        - Non-chat sources (video, content): pass through unchanged.
+        """
+        chat_chunks = [c for c in chunks if c.source in PersonaEngine._CHAT_SOURCES]
+        other_chunks = [c for c in chunks if c.source not in PersonaEngine._CHAT_SOURCES]
+
+        # ── Merge chat chunks by talker ──
+        by_talker: dict[str, list[DataChunk]] = {}
+        for c in chat_chunks:
+            talker = c.metadata.get("talker", "unknown")
+            by_talker.setdefault(talker, []).append(c)
+
+        merged_chat: list[DataChunk] = []
+        for talker, talker_chunks in by_talker.items():
+            talker_chunks.sort(key=lambda c: c.timestamp)
+            all_content = "\n---\n".join(c.content for c in talker_chunks)
+            total_msgs = sum(c.metadata.get("message_count", 1) for c in talker_chunks)
+            base_meta = {
+                "talker": talker,
+                "message_count": total_msgs,
+                "merged_windows": len(talker_chunks),
+            }
+
+            # Split into slices if too long (no data dropped)
+            if len(all_content) <= slice_size:
+                merged_chat.append(DataChunk(
+                    source=talker_chunks[0].source,
+                    type=talker_chunks[0].type,
+                    timestamp=talker_chunks[0].timestamp,
+                    content=all_content,
+                    metadata=base_meta,
+                ))
+            else:
+                # Cut at "---" boundaries to avoid splitting mid-message
+                segments = all_content.split("\n---\n")
+                current_slice = ""
+                slice_idx = 0
+                for seg in segments:
+                    if current_slice and len(current_slice) + len(seg) + 5 > slice_size:
+                        merged_chat.append(DataChunk(
+                            source=talker_chunks[0].source,
+                            type=talker_chunks[0].type,
+                            timestamp=talker_chunks[0].timestamp,
+                            content=current_slice,
+                            metadata={**base_meta, "slice": slice_idx},
+                        ))
+                        slice_idx += 1
+                        current_slice = seg
+                    else:
+                        current_slice = f"{current_slice}\n---\n{seg}" if current_slice else seg
+                if current_slice:
+                    merged_chat.append(DataChunk(
+                        source=talker_chunks[0].source,
+                        type=talker_chunks[0].type,
+                        timestamp=talker_chunks[0].timestamp,
+                        content=current_slice,
+                        metadata={**base_meta, "slice": slice_idx},
+                    ))
+
+        # Combine: chat (sorted by richness) + other (unchanged)
+        merged_chat.sort(key=lambda c: len(c.content), reverse=True)
+        return merged_chat + other_chunks
+
     def run(self, chunks: list[DataChunk], validate: bool = True) -> str:
         """
         Full pipeline:
-          1. Extract findings from chunks
-          2. Embed each finding and store as a Fragment
-          3. Synthesize core.md from all stored fragments
-          4. Generate behavioral fingerprint
-          5. Optionally validate against the input chunks
+          1. Merge chunks per talker for efficiency
+          2. Extract findings from merged chunks
+          3. Embed each finding and store as a Fragment
+          4. Synthesize core.md from all stored fragments
+          5. Generate behavioral fingerprint (uses ALL original chunks)
+          6. Optionally validate against the input chunks
 
         Returns the core.md content as a string.
         """
@@ -67,8 +142,11 @@ class PersonaEngine:
         fragments_before = self._store.stats().get("total", 0)
         sources = list({c.source for c in chunks})
 
-        # 1. Extract
-        findings = self._extractor.extract(chunks)
+        # 1. Prepare chunks — merge chat by talker, keep content sources as-is
+        prepared = self._prepare_chunks(chunks)
+
+        # 2. Extract from prepared chunks
+        findings = self._extractor.extract(prepared)
 
         # 2. Embed + store (with evidence from LLM extraction)
         for finding in findings:

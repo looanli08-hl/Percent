@@ -319,12 +319,23 @@ class SpectrumEngine:
 
 
 @dataclass
+class FacetTag:
+    """A single generative label derived from behavioral analysis."""
+
+    title: str
+    gloss: str
+    facet: str
+    confidence: float = 0.0
+
+
+@dataclass
 class CardData:
     """Complete data needed to render a persona card."""
 
     spectrum: SpectrumResult
     label: str = ""
     description: str = ""
+    facet_tags: list[FacetTag] = field(default_factory=list)
     insights: list[str] = field(default_factory=list)
 
 
@@ -403,12 +414,77 @@ def generate_card_data(
                 if k in missing_dims and isinstance(v, (int, float)):
                     spectrum.dimensions[k] = max(0, min(100, int(v)))
 
-        card.label = data.get("label", "")
-        card.description = data.get("description", "")
+        card.label = data.get("master_label", "") or data.get("label", "")
+        card.description = data.get("master_gloss", "") or data.get("description", "")
+
+        # Parse facet_tags (new generative label system)
+        raw_tags = data.get("facet_tags", [])
+        for tag in raw_tags[:8]:
+            if isinstance(tag, dict) and tag.get("title"):
+                card.facet_tags.append(FacetTag(
+                    title=tag.get("title", ""),
+                    gloss=tag.get("gloss", ""),
+                    facet=tag.get("facet", ""),
+                    confidence=float(tag.get("confidence", 0.0)),
+                ))
+
+        # Legacy fallback
         card.insights = data.get("insights", [])[:8]
     except (json_mod.JSONDecodeError, IndexError, KeyError):
         card.label = "数字旅人"
         card.description = "你的数据正在讲述你的故事"
+        card.facet_tags = []
         card.insights = []
 
     return card
+
+
+def generate_poster_data(
+    fragments: list[Fragment],
+    llm_client,
+    prompts_dir: Path | None = None,
+) -> dict:
+    """Generate rich poster data — 6 chapters with micro-observations."""
+    import json as json_mod
+
+    if prompts_dir is None:
+        prompts_dir = Path(__file__).parent.parent / "prompts"
+
+    template_path = prompts_dir / "poster_generate.md"
+    if not template_path.exists():
+        return {}
+
+    template = template_path.read_text(encoding="utf-8")
+
+    by_source: dict[str, list[str]] = {}
+    for f in fragments:
+        by_source.setdefault(f.source, []).append(f.content[:150])
+
+    frag_lines = []
+    for source, contents in by_source.items():
+        frag_lines.append(f"\n### {source} ({len(contents)} fragments)")
+        for c in contents[:50]:
+            frag_lines.append(f"- {c}")
+    frag_text = "\n".join(frag_lines)
+
+    metrics = {
+        "fragment_count": len(fragments),
+        "source_count": len(by_source),
+        "sources": list(by_source.keys()),
+    }
+    metrics_text = "\n".join(f"- {k}: {v}" for k, v in metrics.items())
+
+    prompt = template.format(fragments=frag_text, metrics=metrics_text)
+    raw = llm_client.complete(prompt)
+
+    try:
+        json_str = raw
+        if "```json" in raw:
+            json_str = raw.split("```json")[1].split("```")[0]
+        elif "```" in raw:
+            json_str = raw.split("```")[1].split("```")[0]
+        data = json_mod.loads(json_str.strip())
+        data["metrics"] = metrics
+        return data
+    except (json_mod.JSONDecodeError, IndexError, KeyError):
+        return {"error": "Failed to parse poster data"}

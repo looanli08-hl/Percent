@@ -1385,7 +1385,7 @@
 
     .card-scroll {
       flex: 1;
-      overflow-y: auto;
+      overflow: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1454,10 +1454,43 @@
       flex-shrink: 0;
     }
 
+    /* ── Facet Tags — primary content ── */
+    .card-facet-tags {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+
+    .card-facet-tag {
+      padding-left: 14px;
+      border-left: 2px solid rgba(196, 101, 74, 0.25);
+    }
+
+    .card-facet-title {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ece6dd;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
+
+    .card-facet-gloss {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px;
+      color: #7d756b;
+      margin-top: 4px;
+      line-height: 1.55;
+    }
+
     .card-chart-wrap {
       margin: 24px auto 0;
-      width: 310px;
-      height: 310px;
+      width: 220px;
+      height: 220px;
       flex-shrink: 0;
     }
 
@@ -1552,6 +1585,130 @@
       opacity: 0.5;
     }
 
+    /* ── Result Toggle ── */
+    .result-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      align-self: center;
+    }
+    .result-toggle-btn {
+      padding: 8px 24px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      background: transparent;
+      color: var(--text-dim);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .result-toggle-btn.active {
+      background: rgba(196, 101, 74, 0.1);
+      color: var(--text-primary);
+    }
+
+    /* ── POSTER — personality dossier ── */
+    .poster-canvas {
+      position: relative;
+      width: 1080px;
+      background: #131211;
+      border-radius: 16px;
+      padding: 48px 52px 48px;
+      display: flex;
+      flex-direction: column;
+      overflow: visible;
+    }
+    .poster-grain {
+      position: absolute; inset: 0; pointer-events: none; z-index: 1;
+      border-radius: 16px; overflow: hidden; opacity: 0.35; mix-blend-mode: multiply;
+    }
+    .poster-hero {
+      text-align: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(196,101,74,0.1);
+    }
+    .poster-brand {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 9px; color: #4a4540; letter-spacing: 0.18em; font-weight: 500;
+    }
+    .poster-label {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 3rem; color: #ece6dd; margin-top: 16px; line-height: 1.1; letter-spacing: -0.02em;
+    }
+    .poster-gloss {
+      font-family: 'Instrument Serif', Georgia, serif; font-style: italic;
+      font-size: 15px; color: #7d756b; margin-top: 8px; line-height: 1.5;
+    }
+    /* Chapters — 3x2 grid */
+    .poster-chapters {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px 36px;
+      margin-top: 32px;
+    }
+    .poster-chapter {
+      padding: 18px;
+      background: rgba(255,255,255,0.015);
+      border-radius: 10px;
+      border: 1px solid rgba(196,101,74,0.04);
+      border-left: 2px solid rgba(196,101,74,0.08);
+    }
+    .poster-chapter:nth-child(1),
+    .poster-chapter:nth-child(2) {
+      border-left: 2px solid rgba(196,101,74,0.25);
+      background: rgba(255,255,255,0.025);
+    }
+    .poster-chapter-title {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 11px; color: #c4654a; letter-spacing: 0.06em;
+      font-weight: 600; text-transform: uppercase;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .poster-chapter-items {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .poster-item {
+      padding-left: 10px;
+      border-left: 1.5px solid rgba(196,101,74,0.18);
+    }
+    .poster-item-label {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px; font-weight: 600; color: #ece6dd; line-height: 1.3;
+    }
+    .poster-item-obs {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 10.5px; color: #9a9189; margin-top: 2px; line-height: 1.5;
+    }
+    .poster-item-src {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 8.5px; color: #8a7d72; margin-top: 2px; letter-spacing: 0.03em;
+    }
+    /* Bottom */
+    .poster-bottom {
+      margin-top: 28px; padding-top: 16px;
+      border-top: 1px solid rgba(196,101,74,0.08);
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .poster-provenance {
+      font-family: 'DM Sans', system-ui, sans-serif; display: flex; gap: 28px;
+    }
+    .poster-provenance-item {}
+    .poster-provenance-number {
+      font-size: 22px; font-weight: 600; color: #c4654a;
+      font-family: 'Instrument Serif', Georgia, serif;
+    }
+    .poster-provenance-label {
+      font-size: 8px; color: #4a4540; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px;
+    }
+    .poster-sig {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 10px; color: #3d3935; letter-spacing: 0.08em; font-weight: 500;
+    }
+
     /* ── Insight Picker (outside card, not exported) ── */
     .insight-edit-btn {
       margin-top: 12px;
@@ -1574,8 +1731,8 @@
     .insight-picker {
       margin-top: 16px;
       padding: 20px 24px;
-      background: rgba(19, 18, 17, 0.6);
-      border: 1px solid rgba(196, 101, 74, 0.08);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
       width: 380px;
       align-self: center;
@@ -1617,7 +1774,7 @@
     .insight-picker-item label {
       font-family: 'DM Sans', system-ui, sans-serif;
       font-size: 12.5px;
-      color: #7d756b;
+      color: var(--text-secondary);
       line-height: 1.6;
       cursor: pointer;
     }
@@ -2031,9 +2188,9 @@
       <div class="card-label" id="cardLabel"></div>
       <div class="card-description" id="cardDescription"></div>
       <div class="card-divider"></div>
-      <div class="card-chart-wrap">
-        <svg id="stellarChart" viewBox="0 0 400 400" width="100%" height="100%"></svg>
-      </div>
+      <!-- Facet tags — primary content -->
+      <div class="card-facet-tags" id="cardFacetTags"></div>
+      <!-- Legacy insights fallback (when no facet_tags) -->
       <div class="card-insights" id="cardInsights"></div>
       <div class="card-footer-separator"></div>
       <div class="card-footer" id="cardFooter"></div>
@@ -2049,7 +2206,40 @@
     <div class="insight-picker view-hidden" id="insightPicker"></div>
 
     <!-- Export button -->
+    <!-- View toggle: card / poster -->
+    <div class="result-toggle view-hidden" id="resultToggle">
+      <button class="result-toggle-btn active" id="toggleCard" onclick="switchResultView('card')">卡片</button>
+      <button class="result-toggle-btn" id="togglePoster" onclick="switchResultView('poster')">海报</button>
+    </div>
+
     <button class="card-export-btn view-hidden" id="cardExportBtn" onclick="exportCard()">保存为图片 ↓</button>
+
+    <!-- ═══ POSTER — full personality dossier ═══ -->
+    <div class="poster-canvas view-hidden" id="posterCanvas">
+      <div class="poster-grain"></div>
+
+      <!-- Hero bar -->
+      <div class="poster-hero" id="posterHero">
+        <div class="poster-brand">% PERCENT · 人格档案</div>
+        <div class="poster-label" id="posterLabel"></div>
+        <div class="poster-gloss" id="posterGloss"></div>
+      </div>
+
+      <!-- 6 chapters in 3x2 grid -->
+      <div class="poster-chapters" id="posterChapters"></div>
+
+      <!-- Bottom provenance -->
+      <div class="poster-bottom">
+        <div class="poster-provenance" id="posterProvenance"></div>
+        <div class="poster-sig">percent.dev</div>
+      </div>
+    </div>
+
+    <button class="card-export-btn view-hidden" id="posterExportBtn" onclick="exportPoster()">保存海报 ↓</button>
+
+    <!-- Edit tags button -->
+    <button class="insight-edit-btn view-hidden" id="insightEditBtn" onclick="toggleInsightPicker()">编辑标签</button>
+    <div class="insight-picker view-hidden" id="insightPicker"></div>
 
     <!-- Fallback when ineligible -->
     <div class="card-fallback view-hidden" id="cardFallback">
@@ -2189,13 +2379,14 @@
     wechat: {
       name: 'WeChat',
       steps: [
-        'Download <a href="https://github.com/hicccc77/WeFlow/releases" target="_blank" rel="noopener">WeFlow</a> — supports macOS (.dmg) and Windows (.exe)',
-        'Open WeFlow while WeChat is running → select chats → export as CSV',
-        'Drag the exported CSV file here',
+        '退出微信，在终端运行：<code>sudo codesign --force --deep --sign - /Applications/WeChat.app</code>',
+        '重新打开微信并登录',
+        '下载 <a href="https://github.com/ylytdeng/wechat-decrypt" target="_blank" rel="noopener">wechat-decrypt</a>，编译并运行 <code>sudo ./find_all_keys_macos</code> 获取密钥',
+        '用密钥解密数据库，导出 CSV 后拖到下方',
       ],
-      dropLabel: 'Drop exported <strong>CSV</strong> file here, or click to browse',
+      dropLabel: '拖入导出的 <strong>CSV</strong> 文件，或点击选择',
       dropAccept: '.csv,.json,.db',
-      hint: 'Accepts: CSV (MemoTrace/WeFlow), JSON, or .db files',
+      hint: '支持: CSV (WeFlow/MemoTrace), JSON, 或 .db 文件',
     },
     bilibili: {
       name: 'Bilibili',
@@ -3167,38 +3358,57 @@
     svgEl.innerHTML = svg;
   }
 
-  // ── Insight selection state ──
+  // ── Tag / insight selection state ──
+  let _allFacetTags = [];
   let _allInsights = [];
   let _selectedIndices = [];
 
   function _loadSavedSelection(total) {
     try {
-      const saved = JSON.parse(localStorage.getItem('percent_insight_selection') || 'null');
-      if (saved && Array.isArray(saved) && saved.every(i => i >= 0 && i < total)) return saved;
+      const saved = JSON.parse(localStorage.getItem('percent_tag_selection') || 'null');
+      if (saved && Array.isArray(saved) && saved.length > 0 && saved.every(i => i >= 0 && i < total)) return saved;
     } catch {}
-    // Default: first 5 (or all if fewer)
-    return Array.from({length: Math.min(5, total)}, (_, i) => i);
+    return Array.from({length: total}, (_, i) => i);
   }
 
   function _saveSelection(indices) {
-    localStorage.setItem('percent_insight_selection', JSON.stringify(indices));
+    localStorage.setItem('percent_tag_selection', JSON.stringify(indices));
   }
 
-  function renderSelectedInsights() {
+  function renderFacetTags() {
+    const tagsEl = document.getElementById('cardFacetTags');
     const insightsEl = document.getElementById('cardInsights');
-    insightsEl.innerHTML = _selectedIndices
-      .map(i => _allInsights[i])
-      .filter(Boolean)
-      .map(text => `<div class="card-insight-item">${escHtml(text)}</div>`)
-      .join('');
+
+    if (_allFacetTags.length > 0) {
+      tagsEl.innerHTML = _selectedIndices
+        .map(i => _allFacetTags[i])
+        .filter(Boolean)
+        .map(tag => `<div class="card-facet-tag">
+          <div class="card-facet-title">${escHtml(tag.title)}</div>
+          <div class="card-facet-gloss">${escHtml(tag.gloss)}</div>
+        </div>`)
+        .join('');
+      tagsEl.style.display = '';
+      insightsEl.style.display = 'none';
+    } else if (_allInsights.length > 0) {
+      tagsEl.style.display = 'none';
+      insightsEl.style.display = '';
+      insightsEl.innerHTML = _selectedIndices
+        .map(i => _allInsights[i])
+        .filter(Boolean)
+        .map(text => `<div class="card-insight-item">${escHtml(text)}</div>`)
+        .join('');
+    }
   }
+
+  function renderSelectedInsights() { renderFacetTags(); }
 
   function toggleInsightPicker() {
     const picker = document.getElementById('insightPicker');
     const btn = document.getElementById('insightEditBtn');
     if (!picker.classList.contains('view-hidden')) {
       picker.classList.add('view-hidden');
-      btn.textContent = '编辑洞察';
+      btn.textContent = '编辑标签';
       return;
     }
     btn.textContent = '收起';
@@ -3209,35 +3419,51 @@
   function _renderPicker() {
     const picker = document.getElementById('insightPicker');
     const count = _selectedIndices.length;
-    const atMax = count >= 5;
-    const atMin = count <= 3;
+    const maxItems = _allFacetTags.length > 0 ? 6 : 5;
+    const atMax = count >= maxItems;
 
-    picker.innerHTML = `
-      <div class="insight-picker-title">选择 3-5 条洞察显示在卡片上</div>
-      ${_allInsights.map((text, i) => {
-        const checked = _selectedIndices.includes(i);
-        const disabled = !checked && atMax;
-        return `<div class="insight-picker-item${disabled ? ' disabled' : ''}" onclick="toggleInsight(${i})">
-          <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} tabindex="-1">
-          <label>${escHtml(text)}</label>
-        </div>`;
-      }).join('')}
-      <div class="insight-picker-hint">${count}/5 已选${atMax ? '（已达上限）' : ''}</div>
-    `;
+    if (_allFacetTags.length > 0) {
+      picker.innerHTML = `
+        <div class="insight-picker-title">选择显示在卡片上的标签（3-${maxItems}）</div>
+        ${_allFacetTags.map((tag, i) => {
+          const checked = _selectedIndices.includes(i);
+          const disabled = !checked && atMax;
+          return `<div class="insight-picker-item${disabled ? ' disabled' : ''}" onclick="toggleInsight(${i})">
+            <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} tabindex="-1">
+            <label><strong>${escHtml(tag.title)}</strong> — ${escHtml(tag.gloss)}</label>
+          </div>`;
+        }).join('')}
+        <div class="insight-picker-hint">${count}/${maxItems} 已选${atMax ? '（已达上限）' : ''}</div>
+      `;
+    } else {
+      picker.innerHTML = `
+        <div class="insight-picker-title">选择 3-5 条洞察显示在卡片上</div>
+        ${_allInsights.map((text, i) => {
+          const checked = _selectedIndices.includes(i);
+          const disabled = !checked && atMax;
+          return `<div class="insight-picker-item${disabled ? ' disabled' : ''}" onclick="toggleInsight(${i})">
+            <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} tabindex="-1">
+            <label>${escHtml(text)}</label>
+          </div>`;
+        }).join('')}
+        <div class="insight-picker-hint">${count}/5 已选${atMax ? '（已达上限）' : ''}</div>
+      `;
+    }
   }
 
   function toggleInsight(index) {
+    const maxItems = _allFacetTags.length > 0 ? 6 : 5;
     const pos = _selectedIndices.indexOf(index);
     if (pos >= 0) {
-      if (_selectedIndices.length <= 3) return; // min 3
+      if (_selectedIndices.length <= 3) return;
       _selectedIndices.splice(pos, 1);
     } else {
-      if (_selectedIndices.length >= 5) return; // max 5
+      if (_selectedIndices.length >= maxItems) return;
       _selectedIndices.push(index);
       _selectedIndices.sort((a, b) => a - b);
     }
     _saveSelection(_selectedIndices);
-    renderSelectedInsights();
+    renderFacetTags();
     _renderPicker();
   }
 
@@ -3280,16 +3506,27 @@
       document.getElementById('cardLabel').innerHTML = `<span class="card-label-mark">「</span>${escHtml(data.label)}<span class="card-label-mark">」</span>`;
       document.getElementById('cardDescription').textContent = data.description;
 
-      renderStellarChart(document.getElementById('stellarChart'), data.dimensions);
+      // Stellar chart — only render if element exists (removed from card when facet_tags present)
+      const chartEl = document.getElementById('stellarChart');
+      if (chartEl) renderStellarChart(chartEl, data.dimensions);
 
-      // Insight selection
+      // Facet tags (new) or insights (legacy)
+      _allFacetTags = data.facet_tags || [];
       _allInsights = data.insights || [];
-      _selectedIndices = _loadSavedSelection(_allInsights.length);
-      renderSelectedInsights();
+      const totalItems = _allFacetTags.length > 0 ? _allFacetTags.length : _allInsights.length;
+      _selectedIndices = _loadSavedSelection(totalItems);
+      renderFacetTags();
 
       const m = data.metrics || {};
       document.getElementById('cardFooter').textContent =
         `${m.source_count || 0} sources · ${m.fragment_count || 0} fragments · ${m.data_span_days || 0} days`;
+
+      // Also load poster data (async, separate API call)
+      renderPoster();
+
+      // Show toggle
+      document.getElementById('resultToggle').classList.remove('view-hidden');
+      document.getElementById('posterExportBtn').classList.add('view-hidden');
 
     } catch (e) {
       console.error('Failed to load card:', e);
@@ -3320,6 +3557,100 @@
       alert('导出失败，请重试');
     } finally {
       btn.textContent = '保存为图片 ↓';
+      btn.disabled = false;
+    }
+  }
+
+  // ── Poster ──
+  let _posterData = null;
+
+  async function renderPoster() {
+    try {
+      const resp = await fetch('/api/poster');
+      const data = await resp.json();
+      _posterData = data;
+
+      if (data.error) return;
+
+      document.getElementById('posterLabel').textContent = data.master_label || '';
+      document.getElementById('posterGloss').textContent = data.master_gloss || '';
+
+      // Render chapters
+      const chaptersEl = document.getElementById('posterChapters');
+      const chapters = data.chapters || [];
+      chaptersEl.innerHTML = chapters.map(ch => `
+        <div class="poster-chapter">
+          <div class="poster-chapter-title">${escHtml(ch.title)}</div>
+          <div class="poster-chapter-items">
+            ${(ch.items || []).map(item => `
+              <div class="poster-item">
+                <div class="poster-item-label">${escHtml(item.label)}</div>
+                <div class="poster-item-obs">${escHtml(item.observation)}</div>
+                <div class="poster-item-src">${escHtml(item.source_hint || '')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      // Provenance
+      const m = data.metrics || {};
+      document.getElementById('posterProvenance').innerHTML = `
+        <div class="poster-provenance-item">
+          <div class="poster-provenance-number">${m.fragment_count || 0}</div>
+          <div class="poster-provenance-label">behavioral fragments</div>
+        </div>
+        <div class="poster-provenance-item">
+          <div class="poster-provenance-number">${m.source_count || 0}</div>
+          <div class="poster-provenance-label">data sources</div>
+        </div>
+      `;
+    } catch (e) {
+      console.error('Poster load failed:', e);
+    }
+  }
+
+  function switchResultView(view) {
+    const card = document.getElementById('cardCanvas');
+    const poster = document.getElementById('posterCanvas');
+    const cardBtn = document.getElementById('cardExportBtn');
+    const posterBtn = document.getElementById('posterExportBtn');
+    const toggleCard = document.getElementById('toggleCard');
+    const togglePoster = document.getElementById('togglePoster');
+
+    if (view === 'poster') {
+      card.classList.add('view-hidden');
+      cardBtn.classList.add('view-hidden');
+      poster.classList.remove('view-hidden');
+      posterBtn.classList.remove('view-hidden');
+      toggleCard.classList.remove('active');
+      togglePoster.classList.add('active');
+    } else {
+      card.classList.remove('view-hidden');
+      cardBtn.classList.remove('view-hidden');
+      poster.classList.add('view-hidden');
+      posterBtn.classList.add('view-hidden');
+      toggleCard.classList.add('active');
+      togglePoster.classList.remove('active');
+    }
+  }
+
+  async function exportPoster() {
+    const el = document.getElementById('posterCanvas');
+    const btn = document.getElementById('posterExportBtn');
+    btn.textContent = '正在生成...';
+    btn.disabled = true;
+    try {
+      await document.fonts.ready;
+      const dataUrl = await window.domToPng(el, { scale: 3, quality: 1.0, backgroundColor: '#131211' });
+      const link = document.createElement('a');
+      link.download = 'percent-poster.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      alert('导出失败，请重试');
+    } finally {
+      btn.textContent = '保存海报 ↓';
       btn.disabled = false;
     }
   }

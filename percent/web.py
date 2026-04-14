@@ -139,10 +139,64 @@ def get_spectrum(regenerate: bool = False) -> dict:
         "metrics": card.spectrum.metrics,
         "label": card.label,
         "description": card.description,
+        "facet_tags": [
+            {"title": t.title, "gloss": t.gloss, "facet": t.facet, "confidence": t.confidence}
+            for t in card.facet_tags
+        ],
         "insights": card.insights,
     }
 
     # Persist to disk with hash
+    if cache_path:
+        try:
+            cache_data = {**result, "_hash": frag_hash}
+            cfg.percent_dir.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(
+                json_mod.dumps(cache_data, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+        except (TypeError, OSError):
+            pass
+
+    return result
+
+
+@app.get("/api/poster")
+def get_poster(regenerate: bool = False) -> dict:
+    """Return rich poster data — 6 chapters with micro-observations."""
+    import json as json_mod
+    import hashlib
+
+    cfg = _require_config()
+    db_path = cfg.fragments_db_path
+    if not db_path.exists():
+        return {"error": "No data"}
+
+    store = FragmentStore(db_path)
+    fragments = store.get_all()
+    store.close()
+
+    frag_hash = hashlib.sha256(
+        "".join(f"{f.source}:{f.content}" for f in fragments).encode()
+    ).hexdigest()[:16]
+
+    cache_path = cfg.percent_dir / "poster_cache.json"
+
+    if not regenerate and cache_path and cache_path.exists():
+        try:
+            cached = json_mod.loads(cache_path.read_text(encoding="utf-8"))
+            if cached.get("_hash") == frag_hash:
+                cached.pop("_hash", None)
+                return cached
+        except (json_mod.JSONDecodeError, KeyError, TypeError):
+            pass
+
+    from percent.config import make_llm_client
+    from percent.persona.spectrum import generate_poster_data
+    client = make_llm_client(cfg)
+    prompts_dir = Path(__file__).parent / "prompts"
+
+    result = generate_poster_data(fragments, client, prompts_dir)
+
     if cache_path:
         try:
             cache_data = {**result, "_hash": frag_hash}
